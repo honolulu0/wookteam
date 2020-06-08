@@ -12,12 +12,12 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('users')->delete();
-        
+
         \DB::table('users')->insert(array (
-            0 => 
+            0 =>
             array (
                 'id' => 1,
                 'identity' => '',
@@ -28,8 +28,6 @@ class UsersTableSeeder extends Seeder
                 'profession' => '技术部',
                 'encrypt' => 'OHsJ88',
                 'userpass' => '3dd0e69a6da5b87a9de356cc8f22a1e3',
-                'wsid' => 9,
-                'wsdate' => 1591348505,
                 'bgid' => 1,
                 'loginnum' => 353,
                 'lastip' => '127.0.0.1',
@@ -40,7 +38,7 @@ class UsersTableSeeder extends Seeder
                 'regdate' => 1589072625,
                 'setting' => NULL,
             ),
-            1 => 
+            1 =>
             array (
                 'id' => 2,
                 'identity' => '',
@@ -51,8 +49,6 @@ class UsersTableSeeder extends Seeder
                 'profession' => '技术部',
                 'encrypt' => 'AA1lsv',
                 'userpass' => '80c515b27ae42470a7c90e59586caaab',
-                'wsid' => 0,
-                'wsdate' => 1591343157,
                 'bgid' => 1,
                 'loginnum' => 345,
                 'lastip' => '127.0.0.1',
@@ -64,7 +60,7 @@ class UsersTableSeeder extends Seeder
                 'setting' => NULL,
             ),
         ));
-        
-        
+
+
     }
 }

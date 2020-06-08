@@ -24,8 +24,6 @@ class CreatePreUsersTable extends Migration
 			$table->string('profession')->nullable()->default('')->comment('职称/职位');
 			$table->string('encrypt', 50)->nullable()->default('');
 			$table->string('userpass', 50)->nullable()->default('')->comment('登录密码');
-			$table->integer('wsid')->nullable()->default(0)->index('IDEX_wsid')->comment('websocket');
-			$table->bigInteger('wsdate')->nullable()->default(0)->index('IDEX_wsdate')->comment('websocket最后刷新时间');
 			$table->integer('bgid')->nullable()->default(0)->comment('背景ID');
 			$table->integer('loginnum')->nullable()->default(0)->comment('累计登陆次数');
 			$table->string('lastip', 20)->nullable()->default('')->comment('最后登录IP');
