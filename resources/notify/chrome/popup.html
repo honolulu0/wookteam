@@ -1,0 +1,82 @@
+﻿<html>
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 380px;
+            border: 0;
+        }
+
+        ul,li {
+            list-style: none;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .message_loading {
+            padding: 6px;
+            font-size: 14px;
+        }
+
+        .message_box {
+            margin: 6px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            color: #ffffff;
+            background-color: #000000;
+            position: relative;
+        }
+        .message_username {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .message_host {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 2px;
+            cursor: pointer;
+        }
+        .message_unread {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            height: 18px;
+            line-height: 18px;
+            color: #ffffff;
+            background-color: #ff0000;
+            text-align: center;
+            border-radius: 10px;
+            padding: 1px 6px;
+            font-size: 12px;
+            transform: scale(0.9);
+            z-index: 1;
+            cursor: pointer;
+        }
+        .message_delete {
+            position: absolute;
+            bottom: 6px;
+            right: 12px;
+            color: #cacaca;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="message_div">
+    <div class="message_loading">Loading...</div>
+</div>
+<script src="js/jquery-3.1.1.min.js"></script>
+<script src="js/base.js"></script>
+<script src="js/popup.js"></script>
+</body>
+</html>
