@@ -73,3 +73,5 @@ const app = new Vue({
 
 $A.app = app;
 
+window.localStorage.setItem("__::WookTeam:check", "success")
+

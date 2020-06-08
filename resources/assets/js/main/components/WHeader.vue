@@ -28,7 +28,7 @@
                 </Dropdown>
                 <div class="right-info" @click="chatDrawerShow=true">
                     <Icon class="right-mticon" type="md-notifications" size="24"/>
-                    <em v-if="chatUnreadTotal > 0" class="right-info-num">{{chatUnreadTotal}}</em>
+                    <em v-if="chatUnreadTotal > 0" class="right-info-num">{{chatUnreadTotal > 99 ? '99+' : chatUnreadTotal}}</em>
                 </div>
                 <Dropdown class="right-info" trigger="click" @on-click="setLanguage" transfer>
                     <div>
@@ -228,7 +228,7 @@
                     .right-info-num {
                         position: absolute;
                         top: 2px;
-                        right: -20%;
+                        left: 12px;
                         height: auto;
                         line-height: normal;
                         color: #ffffff;
@@ -238,6 +238,7 @@
                         padding: 1px 5px;
                         font-size: 12px;
                         transform: scale(0.9);
+                        z-index: 1;
                     }
                 }
             }
@@ -378,12 +379,19 @@
             resCall();
             //
             this.tabActive = this.$route.meta.tabActive;
+            //
+            if ($A.hashParameter("open") === 'chat' && $A.getToken() !== false) {
+                this.chatDrawerShow = true;
+            }
         },
         watch: {
             '$route' () {
                 this.tabActive = this.$route.meta.tabActive;
                 this.systemDrawerShow = false;
                 this.userDrawerShow = false;
+                if ($A.hashParameter("open") === 'chat' && $A.getToken() !== false) {
+                    this.chatDrawerShow = true;
+                }
             }
         },
         methods: {

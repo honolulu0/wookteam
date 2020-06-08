@@ -15,14 +15,18 @@ class Chat
      * 打开对话（创建对话）
      * @param string $username      发送者用户名
      * @param string $receive       接受者用户名
+     * @param bool $forceRefresh    是否强制刷新缓存
      * @return mixed
      */
-    public static function openDialog($username, $receive)
+    public static function openDialog($username, $receive, $forceRefresh = false)
     {
         if (!$username || !$receive) {
             return Base::retError('参数错误！');
         }
         $cacheKey = $username . "@" . $receive;
+        if ($forceRefresh === true) {
+            Cache::forget($cacheKey);
+        }
         $result = Cache::remember($cacheKey, now()->addMinutes(10), function() use ($receive, $username) {
             $row = Base::DBC2A(DB::table('chat_dialog')->where([
                 'user1' => $username,
@@ -125,12 +129,15 @@ class Chat
                 $lastText = '[未知类型]';
                 break;
         }
+        $field = ($dialog['recField'] == 1 ? 'unread1' : 'unread2');
+        $unread = intval(DB::table('chat_dialog')->where('id', $dialog['id'])->value($field));
         if ($lastText) {
             $upArray = [];
             if ($username != $receive) {
                 $upArray = Base::DBUP([
-                    ($dialog['recField'] == 1 ? 'unread1' : 'unread2') => 1,
+                    $field => 1,
                 ]);
+                $unread += 1;
             }
             $upArray['lasttext'] = $lastText;
             $upArray['lastdate'] = $indate;
@@ -147,7 +154,51 @@ class Chat
         }
         $inArray['id'] = DB::table('chat_msg')->insertGetId($inArray);
         $inArray['message'] = $message;
+        $inArray['unread'] = $unread;
         //
         return Base::retSuccess('success', $inArray);
+    }
+
+    /**
+     * 格式化信息（来自接收）
+     * @param $data
+     * @return array
+     */
+    public static function formatMsgReceive($data) {
+        return self::formatMsgData(Base::json2array($data));
+    }
+
+    /**
+     * 格式化信息（用于发送）
+     * @param $array
+     * @return string
+     */
+    public static function formatMsgSend($array) {
+        return Base::array2json(self::formatMsgData($array));
+    }
+
+    /**
+     * 格式化信息
+     * @param array $array
+     * @return array
+     */
+    public static function formatMsgData($array = []) {
+        if (!is_array($array)) {
+            $array = [];
+        }
+        //messageType来自客户端（前端->后端）：refresh/unread/read/roger/user/team
+        //messageType来自服务端（后端->前端）：error/open/kick/user/back/unread
+        if (!isset($array['messageType'])) $array['messageType'] = '';  //消息类型
+        if (!isset($array['messageId'])) $array['messageId'] = '';      //消息ID（用于back给客户端）
+        if (!isset($array['contentId'])) $array['contentId'] = 0;       //消息数据ID（用于roger给服务端）
+        if (!isset($array['channel'])) $array['channel'] = '';          //渠道（用于多端登录）
+        if (!isset($array['username'])) $array['username'] = '';        //发送者
+        if (!isset($array['target'])) $array['target'] = null;          //接受者
+        if (!isset($array['body'])) $array['body'] = [];                //正文内容
+        if (!isset($array['time'])) $array['time'] = time();            //时间
+        //
+        $array['contentId'] = intval($array['contentId']);
+        if (!is_array($array['body']) || empty($array['body'])) $array['body'] = ['_' => time()];
+        return $array;
     }
 }

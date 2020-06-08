@@ -48,9 +48,6 @@
             username() {
                 this.getUserData(0, 300);
             },
-            nickname(val) {
-                this.$emit("on-result", val);
-            }
         },
         methods: {
             popperShow() {
@@ -76,6 +73,7 @@
                 if (localData[this.username].success === true) {
                     this.nickname = localData[this.username].data.nickname;
                     this.profession = localData[this.username].data.profession;
+                    this.$emit("on-result", localData[this.username].data);
                     if (localData[this.username].update + cacheTime > Math.round(new Date().getTime() / 1000)) {
                         return;
                     }
@@ -108,6 +106,7 @@
                             localData[this.username].update = 0;
                             localData[this.username].data = {};
                         }
+                        this.$emit("on-result", localData[this.username].data);
                         window.localStorage[keyName] = $A.jsonStringify(localData);
                         window.__userViewNetworking = false;
                     }

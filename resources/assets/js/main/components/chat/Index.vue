@@ -8,7 +8,7 @@
             </li>
             <li :class="{active:chatTap=='dialog'}" @click="chatTap='dialog'">
                 <Icon type="md-text" />
-                <em v-if="unreadTotal > 0" class="chat-num">{{unreadTotal}}</em>
+                <em v-if="unreadTotal > 0" class="chat-num">{{unreadTotal > 99 ? '99+' : unreadTotal}}</em>
             </li>
             <li :class="{active:chatTap=='team'}" @click="chatTap='team'">
                 <Icon type="md-person" />
@@ -29,7 +29,7 @@
                         <img :src="dialog.userimg">
                         <div class="user-msg-box">
                             <div class="user-msg-title">
-                                <span><user-view :username="dialog.username" placement="right" @on-result="(n)=>{dialog['nickname']=n}"/></span>
+                                <span><user-view :username="dialog.username" placement="right" @on-result="userViewResult(dialog, $event)"/></span>
                                 <em>{{formatCDate(dialog.lastdate)}}</em>
                             </div>
                             <div class="user-msg-text">{{dialog.lasttext}}</div>
@@ -54,7 +54,7 @@
                         <ul>
                             <li v-for="(item, index) in teamListsS(lists)" :key="index" @click="openDialog(item, true)">
                                 <img :src="item.userimg">
-                                <div class="team-username"><user-view :username="item.username" placement="right" @on-result="(n)=>{item['nickname']=n}"/></div>
+                                <div class="team-username"><user-view :username="item.username" placement="right" @on-result="userViewResult(item, $event)"/></div>
                             </li>
                         </ul>
                     </li>
@@ -657,7 +657,7 @@
                 if ($A.getToken() === false) {
                     return;
                 }
-                $A.WS.sendTo('unread', (res) => {
+                $A.WSOB.sendTo('unread', (res) => {
                     if (res.status === 1) {
                         this.unreadTotal = $A.runNum(res.message);
                     } else {
@@ -675,77 +675,76 @@
             }, false);
             resCall();
             //
-            $A.WS.setOnMsgListener("chat/index", (msgDetail) => {
-                if (msgDetail.sender == $A.getUserName()) {
+            $A.WSOB.setOnMsgListener("chat/index", (msgDetail) => {
+                if (msgDetail.username == $A.getUserName()) {
                     return;
                 }
-                if (msgDetail.messageType == 'open') {
-                    if (this.openWindow) {
-                        this.getDialogLists();
-                        this.getDialogMessage();
-                    } else {
-                        this.openAlready = false;
-                        this.dialogTarget = {};
-                    }
-                    return;
-                }
-                if (msgDetail.messageType != 'send') {
-                    return;
-                }
-                //
-                let content = $A.jsonParse(msgDetail.content);
-                if (['taskA'].indexOf(content.type) !== -1) {
-                    return;
-                }
-                let lasttext = $A.WS.getMsgDesc(content);
-                let plusUnread = msgDetail.sender != this.dialogTarget.username || !this.openWindow;
-                this.addDialog({
-                    username: content.username,
-                    userimg: content.userimg,
-                    lasttext: lasttext,
-                    lastdate: content.indate
-                }, plusUnread && content.resend !== 1);
-                if (msgDetail.sender == this.dialogTarget.username) {
-                    this.addMessageData(content, true);
-                }
-                if (!plusUnread) {
-                    $A.WS.sendTo('read', content.username);
-                }
-                if (!this.openWindow) {
-                    this.$Notice.close('chat-notice');
-                    this.$Notice.open({
-                        name: 'chat-notice',
-                        duration: 0,
-                        render: h => {
-                            return h('div', {
-                                class: 'chat-notice-box',
-                                on: {
-                                    click: () => {
-                                        this.$Notice.close('chat-notice');
-                                        this.$emit("on-open-notice", content.username);
-                                        this.clickDialog(content.username);
-                                    }
-                                }
-                            }, [
-                                h('img', { class: 'chat-notice-userimg', attrs: { src: content.userimg } }),
-                                h('div', { class: 'ivu-notice-with-desc' }, [
-                                    h('div', { class: 'ivu-notice-title' }, [
-                                        h('UserView', { props: { username: content.username } })
-                                    ]),
-                                    h('div', { class: 'ivu-notice-desc' }, lasttext)
-                                ])
-                            ])
+                switch (msgDetail.messageType) {
+                    case 'open':
+                        if (this.openWindow) {
+                            this.getDialogLists();
+                            this.getDialogMessage();
+                        } else {
+                            this.openAlready = false;
+                            this.dialogTarget = {};
                         }
-                    });
+                        break;
+                    case 'user':
+                        let body = msgDetail.body;
+                        if (['taskA'].indexOf(body.type) !== -1) {
+                            return;
+                        }
+                        let lasttext = $A.WSOB.getMsgDesc(body);
+                        this.unreadTotal += 1;
+                        this.addDialog({
+                            username: body.username,
+                            userimg: body.userimg,
+                            lasttext: lasttext,
+                            lastdate: body.indate,
+                            unread: body.unread
+                        });
+                        if (msgDetail.username == this.dialogTarget.username) {
+                            this.addMessageData(body, true);
+                        }
+                        if (!this.openWindow) {
+                            this.$Notice.close('chat-notice');
+                            this.$Notice.open({
+                                name: 'chat-notice',
+                                duration: 0,
+                                render: h => {
+                                    return h('div', {
+                                        class: 'chat-notice-box',
+                                        on: {
+                                            click: () => {
+                                                this.$Notice.close('chat-notice');
+                                                this.$emit("on-open-notice", body.username);
+                                                this.clickDialog(body.username);
+                                            }
+                                        }
+                                    }, [
+                                        h('img', {class: 'chat-notice-userimg', attrs: {src: body.userimg}}),
+                                        h('div', {class: 'ivu-notice-with-desc'}, [
+                                            h('div', {class: 'ivu-notice-title'}, [
+                                                h('UserView', {props: {username: body.username}})
+                                            ]),
+                                            h('div', {class: 'ivu-notice-desc'}, lasttext)
+                                        ])
+                                    ])
+                                }
+                            });
+                        }
+                        break;
                 }
             });
-            $A.WS.setOnSpecialListener("chat/index", (content) => {
+            $A.WSOB.setOnSpecialListener("chat/index", (simpleMsg) => {
                 this.addDialog({
-                    username: content.username,
-                    userimg: content.userimg,
-                    lasttext: $A.WS.getMsgDesc(content),
-                    lastdate: content.indate
+                    username: simpleMsg.target,
+                    lasttext: $A.WSOB.getMsgDesc(simpleMsg.body),
+                    lastdate: simpleMsg.body.indate
                 });
+                if (simpleMsg.target == this.dialogTarget.username) {
+                    this.addMessageData(simpleMsg.body, true);
+                }
             });
         },
 
@@ -764,7 +763,7 @@
 
             openWindow(val) {
                 if (val) {
-                    $A.WS.connection();
+                    $A.WSOB.connection();
                     if (!this.openAlready) {
                         this.openAlready = true;
                         this.getDialogLists();
@@ -978,20 +977,21 @@
                 });
             },
 
-            addDialog(data, plusUnread = false) {
+            addDialog(data) {
                 if (!data.username) {
                     return;
                 }
                 let lists = this.dialogLists.filter((item) => {return item.username == data.username});
+                let unread = 0;
                 if (lists.length > 0) {
-                    data.unread = $A.runNum(lists[0].unread);
+                    if (typeof data.userimg === "undefined") {
+                        data.userimg = lists[0].userimg;
+                    }
+                    unread = $A.runNum(lists[0].unread);
                     this.dialogLists = this.dialogLists.filter((item) => {return item.username != data.username});
-                } else {
-                    data.unread = 0;
                 }
-                if (plusUnread) {
-                    data.unread += 1;
-                    this.unreadTotal += 1;
+                if (typeof data.unread === "undefined") {
+                    data.unread = unread;
                 }
                 this.dialogLists.unshift(data);
             },
@@ -1008,7 +1008,7 @@
                 if (typeof user.unread === "number" && user.unread > 0) {
                     this.unreadTotal -= user.unread;
                     this.$set(user, 'unread', 0);
-                    $A.WS.sendTo('read', user.username);
+                    $A.WSOB.sendTo('read', user.username);
                 }
             },
 
@@ -1114,7 +1114,7 @@
                             indate: Math.round(new Date().getTime() / 1000),
                             url: item.url
                         };
-                        $A.WS.sendTo('user', this.dialogTarget.username, data, (res) => {
+                        $A.WSOB.sendTo('user', this.dialogTarget.username, data, (res) => {
                             this.$set(data, res.status === 1 ? 'id' : 'error', res.message)
                         });
                         //
@@ -1174,7 +1174,7 @@
                         indate: Math.round(new Date().getTime() / 1000),
                         text: text
                     };
-                    $A.WS.sendTo('user', this.dialogTarget.username, data, (res) => {
+                    $A.WSOB.sendTo('user', this.dialogTarget.username, data, (res) => {
                         this.$set(data, res.status === 1 ? 'id' : 'error', res.message)
                     });
                     //
@@ -1188,6 +1188,11 @@
                 this.$nextTick(() => {
                     this.messageText = "";
                 });
+            },
+
+            userViewResult(user, data) {
+                this.$set(user, 'nickname', data.nickname);
+                this.$set(user, 'userimg', data.userimg);
             },
         }
     }

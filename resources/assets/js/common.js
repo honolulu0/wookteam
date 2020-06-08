@@ -519,12 +519,15 @@
          * @returns {*}
          */
         jsonParse(str, defaultVal) {
-            if (str !== null && typeof str === "object") {
+            if (str === null) {
+                return defaultVal ? defaultVal : {};
+            }
+            if (typeof str === "object") {
                 return str;
             }
-            try{
+            try {
                 return JSON.parse(str);
-            }catch (e) {
+            } catch (e) {
                 return defaultVal ? defaultVal : {};
             }
         },
@@ -713,6 +716,58 @@
                 }
             }
             return params;
+        },
+
+        /**
+         * 删除地址中的参数
+         * @param url
+         * @param parameter
+         * @returns {string|*}
+         */
+        removeURLParameter(url, parameter) {
+            if (parameter instanceof Array) {
+                parameter.forEach((key) => {
+                    url = $A.removeURLParameter(url, key)
+                });
+                return url;
+            }
+            var urlparts = url.split('?');
+            if (urlparts.length >= 2) {
+                //参数名前缀
+                var prefix = encodeURIComponent(parameter) + '=';
+                var pars = urlparts[1].split(/[&;]/g);
+
+                //循环查找匹配参数
+                for (var i = pars.length; i-- > 0;) {
+                    if (pars[i].lastIndexOf(prefix, 0) !== -1) {
+                        //存在则删除
+                        pars.splice(i, 1);
+                    }
+                }
+
+                return urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : '');
+            }
+            return url;
+        },
+
+        /**
+         * 连接加上参数
+         * @param url
+         * @param params
+         * @returns {*}
+         */
+        urlAddParams(url, params) {
+            if (typeof params === "object" && params !== null) {
+                url+= "";
+                url+= url.indexOf("?") === -1 ? '?' : '';
+                for (var key in params) {
+                    if (!params.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    url+= '&' + key + '=' + params[key];
+                }
+            }
+            return url.replace("?&", "?");
         },
 
         /**

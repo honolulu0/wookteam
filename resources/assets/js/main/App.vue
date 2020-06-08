@@ -21,6 +21,16 @@
             }
         },
         mounted() {
+            let token = $A.hashParameter("token");
+            if ($A.count(token) > 10) {
+                $.setToken(token);
+                $A.getUserInfo(true);
+                let path = $A.removeURLParameter(window.location.href,'token');
+                if ($A.strExists(path, "#")) {
+                    this.goForward({path: $A.getMiddle(path, '#')}, true);
+                }
+            }
+            //
             this.sessionStorage('/', 1);
             //
             let hash = window.location.hash;
@@ -149,47 +159,52 @@
                 });
             },
 
-            handleWebSocket(force) {
+            handleWebSocket() {
                 if ($A.getToken() === false) {
-                    $A.WS.close();
+                    $A.WSOB.close();
                 } else {
-                    $A.WS.setOnMsgListener("app", (msgDetail) => {
-                        if (msgDetail.sender == $A.getUserName()) {
+                    $A.WSOB.setOnMsgListener("app", (msgDetail) => {
+                        if (msgDetail.username == $A.getUserName()) {
                             return;
                         }
-                        if (msgDetail.messageType == 'forced') {
-                            $A.token("");
-                            $A.storage("userInfo", {});
-                            $A.triggerUserInfoListener({});
-                            //
-                            let content = $A.jsonParse(msgDetail.content)
-                            let id = 'inip_' + Math.round(Math.random() * 10000);
-                            let ip = content.ip;
-                            let ip2 = ip.substring(0, ip.lastIndexOf('.')) + '.*';
-                            this.$Modal.warning({
-                                title: this.$L("系统提示"),
-                                content: this.$L('您的帐号在其他地方（%）登录，您被迫退出，如果这不是您本人的操作，请注意帐号安全！', '<span id="' + id + '">' + ip2 + '</span>'),
-                                onOk: () => {
-                                    this.goForward({path: '/'}, true);
+                        switch (msgDetail.messageType) {
+                            case 'open':
+                                window.localStorage.setItem("__::WookTeam:config", $A.jsonStringify(msgDetail.config));
+                                break;
+                            case 'close':
+                                window.localStorage.setItem("__::WookTeam:config", $A.jsonStringify({}));
+                                break;
+                            case 'user':
+                                if (msgDetail.body.type == 'taskA') {
+                                    $A.triggerTaskInfoListener(msgDetail.body.act, msgDetail.body.taskDetail, false);
                                 }
-                            });
-                            this.$nextTick(() => {
-                                $A.getIpInfo(ip, (res) => {
-                                    if (res.ret === 1) {
-                                        $A("span#" + id).text(res.data.textSmall);
-                                        $A("span#" + id).attr("title", ip2);
+                                break;
+                            case 'kick':
+                                $A.token("");
+                                $A.storage("userInfo", {});
+                                $A.triggerUserInfoListener({});
+                                //
+                                let id = 'inip_' + Math.round(Math.random() * 10000);
+                                let ip = msgDetail.body.ip;
+                                let ip2 = ip.substring(0, ip.lastIndexOf('.')) + '.*';
+                                this.$Modal.warning({
+                                    title: this.$L("系统提示"),
+                                    content: this.$L('您的帐号在其他地方（%）登录，您被迫退出，如果这不是您本人的操作，请注意帐号安全！', '<span id="' + id + '">' + ip2 + '</span>'),
+                                    onOk: () => {
+                                        this.goForward({path: '/'}, true);
                                     }
                                 });
-                            });
-                            return;
-                        } else if (msgDetail.messageType != 'send') {
-                            return;
+                                this.$nextTick(() => {
+                                    $A.getIpInfo(ip, (res) => {
+                                        if (res.ret === 1) {
+                                            $A("span#" + id).text(res.data.textSmall);
+                                            $A("span#" + id).attr("title", ip2);
+                                        }
+                                    });
+                                });
+                                break;
                         }
-                        let content = $A.jsonParse(msgDetail.content)
-                        if (content.type == 'taskA') {
-                            $A.triggerTaskInfoListener(content.act, content.taskDetail, false);
-                        }
-                    }).connection(force);
+                    });
                 }
             }
         }
