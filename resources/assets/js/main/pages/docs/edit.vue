@@ -168,13 +168,13 @@
 <script>
     import Vue from 'vue'
     import minder from '../../components/docs/minder'
-    import TEditor from "../../components/TEditor";
-    import Sheet from "../../components/docs/sheet/index";
-    import Flow from "../../components/docs/flow/index";
-    import NestedDraggable from "../../components/docs/NestedDraggable";
-    import WDrawer from "../../components/iview/WDrawer";
-
     Vue.use(minder)
+
+    const TEditor = resolve => require(['../../components/TEditor'], resolve);
+    const Sheet = resolve => require(['../../components/docs/sheet/index'], resolve);
+    const Flow = resolve => require(['../../components/docs/flow/index'], resolve);
+    const NestedDraggable = resolve => require(['../../components/docs/NestedDraggable'], resolve);
+    const WDrawer = resolve => require(['../../components/iview/WDrawer'], resolve);
 
     export default {
         components: {WDrawer, Flow, Sheet, TEditor, NestedDraggable},

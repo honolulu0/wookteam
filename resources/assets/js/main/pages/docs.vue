@@ -108,6 +108,8 @@
                 height: 100%;
                 min-height: 500px;
                 .docs-menu {
+                    display: flex;
+                    flex-direction: column;
                     width: 230px;
                     border-radius: 3px 0 0 3px;
                     background: rgba(255, 255, 255, 0.8);
@@ -118,6 +120,8 @@
                         color: #333333;
                     }
                     ul {
+                        flex: 1;
+                        overflow: auto;
                         li {
                             padding: 12px;
                             cursor: pointer;

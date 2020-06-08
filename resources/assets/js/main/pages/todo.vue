@@ -43,7 +43,6 @@
                             </div>
                             <div class="todo-card-content">
                                 <draggable
-                                    v-if="taskDatas[index].lists.length > 0"
                                     v-model="taskDatas[index].lists"
                                     class="content-ul"
                                     group="task"
@@ -61,7 +60,7 @@
                                     </div>
                                     <div v-if="taskDatas[index].hasMorePages === true" class="content-li more" @click="getTaskLists(index, true)">{{$L('加载更多')}}</div>
                                 </draggable>
-                                <div v-else-if="taskDatas[index].loadIng == 0" class="content-empty">{{$L('恭喜你！已完成了所有待办')}}</div>
+                                <div v-if="taskDatas[index].lists.length === 0 && taskDatas[index].loadIng == 0" class="content-empty">{{$L('恭喜你！已完成了所有待办')}}</div>
                                 <div v-if="taskDatas[index].loadIng > 0" class="content-loading"><w-loading></w-loading></div>
                             </div>
                         </div>
@@ -227,6 +226,7 @@
                             .content-ul {
                                 display: flex;
                                 flex-direction: column;
+                                min-height: 20px;
                                 .content-li {
                                     display: flex;
                                     flex-direction: row;
@@ -279,7 +279,7 @@
                                 margin-bottom: 8px;
                             }
                             .content-empty {
-                                margin: 20px auto;
+                                margin: 6px auto;
                                 text-align: center;
                                 color: #666;
                             }
