@@ -106,7 +106,7 @@
                     <project-archived :canload="projectSettingDrawerShow && projectSettingDrawerTab == 'archived'" :projectid="projectid"></project-archived>
                 </TabPane>
                 <TabPane :label="$L('项目统计')" name="statistics">
-                    <project-statistics :canload="projectSettingDrawerShow && projectSettingDrawerTab == 'statistics'" :projectid="projectid"></project-statistics>
+                    <project-statistics ref="statistics" :canload="projectSettingDrawerShow && projectSettingDrawerTab == 'statistics'" :projectid="projectid"></project-statistics>
                 </TabPane>
                 <TabPane :label="$L('成员管理')" name="member">
                     <project-users :canload="projectSettingDrawerShow && projectSettingDrawerTab == 'member'" :projectid="projectid"></project-users>
@@ -403,7 +403,14 @@
         activated() {
             this.projectid = this.$route.params.projectid;
             if (typeof this.$route.params.other === "object") {
-                this.$set(this.projectDetail, 'title', $A.getObject(this.$route.params.other, 'title'))
+                this.$set(this.projectDetail, 'title', $A.getObject(this.$route.params.other, 'title'));
+            }
+            if (this.$route.params.statistics === '已完成') {
+                this.projectSettingDrawerTab = 'statistics';
+                this.projectSettingDrawerShow = true;
+                this.$nextTick(() => {
+                    this.$refs.statistics.setTaskType('已完成');
+                });
             }
         },
         deactivated() {

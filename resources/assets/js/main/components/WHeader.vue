@@ -272,11 +272,11 @@
     }
 </style>
 <script>
-    const ImgUpload = resolve => require(['./ImgUpload'], resolve);
-    const HeaderCreate = resolve => require(['./project/header/create'], resolve);
-    const HeaderArchived = resolve => require(['./project/header/archived'], resolve);
-    const ChatIndex = resolve => require(['./chat/Index'], resolve);
-    const WDrawer = resolve => require(['./iview/WDrawer'], resolve);
+    import ImgUpload from "./ImgUpload";
+    import HeaderCreate from "./project/header/create";
+    import HeaderArchived from "./project/header/archived";
+    import ChatIndex from "./chat/Index";
+    import WDrawer from "./iview/WDrawer";
 
     export default {
         name: 'WHeader',

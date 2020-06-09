@@ -46,7 +46,7 @@
                             </div>
                         </div>
                         <div class="project-num" @click="handleProject('open', item)">
-                            <div class="project-complete"><em>{{item.complete}}</em>{{$L('已完成数')}}</div>
+                            <div class="project-complete" @click.stop="openComplete(item)"><em>{{item.complete}}</em>{{$L('已完成数')}}</div>
                             <div class="project-num-line"></div>
                             <div class="project-unfinished"><em>{{item.unfinished}}</em>{{$L('未完成数')}}</div>
                         </div>
@@ -484,6 +484,14 @@
                         });
                     }
                 });
+            },
+
+            openComplete(item) {
+                if (item.complete > 0) {
+                    this.openProject(item.id, item, '已完成')
+                } else {
+                    this.handleProject('open', item);
+                }
             },
 
             handleProject(event, item) {

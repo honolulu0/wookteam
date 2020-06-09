@@ -19,25 +19,27 @@ function onDelete(index) {
 
 function showLists(lists) {
     var html = '';
-    console.log(lists);
+    var j = 1;
+    var length = Object.keys(lists).length;
     for (var index in lists) {
         if (!lists.hasOwnProperty(index)) {
             continue;
         }
         const item = lists[index];
-        html+= '<li class="message_box" data-index="' + index + '" data-token="' + item.token + '">';
+        html+= '<li class="message_box' + (j == length ? ' last' : '') + '" data-index="' + index + '" data-token="' + item.token + '">';
         html+= '<div class="message_username">' + item.username + '</div>';
         html+= '<div class="message_host">' + index + '</div>';
-        html+= '<div class="message_unread">未读: ' + item.unread + '</div>';
+        html+= '<div class="message_unread' + (item.unread == 0 ? ' zero' : '') + '">未读: ' + item.unread + '</div>';
         html+= '<div class="message_delete">删除</div>';
         html+= '</li>';
+        j++;
     }
     if (!html) {
         html+= '<li class="message_box">';
         html+= '<div class="message_loading">没有相关的记录！</div>';
         html+= '</li>';
     }
-    $("#message_div").html('<ul>' + html + '</ul>');
+    $("#message_div").html('<ul class="message_lists">' + html + '</ul>');
     $("div.message_delete").click(function(){
         if (confirm("确定要删除此记录吗？")) {
             onDelete($(this).parents("li").attr("data-index"));

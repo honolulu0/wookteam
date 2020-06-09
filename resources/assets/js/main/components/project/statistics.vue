@@ -292,6 +292,10 @@
         },
 
         methods: {
+            setTaskType(type) {
+                this.taskType = type;
+            },
+
             setPage(page) {
                 this.listPage = page;
                 this.getLists();

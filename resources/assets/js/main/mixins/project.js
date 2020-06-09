@@ -1,7 +1,7 @@
 export default {
     methods: {
-        openProject(projectid, otherParam) {
-            this.goForward({name: 'project-panel', params: {projectid:projectid, other:otherParam||{}}});
+        openProject(projectid, otherParam, statistics = '') {
+            this.goForward({name: 'project-panel', params: {projectid:projectid, statistics: statistics, other:otherParam||{}}});
         },
 
         outProject(projectid, successCallback) {

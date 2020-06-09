@@ -1,6 +1,7 @@
 <template>
     <div class="flow-content">
         <iframe ref="myFlow" class="flow-iframe" :src="url"></iframe>
+        <div v-if="loadIng" class="flow-loading"><w-loading></w-loading></div>
     </div>
 </template>
 
@@ -25,6 +26,12 @@
             outline: 0;
             padding: 0;
         }
+        .flow-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
     }
 </style>
 <script>
@@ -38,6 +45,8 @@
         },
         data() {
             return {
+                loadIng: true,
+
                 flow: null,
                 url: window.location.origin + '/js/grapheditor/index.html',
             }
@@ -56,6 +65,7 @@
                 const data = event.data;
                 switch (data.act) {
                     case 'ready':
+                        this.loadIng = false;
                         this.flow.postMessage({
                             act: 'setXml',
                             params: {

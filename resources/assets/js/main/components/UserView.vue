@@ -55,9 +55,19 @@
             },
 
             getUserData(num, cacheTime) {
-                let keyName = '__name:' + this.username.substring(0, 1) + '__';
+                let keyName = '__userName:' + this.username.substring(0, 1) + '__';
                 let localData = $A.jsonParse(window.localStorage[keyName]);
+                //
                 if (window.__userViewNetworking === true) {
+                    if (num == 0) {
+                        if (typeof localData[this.username] !== "object") {
+                            localData[this.username] = {};
+                        }
+                        if (localData[this.username].success === true) {
+                            this.nickname = localData[this.username].data.nickname;
+                            this.profession = localData[this.username].data.profession;
+                        }
+                    }
                     if (num < 100) {
                         setTimeout(() => {
                             this.getUserData(num + 1, cacheTime)
@@ -69,7 +79,6 @@
                 if (typeof localData[this.username] !== "object") {
                     localData[this.username] = {};
                 }
-                //
                 if (localData[this.username].success === true) {
                     this.nickname = localData[this.username].data.nickname;
                     this.profession = localData[this.username].data.profession;
