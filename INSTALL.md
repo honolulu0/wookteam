@@ -66,7 +66,7 @@ LARAVELS_PROXY_URL=
 ./cmd supervisorctl restart all
 ```
 
-到此安装完毕，项目地址为：***`http://IP:APP_PORT`***。
+到此安装完毕，项目地址为：**`http://IP:APP_PORT`**。
 
 #### 停止服务
 
