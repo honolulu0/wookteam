@@ -2,11 +2,83 @@
 
 **[中文文档](./INSTALL.md)**
 
-## Setup
+## Setup (using Docker)
+
+> `Docker` & `Docker Compose` must be installed
+
+#### 1. Clone the repository
+
+```bash
+// using ssh
+$ git clone git@github.com:kuaifan/wookteam.git
+// or you can use https
+$ git clone https://github.com/kuaifan/wookteam.git
+
+// copy .env
+$ cp .env.example .env
+```
+
+#### 2. Modify`.env`
+
+`APP_PORT`= (whatever port you want to run the app)
+
+`DB_HOST`= (Value should be`mariadb`)
+
+`DB_DATABASE`= (Add value as you wish)
+
+`DB_USERNAME`= (Add value as you wish)
+
+`DB_PASSWORD`= (Add value as you wish)
+
+`DB_ROOT_PASSWORD`= (Add value as you wish)
+
+> example：
+
+```env
+APP_PORT=80
+......
+DB_CONNECTION=mysql
+DB_HOST=mariadb
+DB_PORT=3306
+DB_DATABASE=wookteam
+DB_USERNAME=wookteam
+DB_PASSWORD=123456
+DB_ROOT_PASSWORD=123456
+......
+LARAVELS_LISTEN_IP=0.0.0.0
+LARAVELS_LISTEN_PORT=5200
+LARAVELS_PROXY_URL=
+```
+
+#### 3. Build image & install
+
+```bash
+./cmd build php
+./cmd composer install
+./cmd up -d
+./cmd art key:generate
+./cmd art migrate --seed
+./cmd npm install
+./cmd npm run prod
+```
+
+#### To stop the app server
+
+```bash
+./cmd stop
+```
+
+> P.S: Once application is setup, whenever you want to start the server (if it is stopped) run below command
+
+```bash
+./cmd start
+```
+
+## Setup (if you're not using docker)
 
 > Fork the repo if you are outside collaborator https://github.com/kuaifan/wookteam.
 
-#### Clone the project to your local or server
+#### 1. Clone the project to your local or server
 
 ```bash
 // using ssh
@@ -22,7 +94,7 @@ $ git remote add origin git@github.com:kuaifan/wookteam.git
 $ cp .env.example .env
 ```
 
-#### Modify`.env`
+#### 2. Modify`.env`
 
 > Database、WebSocket
 
@@ -41,7 +113,7 @@ LARAVELS_LISTEN_PORT=5200
 LARAVELS_PROXY_URL=ws://wookteam.com/ws
 ```
 
-#### Setup application
+#### 3. Setup application
 
 ```bash
 $ git checkout master # use dev branch for local development
@@ -55,7 +127,7 @@ $ npm install
 $ npm run production
 ```
 
-#### Run Laravels (WebSocket)
+#### 4. Run Laravels (WebSocket)
 
 > Please confirm your environment and installation[Swoole](https://www.swoole.com/)。
 
@@ -78,7 +150,7 @@ redirect_stderr=true
 stdout_logfile=/var/log/supervisor/%(program_name)s.log
 ```
 
-## Deployment To Nginx
+## 5. Deployment To Nginx
 
 ```nginx
 map $http_upgrade $connection_upgrade {
@@ -141,7 +213,7 @@ server {
 }
 ```
 
-#### Account
+## Account
 
 - admin/123456
 - system/123456

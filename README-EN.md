@@ -9,7 +9,8 @@
 ## Website
 
 - [https://www.wookteam.com](https://www.wookteam.com)
-- [Install](./INSTALL-EN.md)
+- [Install(using Docker)](./INSTALL-EN.md#Setup-using-Docker)
+- [Install(not Docker)](./INSTALL-EN.md#Setup-if-youre-not-using-docker))
 
 ## Demo
 

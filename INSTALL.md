@@ -2,11 +2,11 @@
 
 **[English Documentation](./INSTALL-EN.md)**
 
-## 设置
+## 安装设置（使用Docker）
 
-> Fork the repo if you are outside collaborator https://github.com/kuaifan/wookteam.
+> 必须安装 `Docker` 和 `Docker Compose`
 
-#### 克隆项目到您的本地或服务器
+#### 1、克隆项目到您的本地或服务器
 
 ```bash
 // 使用ssh
@@ -14,15 +14,83 @@ $ git clone git@github.com:kuaifan/wookteam.git
 // 或者你也可以使用https
 $ git clone https://github.com/kuaifan/wookteam.git
 
-// 配置 remotes
-$ cd wookteam
-$ git remote add origin git@github.com:kuaifan/wookteam.git
+// 拷贝 .env
+$ cp .env.example .env
+```
+
+#### 2、修改`.env`
+
+`APP_PORT`= (你想要运行应用程序的任何端口)
+
+`DB_HOST`= (值应该是`mariadb`)
+
+`DB_DATABASE`= (设置你想要的数据库名称)
+
+`DB_USERNAME`= (设置你想要的数据库用户名)
+
+`DB_PASSWORD`= (设置你想要的数据库密码)
+
+`DB_ROOT_PASSWORD`= (设置你想要的数据库root密码)
+
+> 设置例子：
+
+```env
+APP_PORT=80
+......
+DB_CONNECTION=mysql
+DB_HOST=mariadb
+DB_PORT=3306
+DB_DATABASE=wookteam
+DB_USERNAME=wookteam
+DB_PASSWORD=123456
+DB_ROOT_PASSWORD=123456
+......
+LARAVELS_LISTEN_IP=0.0.0.0
+LARAVELS_LISTEN_PORT=5200
+LARAVELS_PROXY_URL=
+```
+
+#### 3、构建项目
+
+```bash
+./cmd build php
+./cmd composer install
+./cmd up -d
+./cmd art key:generate
+./cmd art migrate --seed
+./cmd npm install
+./cmd npm run prod
+```
+
+#### 停止服务
+
+```bash
+./cmd stop
+```
+
+> 一旦应用程序被设置，无论何时你想要启动服务器(如果它被停止)运行以下命令
+
+```bash
+./cmd start
+```
+
+## 安装设置（如果你没有使用docker）
+
+> Fork the repo if you are outside collaborator https://github.com/kuaifan/wookteam.
+
+#### 1、克隆项目到您的本地或服务器
+
+```bash
+// 使用ssh
+$ git clone git@github.com:kuaifan/wookteam.git
+// 或者你也可以使用https
+$ git clone https://github.com/kuaifan/wookteam.git
 
 // 拷贝 .env
 $ cp .env.example .env
 ```
 
-#### 修改`.env`
+#### 2、修改`.env`
 
 > 数据库信息、WebSocket
 
@@ -41,7 +109,7 @@ LARAVELS_LISTEN_PORT=5200
 LARAVELS_PROXY_URL=ws://wookteam.com/ws
 ```
 
-#### 设置项目
+#### 3、设置项目
 
 ```bash
 $ git checkout master # 如果使用dev分支进行本地开发
@@ -55,7 +123,7 @@ $ npm install
 $ npm run production
 ```
 
-#### 运行 Laravels (WebSocket)
+#### 4、运行 Laravels (WebSocket)
 
 > 请确认您的环境以及安装[Swoole](https://www.swoole.com/)。
 
@@ -78,7 +146,7 @@ redirect_stderr=true
 stdout_logfile=/var/log/supervisor/%(program_name)s.log
 ```
 
-## 部署到Nginx
+## 5、部署到Nginx
 
 ```nginx
 map $http_upgrade $connection_upgrade {
@@ -141,7 +209,7 @@ server {
 }
 ```
 
-#### 默认账号
+## 默认账号
 
 - admin/123456
 - system/123456
