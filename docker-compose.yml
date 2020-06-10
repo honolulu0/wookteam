@@ -16,8 +16,6 @@ services:
 
   php:
     hostname: php
-    ports:
-      - "55200:5200"
     build:
       context: .
       dockerfile: docker/php.Dockerfile
