@@ -18,7 +18,7 @@ $ git clone https://github.com/kuaifan/wookteam.git
 $ cd wookteam
 
 // 拷贝 .env
-$ cp .env.example .env
+$ cp .env.docker .env
 ```
 
 #### 2、修改`.env`
