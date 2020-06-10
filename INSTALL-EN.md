@@ -14,6 +14,9 @@ $ git clone git@github.com:kuaifan/wookteam.git
 // or you can use https
 $ git clone https://github.com/kuaifan/wookteam.git
 
+// enter directory
+$ cd wookteam
+
 // copy .env
 $ cp .env.example .env
 ```
@@ -86,9 +89,8 @@ $ git clone git@github.com:kuaifan/wookteam.git
 // or you can use https
 $ git clone https://github.com/kuaifan/wookteam.git
 
-// configure remotes
+// enter directory
 $ cd wookteam
-$ git remote add origin git@github.com:kuaifan/wookteam.git
 
 // copy .env
 $ cp .env.example .env

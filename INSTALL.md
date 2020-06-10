@@ -14,6 +14,9 @@ $ git clone git@github.com:kuaifan/wookteam.git
 // 或者你也可以使用https
 $ git clone https://github.com/kuaifan/wookteam.git
 
+// 进入目录
+$ cd wookteam
+
 // 拷贝 .env
 $ cp .env.example .env
 ```
@@ -85,6 +88,9 @@ LARAVELS_PROXY_URL=
 $ git clone git@github.com:kuaifan/wookteam.git
 // 或者你也可以使用https
 $ git clone https://github.com/kuaifan/wookteam.git
+
+// 进入目录
+$ cd wookteam
 
 // 拷贝 .env
 $ cp .env.example .env
