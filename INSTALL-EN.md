@@ -66,7 +66,7 @@ LARAVELS_PROXY_URL=
 ./cmd supervisorctl restart all
 ```
 
-Installed, project url: ***http://IP:APP_PORT***.
+Installed, project url: ***`http://IP:APP_PORT`***.
 
 #### To stop the app server
 
