@@ -9,8 +9,8 @@
 ## 官网地址
 
 - [https://www.wookteam.com](https://www.wookteam.com)
-- [安装教程(Docker)](./INSTALL.md#安装设置-使用Docker)
-- [安装教程(非Docker)](./INSTALL.md#安装设置-如果你没有使用docker)
+- [安装教程(Docker)](./INSTALL.md#安装设置使用docker)
+- [安装教程(非Docker)](./INSTALL.md#安装设置如果你没有使用docker)
 
 ## 演示地址
 
