@@ -2,7 +2,7 @@ FROM phpswoole/swoole:4.5.2-php7.4
 
 # Installation dependencies and PHP core extensions
 RUN apt-get update \
-        && apt-get install -y \
+        && apt-get -y install --no-install-recommends \
         libpng-dev \
         libzip-dev \
         libzip4 \
@@ -11,7 +11,6 @@ RUN apt-get update \
         git \
         net-tools \
         iputils-ping \
-        npm \
         vim \
         supervisor \
         && rm -r /var/lib/apt/lists/* \
