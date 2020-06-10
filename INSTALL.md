@@ -59,10 +59,11 @@ LARAVELS_PROXY_URL=
 ./cmd build php
 ./cmd composer install
 ./cmd up -d
-./cmd art key:generate
-./cmd art migrate --seed
+./cmd artisan key:generate
+./cmd artisan migrate --seed
 ./cmd npm install
 ./cmd npm run prod
+./cmd supervisorctl restart all
 ```
 
 #### 停止服务
@@ -75,6 +76,30 @@ LARAVELS_PROXY_URL=
 
 ```bash
 ./cmd start
+```
+
+到此安装完毕，项目地址为：***http://IP:APP_PORT***。
+
+### 运行命令的快捷方式
+
+> 你可以使用一下命令来执行
+
+```bash
+./cmd artisan "your command"    // 运行 artisan 命令
+
+./cmd php "your command"   // 运行 php 命令
+
+./cmd composer "your command"   // 运行 composer 命令
+
+./cmd supervisorctl "your command"   // 运行 supervisorctl 命令
+
+./cmd test "your command"   // 运行 phpunit 命令
+
+./cmd npm "your command"    // 运行 npm 命令
+
+./cmd yarn "your command"   // 运行 yarn 命令
+
+./cmd mysql "your command"  // 运行 mysql 命令
 ```
 
 ## 安装设置（如果你没有使用docker）

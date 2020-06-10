@@ -59,11 +59,14 @@ LARAVELS_PROXY_URL=
 ./cmd build php
 ./cmd composer install
 ./cmd up -d
-./cmd art key:generate
-./cmd art migrate --seed
+./cmd artisan key:generate
+./cmd artisan migrate --seed
 ./cmd npm install
 ./cmd npm run prod
+./cmd supervisorctl restart all
 ```
+
+Installed, project url: ***http://IP:APP_PORT***.
 
 #### To stop the app server
 
@@ -75,6 +78,28 @@ LARAVELS_PROXY_URL=
 
 ```bash
 ./cmd start
+```
+
+### Shortcuts for running command
+
+> You can use the following command to execute it
+
+```bash
+./cmd artisan "your command"    // To run a artisan command
+
+./cmd php "your command"   // To run a php command
+
+./cmd composer "your command"   // To run a composer command
+
+./cmd supervisorctl "your command"   // To run a supervisorctl command
+
+./cmd test "your command"   // To run a phpunit command
+
+./cmd npm "your command"    // To run a npm command
+
+./cmd yarn "your command"   // To run a yarn command
+
+./cmd mysql "your command"  // To run a mysql command
 ```
 
 ## Setup (if you're not using docker)

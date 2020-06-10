@@ -13,6 +13,14 @@ RUN apt-get update \
         iputils-ping \
         vim \
         supervisor \
+        sudo \
+        curl \
+        dirmngr \
+        apt-transport-https \
+        lsb-release \
+        ca-certificates \
+        && curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
+        && apt-get -y install nodejs \
         && rm -r /var/lib/apt/lists/* \
         && docker-php-ext-configure gd \
         && docker-php-ext-install pdo_mysql gd pcntl zip

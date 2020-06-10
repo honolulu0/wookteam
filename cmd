@@ -3,7 +3,7 @@
 COMPOSE="docker-compose"
 
 if [ $# -gt 0 ];then
-    if [[ "$1" == "art" ]]; then
+    if [[ "$1" == "artisan" ]]; then
         shift 1
         $COMPOSE run --rm -w /var/www php php artisan "$@"
     elif [[ "$1" == "php" ]]; then
@@ -12,15 +12,18 @@ if [ $# -gt 0 ];then
     elif [[ "$1" == "composer" ]]; then
         shift 1
         $COMPOSE run --rm -w /var/www php composer "$@"
+    elif [[ "$1" == "supervisorctl" ]]; then
+        shift 1
+        $COMPOSE run --rm -w /var/www php supervisorctl "$@"
     elif [[ "$1" == "test" ]]; then
         shift 1
         $COMPOSE run --rm -w /var/www php ./vendor/bin/phpunit "$@"
     elif [[ "$1" == "npm" ]]; then
         shift 1
-        $COMPOSE run --rm -w /var/www nodejs npm "$@"
+        $COMPOSE run --rm -w /var/www php npm "$@"
     elif [[ "$1" == "yarn" ]]; then
         shift 1
-        $COMPOSE run --rm -w /var/www nodejs yarn "$@"
+        $COMPOSE run --rm -w /var/www php yarn "$@"
     elif [[ "$1" == "mysql" ]]; then
         shift 1
         $COMPOSE run --rm -w / mariadb mysql "$@"
