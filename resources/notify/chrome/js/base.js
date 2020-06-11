@@ -56,13 +56,13 @@
      * @param url
      * @returns {string}
      */
-    getHostname(url) {
+    getHost(url) {
         if (/^chrome:\/\//.test(url)) {
             return "";
         }
         try {
             var info = new URL(url);
-            return info.hostname;
+            return info.host || info.hostname;
         } catch (err) {
             console.log(err);
         }

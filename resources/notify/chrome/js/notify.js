@@ -63,7 +63,7 @@ const getBadgeNum = function () {
                     case 'user':
                         instances[key].unread++;
                         chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-                            if ($A.getHostname(tabs[0].url) != key) {
+                            if ($A.getHost(tabs[0].url) != key) {
                                 var url = 'http://' + key + '/#/todo?token=' + encodeURIComponent(instances[key].token) + '&open=chat';
                                 $A.showNotify(key, {
                                     body: $A.getMsgDesc(body),
@@ -100,7 +100,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     var configLists;
     if (request.act === "config") {
         if (sender.tab) {
-            var hostname = $A.getHostname(sender.tab.url);
+            var hostname = $A.getHost(sender.tab.url);
             if (hostname) {
                 configLists = $A.jsonParse($A.getStorage("configLists"), {});
                 if (typeof configLists[hostname] !== "object") {

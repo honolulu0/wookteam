@@ -113,4 +113,5 @@ return [
     "不能操作自己！" => "Can't operate oneself!",
     "成员不存在！" => "Member does not exist!",
     "操作成功！" => "Operation successful!",
+    "一次最多只能获取%条数据！" => "A maximum of % data can be retrieved at one time!",
 ];

@@ -114,11 +114,26 @@ class UsersController extends Controller
     /**
      * 获取指定会员基本信息
      *
-     * @apiParam {String} username           会员用户名
+     * @apiParam {String|jsonArray} username          会员用户名(多个格式：jsonArray，一次最多30个)
      */
     public function basic()
     {
-        return Base::retSuccess('success', Users::username2basic(trim(Request::input('username'))));
+        $username = trim(Request::input('username'));
+        $array = Base::json2array($username);
+        if (empty($array)) {
+            $array[] = $username;
+        }
+        if (count($array) > 50) {
+            return Base::retError(['一次最多只能获取%条数据！', 50]);
+        }
+        $retArray = [];
+        foreach ($array AS $name) {
+            $basic = Users::username2basic($name);
+            if ($basic) {
+                $retArray[] = $basic;
+            }
+        }
+        return Base::retSuccess('success', $retArray);
     }
 
     /**

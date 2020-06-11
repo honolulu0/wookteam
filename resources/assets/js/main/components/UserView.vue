@@ -42,84 +42,29 @@
             }
         },
         mounted() {
-            this.getUserData(0, 300);
+            this.getUserData(300);
         },
         watch: {
             username() {
-                this.getUserData(0, 300);
+                this.getUserData(300);
             },
         },
         methods: {
             popperShow() {
-                this.getUserData(0, 60)
+                this.getUserData(30)
             },
 
-            getUserData(num, cacheTime) {
-                let keyName = '__userName:' + this.username.substring(0, 1) + '__';
-                let localData = $A.jsonParse(window.localStorage[keyName]);
-                //
-                if (window.__userViewNetworking === true) {
-                    if (num == 0) {
-                        if (typeof localData[this.username] !== "object") {
-                            localData[this.username] = {};
-                        }
-                        if (localData[this.username].success === true) {
-                            this.nickname = localData[this.username].data.nickname;
-                            this.profession = localData[this.username].data.profession;
-                        }
+            getUserData(cacheTime) {
+                $A.getUserBasic(this.username, (data, success) => {
+                    if (success) {
+                        this.nickname = data.nickname;
+                        this.profession = data.profession;
+                    } else {
+                        this.nickname = '';
+                        this.profession = '';
                     }
-                    if (num < 100) {
-                        setTimeout(() => {
-                            this.getUserData(num + 1, cacheTime)
-                        }, 500);
-                    }
-                    return;
-                }
-                //
-                if (typeof localData[this.username] !== "object") {
-                    localData[this.username] = {};
-                }
-                if (localData[this.username].success === true) {
-                    this.nickname = localData[this.username].data.nickname;
-                    this.profession = localData[this.username].data.profession;
-                    this.$emit("on-result", localData[this.username].data);
-                    if (localData[this.username].update + cacheTime > Math.round(new Date().getTime() / 1000)) {
-                        return;
-                    }
-                }
-                //
-                window.__userViewNetworking = true;
-                $A.aAjax({
-                    url: 'users/basic',
-                    data: {
-                        username: this.username,
-                    },
-                    error: () => {
-                        localData[this.username].success = false;
-                        localData[this.username].update = 0;
-                        localData[this.username].data = {};
-                        window.localStorage[keyName] = $A.jsonStringify(localData);
-                        window.__userViewNetworking = false;
-                    },
-                    success: (res) => {
-                        if (res.ret === 1) {
-                            this.nickname = res.data.nickname;
-                            this.profession = res.data.profession;
-                            localData[this.username].success = true;
-                            localData[this.username].update = Math.round(new Date().getTime() / 1000);
-                            localData[this.username].data = res.data;
-                        } else {
-                            this.nickname = '';
-                            this.profession = '';
-                            localData[this.username].success = false;
-                            localData[this.username].update = 0;
-                            localData[this.username].data = {};
-                        }
-                        this.$emit("on-result", localData[this.username].data);
-                        window.localStorage[keyName] = $A.jsonStringify(localData);
-                        window.__userViewNetworking = false;
-                    }
-                });
+                    this.$emit("on-result", data);
+                }, cacheTime);
             }
         }
     }

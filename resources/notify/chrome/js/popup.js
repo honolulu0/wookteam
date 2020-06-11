@@ -51,7 +51,7 @@ function showLists(lists) {
         chrome.tabs.query({}, function (tabs) {
             var has = false;
             tabs.some(function (item) {
-                if ($A.getHostname(item.url) == index) {
+                if ($A.getHost(item.url) == index) {
                     chrome.windows.update(item.windowId, {focused: true});
                     chrome.tabs.highlight({tabs: item.index, windowId: item.windowId});
                     chrome.tabs.update({url: $A.urlAddParams($A.removeURLParameter(item.url, ['open', 'rand']), {open: 'chat', rand: Math.round(new Date().getTime())})});

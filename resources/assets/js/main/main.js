@@ -181,6 +181,111 @@ import '../../sass/main.scss';
         },
 
         /**
+         * 根据用户名获取用户基本信息
+         * @param username
+         * @param callback
+         * @param cacheTime
+         */
+        getUserBasic(username, callback, cacheTime = 300) {
+            if (typeof callback !== "function") {
+                return;
+            }
+            if (!username) {
+                callback({}, false);
+                return;
+            }
+            //
+            let keyName = '__userName:' + username.substring(0, 1) + '__';
+            let localData = $A.jsonParse(window.localStorage[keyName]);
+            if ($A.getObject(localData, username + '.success') === true) {
+                callback(localData[username].data, true);
+                if (localData[username].update + cacheTime > Math.round(new Date().getTime() / 1000)) {
+                    return;
+                }
+            }
+            //
+            $A.__userBasicObject.push({
+                username: username,
+                callback: callback
+            });
+            $A.__userBasicEvent();
+        },
+        __userBasicEvent() {
+            if ($A.__userBasicLoading === true) {
+                return;
+            }
+            $A.__userBasicLoading = true;
+            //
+            let userArray = [];
+            $A.__userBasicObject.some((item) => {
+                userArray.push(item.username);
+                if (userArray.length >= 30) {
+                    return true;
+                }
+            });
+            //
+            $A.aAjax({
+                url: 'users/basic',
+                data: {
+                    username: $A.jsonStringify(userArray),
+                },
+                error: () => {
+                    userArray.forEach((username) => {
+                        let tmpLists = $A.__userBasicObject.filter((item) => { return item.username == username });
+                        tmpLists.forEach((item) => {
+                            if (typeof item.callback === "function") {
+                                item.callback({}, false);
+                                item.callback = null;
+                            }
+                        });
+                    });
+                    //
+                    $A.__userBasicLoading = false;
+                    $A.__userBasicObject = $A.__userBasicObject.filter((item) => { return typeof item.callback === "function"});
+                    if ($A.__userBasicObject.length > 0) {
+                        $A.__userBasicEvent();
+                    }
+                },
+                success: (res) => {
+                    if (res.ret === 1) {
+                        res.data.forEach((data) => {
+                            let keyName = '__userName:' + data.username.substring(0, 1) + '__';
+                            let localData = $A.jsonParse(window.localStorage[keyName]);
+                            localData[data.username] = {
+                                success: true,
+                                update: Math.round(new Date().getTime() / 1000),
+                                data: data
+                            };
+                            window.localStorage[keyName] = $A.jsonStringify(localData);
+                        });
+                    }
+                    userArray.forEach((username) => {
+                        let tmpLists = $A.__userBasicObject.filter((item) => { return item.username == username });
+                        tmpLists.forEach((item) => {
+                            if (typeof item.callback === "function") {
+                                let info = res.data.filter((data) => { return data.username == username });
+                                if (info.length === 0) {
+                                    item.callback({}, false);
+                                } else {
+                                    item.callback(info[0], true);
+                                }
+                                item.callback = null;
+                            }
+                        });
+                    });
+                    //
+                    $A.__userBasicLoading = false;
+                    $A.__userBasicObject = $A.__userBasicObject.filter((item) => { return typeof item.callback === "function"});
+                    if ($A.__userBasicObject.length > 0) {
+                        $A.__userBasicEvent();
+                    }
+                }
+            });
+        },
+        __userBasicLoading: false,
+        __userBasicObject: [],
+
+        /**
          * 打开登录页面
          */
         userLogout() {
