@@ -46,7 +46,7 @@
                     <Input v-model="formAdd.profession"></Input>
                 </FormItem>
                 <FormItem prop="username" :label="$L('用户名')">
-                    <Input type="text" v-model="formAdd.username" :placeholder="$L('添加后不可修改')"></Input>
+                    <TagInput v-model="formAdd.username" :placeholder="$L('添加后不可修改，使用英文逗号添加多个。')"/>
                 </FormItem>
                 <FormItem prop="userpass" :label="$L('登录密码')">
                     <Input type="password" v-model="formAdd.userpass" :placeholder="$L('最少6位数')"></Input>
@@ -88,13 +88,15 @@
 <script>
     import WContent from "../components/WContent";
     import ImgUpload from "../components/ImgUpload";
+    import TagInput from "../components/TagInput";
     export default {
-        components: {ImgUpload, WContent},
+        components: {TagInput, ImgUpload, WContent},
         data () {
             return {
                 loadIng: 0,
 
                 userInfo: {},
+                isAdmin: false,
 
                 columns: [],
 
@@ -115,7 +117,7 @@
             }
         },
         created() {
-            let isAdmin = $A.identity('admin');
+            this.isAdmin = $A.identity('admin');
             this.noDataText = this.$L("数据加载中.....");
             this.columns = [{
                 "title": this.$L("头像"),
@@ -150,6 +152,14 @@
                             }
                         }, '[自己]'))
                     }
+                    if ($A.identityRaw('admin', params.row.identity)) {
+                        arr.push(h('span', {
+                            style: {
+                                color: '#ff0000',
+                                paddingRight: '4px'
+                            }
+                        }, '[管理员]'))
+                    }
                     arr.push(h('span', params.row.username))
                     return h('span', arr);
                 }
@@ -176,7 +186,7 @@
             }, {
                 "title": this.$L("操作"),
                 "key": 'action',
-                "width": isAdmin ? 160 : 80,
+                "width": this.isAdmin ? 160 : 80,
                 "align": 'center',
                 render: (h, params) => {
                     let array = [];
@@ -197,46 +207,43 @@
                             }
                         }
                     }, this.$L('查看')));
-                    if (isAdmin) {
-                        array.push(h('Button', {
+                    if (this.isAdmin) {
+                        array.push(h('Dropdown', {
                             props: {
-                                type: 'warning',
-                                size: 'small'
-                            },
-                            style: {
-                                fontSize: '12px',
-                                marginLeft: '5px'
+                                trigger: 'click',
+                                transfer: true
                             },
                             on: {
-                                click: () => {
-                                    this.$Modal.confirm({
-                                        title: this.$L('删除团队成员'),
-                                        content: this.$L('你确定要删除此团队成员吗？'),
-                                        loading: true,
-                                        onOk: () => {
-                                            $A.aAjax({
-                                                url: 'users/team/delete?username=' + params.row.username,
-                                                error: () => {
-                                                    this.$Modal.remove();
-                                                    alert(this.$L('网络繁忙，请稍后再试！'));
-                                                },
-                                                success: (res) => {
-                                                    this.$Modal.remove();
-                                                    this.getLists();
-                                                    setTimeout(() => {
-                                                        if (res.ret === 1) {
-                                                            this.$Message.success(res.msg);
-                                                        }else{
-                                                            this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });
-                                                        }
-                                                    }, 350);
-                                                }
-                                            });
-                                        }
-                                    });
+                                'on-click': (name) => {
+                                    this.handleUser(name, params.row.username)
                                 }
                             }
-                        }, this.$L('删除')));
+                        }, [
+                            h('Button', {
+                                props: {
+                                    type: 'warning',
+                                    size: 'small'
+                                },
+                                style: {
+                                    fontSize: '12px',
+                                    marginLeft: '5px'
+                                },
+                            }, this.$L('操作')),
+                            h('DropdownMenu', {
+                                slot: 'list',
+                            }, [
+                                h('DropdownItem', {
+                                    props: {
+                                        name: $A.identityRaw('admin', params.row.identity) ? 'deladmin' : 'setadmin',
+                                    },
+                                }, this.$L($A.identityRaw('admin', params.row.identity) ? '取消管理员' : '设为管理员')),
+                                h('DropdownItem', {
+                                    props: {
+                                        name: 'delete',
+                                    },
+                                }, this.$L('删除'))
+                            ])
+                        ]))
                     }
                     return h('div', array);
                 }
@@ -334,6 +341,86 @@
                         });
                     }
                 });
+            },
+
+            handleUser(act, username) {
+                switch (act) {
+                    case "delete": {
+                        this.$Modal.confirm({
+                            title: this.$L('删除团队成员'),
+                            content: this.$L('你确定要删除此团队成员吗？'),
+                            loading: true,
+                            onOk: () => {
+                                $A.aAjax({
+                                    url: 'users/team/delete?username=' + username,
+                                    error: () => {
+                                        this.$Modal.remove();
+                                        alert(this.$L('网络繁忙，请稍后再试！'));
+                                    },
+                                    success: (res) => {
+                                        this.$Modal.remove();
+                                        this.getLists();
+                                        setTimeout(() => {
+                                            if (res.ret === 1) {
+                                                this.$Message.success(res.msg);
+                                            }else{
+                                                this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });
+                                            }
+                                        }, 350);
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                    }
+                    case "setadmin":
+                    case "deladmin": {
+                        this.$Modal.confirm({
+                            title: this.$L('确定操作'),
+                            content: this.$L(act=='deladmin' ? '你确定取消管理员身份的操作吗？' : '你确定设置管理员的操作吗？'),
+                            loading: true,
+                            onOk: () => {
+                                $A.aAjax({
+                                    url: 'users/team/admin?act=' + (act=='deladmin'?'del':'set') + '&username=' + username,
+                                    error: () => {
+                                        this.$Modal.remove();
+                                        alert(this.$L('网络繁忙，请稍后再试！'));
+                                    },
+                                    success: (res) => {
+                                        this.$Modal.remove();
+                                        if (res.ret === 1) {
+                                            this.lists.some((item) => {
+                                                if (item.username == username) {
+                                                    this.$set(item, 'identity', res.data.identity);
+                                                    return true;
+                                                }
+                                            });
+                                            if (res.data.up === 1) {
+                                                let data = {
+                                                    type: 'text',
+                                                    username: this.userInfo.username,
+                                                    userimg: this.userInfo.userimg,
+                                                    indate: Math.round(new Date().getTime() / 1000),
+                                                    text: this.$L(act=='deladmin' ? '您的管理员身份已被撤销。' : '恭喜您成为管理员。')
+                                                };
+                                                $A.WSOB.sendTo('user', username, data, 'special');
+                                                $A.WSOB.sendTo('info', username, { 'type': 'update'});
+                                            }
+                                        }
+                                        setTimeout(() => {
+                                            if (res.ret === 1) {
+                                                this.$Message.success(res.msg);
+                                            } else {
+                                                this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                                            }
+                                        }, 350);
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                    }
+                }
             }
         },
     }

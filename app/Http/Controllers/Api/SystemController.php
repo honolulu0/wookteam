@@ -40,8 +40,8 @@ class SystemController extends Controller
             } else {
                 $user = $user['data'];
             }
-            if ($user['id'] != 1) {
-                return Base::retError('权限不足！');
+            if (Base::isError(Users::identity('admin'))) {
+                return Base::retError('权限不足！', [], -1);
             }
             $all = Request::input();
             foreach ($all AS $key => $value) {

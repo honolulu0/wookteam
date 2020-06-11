@@ -20,7 +20,7 @@ class UsersTableSeeder extends Seeder
             0 =>
             array (
                 'id' => 1,
-                'identity' => '',
+                'identity' => ',admin,',
                 'token' => 'MUBhZG1pbkBPSHNKODhAMTU5MTM0Mzg1NUBzdkJ6UnU=',
                 'username' => 'admin',
                 'nickname' => '大乔',
@@ -36,12 +36,12 @@ class UsersTableSeeder extends Seeder
                 'linedate' => 1591343909,
                 'regip' => '127.0.0.1',
                 'regdate' => 1589072625,
-                'setting' => NULL,
+                'setting' => '{\\"version\\":1}',
             ),
             1 =>
             array (
                 'id' => 2,
-                'identity' => '',
+                'identity' => ',admin,',
                 'token' => 'MkBzeXN0ZW1AQUExbHN2QDE1OTEzNDI2OTBAQlZ5Z005',
                 'username' => 'system',
                 'nickname' => '小乔',
@@ -57,7 +57,7 @@ class UsersTableSeeder extends Seeder
                 'linedate' => 1591343157,
                 'regip' => '127.0.0.1',
                 'regdate' => 1589072625,
-                'setting' => NULL,
+                'setting' => '{\\"version\\":1}',
             ),
         ));
 

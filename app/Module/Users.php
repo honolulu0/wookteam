@@ -216,6 +216,18 @@ class Users
     }
 
     /**
+     * 判断用户权限（身份）
+     * @param $identity
+     * @param $userIdentity
+     * @return bool
+     */
+    public static function identityRaw($identity, $userIdentity)
+    {
+        $userIdentity = is_array($userIdentity) ? $userIdentity : explode(",", trim($userIdentity, ","));
+        return $identity && in_array($identity, $userIdentity);
+    }
+
+    /**
      * 筛选用户信息
      * @param $userinfo
      * @return mixed

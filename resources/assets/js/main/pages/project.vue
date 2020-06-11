@@ -270,6 +270,10 @@
     }
 </style>
 <script>
+    import Vue from 'vue'
+    import TagInput from '../components/TagInput'
+    Vue.component('TagInput', TagInput)
+
     import WContent from "../components/WContent";
     import ProjectArchived from "../components/project/archived";
     import ProjectUsers from "../components/project/users";
@@ -432,11 +436,11 @@
                                     marginBottom: '20px',
                                 }
                             }, this.$L('添加流程')),
-                            h('Input', {
+                            h('TagInput', {
                                 props: {
                                     value: this.labelsValue,
                                     autofocus: true,
-                                    placeholder: this.$L('请输入流程名称，多个可用空格分隔。')
+                                    placeholder: this.$L('请输入流程名称，多个可用英文逗号分隔。')
                                 },
                                 on: {
                                     input: (val) => {
@@ -448,7 +452,7 @@
                     },
                     onOk: () => {
                         if (this.labelsValue) {
-                            let array = $A.trim(this.labelsValue).split(" ");
+                            let array = $A.trim(this.labelsValue).split(",");
                             array.forEach((name) => {
                                 if ($A.trim(name)) {
                                     this.formAdd.labels.push($A.trim(name));

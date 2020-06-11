@@ -174,6 +174,11 @@
                             case 'close':
                                 window.localStorage.setItem("__::WookTeam:config", $A.jsonStringify({}));
                                 break;
+                            case 'info':
+                                if (msgDetail.body.type == 'update') {
+                                    $A.getUserInfo(true);
+                                }
+                                break;
                             case 'user':
                                 if (msgDetail.body.type == 'taskA') {
                                     $A.triggerTaskInfoListener(msgDetail.body.act, msgDetail.body.taskDetail, false);

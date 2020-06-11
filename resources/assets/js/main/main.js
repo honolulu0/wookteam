@@ -201,7 +201,15 @@ import '../../sass/main.scss';
          */
         identity(role) {
             let userInfo = $A.getUserInfo();
-            let identity = userInfo.identity;
+            return $A.identityRaw(role, userInfo.identity);
+        },
+
+        /**
+         * 权限是否通过
+         * @param role
+         * @returns {boolean}
+         */
+        identityRaw(role, identity) {
             let isRole = false;
             $A.each(identity, (index, res) => {
                 if (res === role) {
@@ -586,6 +594,7 @@ import '../../sass/main.scss';
              * - read: 已读会员信息
              * - roger: 收到信息回执
              * - user: 指定target
+             * - update: 指定target
              * - team: 团队会员
              * @param target            发送目标
              * @param body              发送内容（对象或数组）
@@ -629,7 +638,7 @@ import '../../sass/main.scss';
                     }
                     return this;
                 }
-                if (['refresh', 'unread', 'read', 'roger', 'user', 'team'].indexOf(messageType) === -1) {
+                if (['refresh', 'unread', 'read', 'roger', 'user', 'info', 'team'].indexOf(messageType) === -1) {
                     this.__log("[WS] Wrong message messageType: " + messageType);
                     typeof callback === "function" && callback({status: 0, message: '错误的消息类型: ' + messageType});
                     return this;

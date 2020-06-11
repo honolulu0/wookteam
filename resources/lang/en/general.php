@@ -110,4 +110,7 @@ return [
     "注册成功！" => "Registered!",
     "注册失败，请稍后再试。" => "Registration failed. Please try again later.",
     "当前环境禁止修改密码！" => "Password changes are not allowed here!",
+    "不能操作自己！" => "Can't operate oneself!",
+    "成员不存在！" => "Member does not exist!",
+    "操作成功！" => "Operation successful!",
 ];

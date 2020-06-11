@@ -253,6 +253,21 @@ class WebSocketService implements WebSocketHandlerInterface
                 break;
 
             /**
+             * 发给用户（不保存记录）
+             */
+            case 'info':
+                $pushLists = [];
+                foreach ($this->getUserOfName($data['target']) AS $item) {
+                    $pushLists[] = [
+                        'fd' => $item['fd'],
+                        'msg' => $data
+                    ];
+                }
+                $pushTask = new PushTask($pushLists);
+                Task::deliver($pushTask);
+                break;
+
+            /**
              * 发给整个团队
              */
             case 'team':

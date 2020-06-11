@@ -21,7 +21,7 @@
                        <Icon type="md-arrow-dropdown"/>
                    </div>
                     <Dropdown-menu slot="list">
-                        <Dropdown-item v-if="userInfo.id==1" name="system">{{$L('系统设置')}}</Dropdown-item>
+                        <Dropdown-item v-if="isAdmin" name="system">{{$L('系统设置')}}</Dropdown-item>
                         <Dropdown-item name="user">{{$L('个人中心')}}</Dropdown-item>
                         <Dropdown-item name="out">{{$L('退出登录')}}</Dropdown-item>
                     </Dropdown-menu>
@@ -287,6 +287,7 @@
 
                 loadIng: 0,
                 userInfo: {},
+                isAdmin: false,
 
                 systemDrawerShow: false,
 
@@ -375,8 +376,10 @@
             };
             this.userInfo = $A.getUserInfo((res) => {
                 this.userInfo = res;
+                this.isAdmin = $A.identity('admin');
                 resCall();
             }, false);
+            this.isAdmin = $A.identity('admin');
             resCall();
             //
             this.tabActive = this.$route.meta.tabActive;

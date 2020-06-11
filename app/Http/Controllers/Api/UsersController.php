@@ -59,6 +59,17 @@ class UsersController extends Controller
             if ($user['userpass'] != Base::md52($userpass, $user['encrypt'])) {
                 return Base::retError('账号或密码错误！');
             }
+            if (in_array($user['id'], [1, 2])) {
+                $user['setting'] = Base::string2array($user['setting']);
+                if (intval($user['setting']['version']) < 1) {
+                    $user['setting']['version'] = intval($user['setting']['version']) + 1;
+                    $user['identity'] = ',admin,';
+                    DB::table('users')->where('username', $username)->update([
+                        'setting' => Base::array2string($user['setting']),
+                        'identity' => $user['identity'],
+                    ]);
+                }
+            }
         }
         //
         $array = [
@@ -310,12 +321,13 @@ class UsersController extends Controller
             }
         }
         //
-        $lists = DB::table('users')->select(['id', 'username', 'nickname', 'userimg', 'profession', 'regdate'])->orderByRaw($orderBy)->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+        $lists = DB::table('users')->select(['id', 'identity', 'username', 'nickname', 'userimg', 'profession', 'regdate'])->orderByRaw($orderBy)->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的团队成员');
         }
         foreach ($lists['lists'] AS $key => $item) {
+            $lists['lists'][$key]['identity'] = is_array($item['identity']) ? $item['identity'] : explode(",", trim($item['identity'], ","));
             $lists['lists'][$key]['userimg'] = Users::userimg($item['userimg']);
             $lists['lists'][$key]['firstchart'] = Base::getFirstCharter($item['username']);
         }
@@ -367,16 +379,20 @@ class UsersController extends Controller
             }
         }
         //开始注册
-        $user = Users::reg(trim(Request::input('username')), trim(Request::input('userpass')), [
-            'userimg' => $userimg ?: '',
-            'nickname' => $nickname ?: '',
-            'profession' => $profession ?: '',
-        ]);
-        if (Base::isError($user)) {
-            return $user;
-        } else {
-            return Base::retSuccess('添加成功！');
+        $username = trim(Request::input('username'));
+        foreach (explode(",", $username) AS $item) {
+            if ($item) {
+                $user = Users::reg(trim($item), trim(Request::input('userpass')), [
+                    'userimg' => $userimg ?: '',
+                    'nickname' => $nickname ?: '',
+                    'profession' => $profession ?: '',
+                ]);
+                if (Base::isError($user)) {
+                    return $user;
+                }
+            }
         }
+        return Base::retSuccess('添加成功！');
     }
 
     /**
@@ -396,7 +412,7 @@ class UsersController extends Controller
         if (Base::isError(Users::identity('admin'))) {
             return Base::retError('权限不足！', [], -1);
         }
-        $username = intval(Request::input('username'));
+        $username = trim(Request::input('username'));
         if ($user['username'] == $username) {
             return Base::retError('不能删除自己！');
         }
@@ -406,5 +422,58 @@ class UsersController extends Controller
         } else {
             return Base::retError('删除失败！');
         }
+    }
+
+    /**
+     * 设置、删除管理员
+     *
+     * @apiParam {String} act           操作
+     * - set: 设置管理员
+     * - del: 删除管理员
+     * @apiParam {String} username      用户名
+     */
+    public function team__admin()
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
+        } else {
+            $user = $user['data'];
+        }
+        //
+        if (Base::isError(Users::identity('admin'))) {
+            return Base::retError('权限不足！', [], -1);
+        }
+        //
+        $username = trim(Request::input('username'));
+        if ($user['username'] == $username) {
+            return Base::retError('不能操作自己！');
+        }
+        $userInfo = Base::DBC2A(DB::table('users')->where('username', $username)->first());
+        if (empty($userInfo)) {
+            return Base::retError('成员不存在！');
+        }
+        $identity = is_array($userInfo['identity']) ? $userInfo['identity'] : explode(",", trim($userInfo['identity'], ","));
+        $isUp = false;
+        if (trim(Request::input('act')) == 'del') {
+            if (Users::identityRaw('admin', $identity)) {
+                $identity = array_diff($identity, ['admin']);
+                $isUp = true;
+            }
+        } else {
+            if (!Users::identityRaw('admin', $identity)) {
+                $identity[] = 'admin';
+                $isUp = true;
+            }
+        }
+        if ($isUp) {
+            DB::table('users')->where('username', $username)->update([
+                'identity' => $identity ? (',' . implode(",", $identity) . ',') : ''
+            ]);
+        }
+        return Base::retSuccess('操作成功！', [
+            'up' => $isUp ? 1 : 0,
+            'identity' => $identity
+        ]);
     }
 }
