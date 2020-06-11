@@ -20,7 +20,7 @@
             <li class="sreach">
                 <Input :placeholder="$L('搜索')" prefix="ios-search" v-model="dialogSearch"/>
             </li>
-            <li class="lists">
+            <li ref="dialogLists" class="lists">
                 <ul>
                     <li v-for="(dialog, index) in dialogListsS"
                         :key="index"
@@ -1009,6 +1009,21 @@
                     this.unreadTotal -= user.unread;
                     this.$set(user, 'unread', 0);
                     $A.WSOB.sendTo('read', user.username);
+                }
+                if (autoAddDialog === true) {
+                    //自动滚到焦点
+                    this.$nextTick(() => {
+                        let dialogObj = $A(this.$refs.dialogLists);
+                        let activeObj = dialogObj.find("li.active");
+                        if (activeObj.length > 0) {
+                            let offsetTop = activeObj.offset().top;
+                            if (offsetTop < 0) {
+                                dialogObj.stop().scrollTop(activeObj[0].offsetTop)
+                            } else if (offsetTop > dialogObj.height()) {
+                                dialogObj.stop().scrollTop(activeObj[0].offsetTop + activeObj.height() - dialogObj.height())
+                            }
+                        }
+                    });
                 }
             },
 

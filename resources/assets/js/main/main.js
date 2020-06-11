@@ -195,7 +195,7 @@ import '../../sass/main.scss';
                 return;
             }
             //
-            let keyName = '__userName:' + username.substring(0, 1) + '__';
+            let keyName = '__userBasic:' + username.substring(0, 1) + '__';
             let localData = $A.jsonParse(window.localStorage[keyName]);
             if ($A.getObject(localData, username + '.success') === true) {
                 callback(localData[username].data, true);
@@ -249,7 +249,7 @@ import '../../sass/main.scss';
                 success: (res) => {
                     if (res.ret === 1) {
                         res.data.forEach((data) => {
-                            let keyName = '__userName:' + data.username.substring(0, 1) + '__';
+                            let keyName = '__userBasic:' + data.username.substring(0, 1) + '__';
                             let localData = $A.jsonParse(window.localStorage[keyName]);
                             localData[data.username] = {
                                 success: true,

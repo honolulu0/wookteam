@@ -30,7 +30,7 @@
                         </ul>
                     </div>
                     <div class="docs-container">
-                        <div v-if="selectBookData.id > 0">
+                        <div v-if="selectBookData.id > 0" class="docs-box">
                             <div class="docs-header">
                                 <div class="docs-h1">{{selectBookData.title}}</div>
                                 <div class="docs-setting">
@@ -152,6 +152,12 @@
                     flex: 1;
                     background-color: #ffffff;
                     border-radius: 0 3px 3px 0;
+                    .docs-box {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                    }
                     .docs-header {
                         display: flex;
                         align-items: center;
@@ -175,7 +181,10 @@
                         }
                     }
                     .docs-section {
+                        flex: 1;
                         margin: 0 26px;
+                        overflow: auto;
+                        transform: translateZ(0);
                         .none {
                             background-color: transparent;
                             text-align: center;

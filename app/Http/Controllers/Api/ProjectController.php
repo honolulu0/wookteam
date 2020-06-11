@@ -190,6 +190,9 @@ class ProjectController extends Controller
                 'inorder' => 0,
             ];
         }
+        if (count($insertLabels) > 100) {
+            return Base::retError(['项目流程最多不能超过%个！', 100]);
+        }
         //开始创建
         $projectid = DB::table('project_lists')->insertGetId([
             'title' => $title,
@@ -848,6 +851,9 @@ class ProjectController extends Controller
         $count = DB::table('project_label')->where('projectid', $projectid)->where('title', $title)->count();
         if ($count > 0) {
             return Base::retError('列表名称已存在！');
+        }
+        if (DB::table('project_label')->where('projectid', $projectid)->count() + 1 >= 100) {
+            return Base::retError(['列表最多不能超过%个！', 100]);
         }
         //
         $id = DB::table('project_label')->insertGetId([

@@ -352,7 +352,7 @@ class UsersController extends Controller
     /**
      * 添加团队成员
      *
-     * @apiParam {String} username              用户名
+     * @apiParam {String} username              用户名（多个用英文逗号分隔）
      * @apiParam {String} userpass              密码
      * @apiParam {Object} [userimg]             会员头像
      * @apiParam {String} [nickname]            昵称
@@ -395,7 +395,11 @@ class UsersController extends Controller
         }
         //开始注册
         $username = trim(Request::input('username'));
-        foreach (explode(",", $username) AS $item) {
+        $array = explode(",", $username);
+        if (count($array) > 500) {
+            return Base::retError(['一次最多只能添加%个账号！', 500]);
+        }
+        foreach ($array AS $item) {
             if ($item) {
                 $user = Users::reg(trim($item), trim(Request::input('userpass')), [
                     'userimg' => $userimg ?: '',

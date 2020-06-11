@@ -525,7 +525,7 @@
                         return;
                     }
                     currentPage = Math.max(1, $A.runNum(taskData['currentPage']));
-                    let tempLists = this.taskDatas[detail.level].lists.filter((item) => { return item.complete == 0; });
+                    let tempLists = this.taskDatas[index].lists.filter((item) => { return item.complete == 0; });
                     if (tempLists.length >= currentPage * pagesize) {
                         currentPage++;
                     } else {
