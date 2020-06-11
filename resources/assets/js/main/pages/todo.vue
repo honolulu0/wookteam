@@ -514,7 +514,7 @@
                 }
             },
 
-            getTaskLists(index, isNext) {
+            getTaskLists(index, isNext, withNextNum = 0) {
                 let taskData = this.taskDatas[index];
                 let currentPage = 1;
                 let pagesize = 20;
@@ -525,12 +525,13 @@
                         return;
                     }
                     currentPage = Math.max(1, $A.runNum(taskData['currentPage']));
-                    let tempLists = this.taskDatas[index].lists.filter((item) => { return item.complete == 0; });
+                    let tempLists = this.taskDatas[index].lists;
                     if (tempLists.length >= currentPage * pagesize) {
                         currentPage++;
                     } else {
                         withNextPage = true;
                     }
+                    withNextNum = $A.runNum(withNextNum);
                 }
                 this.$set(taskData, 'hasMorePages', false);
                 this.$set(taskData, 'loadIng', $A.runNum(taskData.loadIng) + 1);
@@ -567,8 +568,8 @@
                             this.taskSortData = this.getTaskSort();
                             this.$set(taskData, 'currentPage', res.data.currentPage);
                             this.$set(taskData, 'hasMorePages', res.data.hasMorePages);
-                            if (res.data.currentPage && withNextPage) {
-                                this.getTaskLists(index, true);
+                            if (res.data.currentPage && withNextPage && withNextNum < 5) {
+                                this.getTaskLists(index, true, withNextNum + 1);
                             }
                         } else {
                             this.$set(taskData, 'lists', []);

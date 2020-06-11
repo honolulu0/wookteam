@@ -208,7 +208,12 @@ import '../../sass/main.scss';
                 username: username,
                 callback: callback
             });
-            $A.__userBasicEvent();
+            //
+            $A.__userBasicTimeout++;
+            let timeout = $A.__userBasicTimeout;
+            setTimeout(() => {
+                timeout === $A.__userBasicTimeout && $A.__userBasicEvent();
+            }, 100);
         },
         __userBasicEvent() {
             if ($A.__userBasicLoading === true) {
@@ -282,6 +287,7 @@ import '../../sass/main.scss';
                 }
             });
         },
+        __userBasicTimeout: 0,
         __userBasicLoading: false,
         __userBasicObject: [],
 

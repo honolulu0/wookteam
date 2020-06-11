@@ -4,7 +4,7 @@
         <!--左边选项-->
         <ul class="chat-menu">
             <li class="self">
-                <img :src="userInfo.userimg">
+                <img :src="userInfo.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
             </li>
             <li :class="{active:chatTap=='dialog'}" @click="chatTap='dialog'">
                 <Icon type="md-text" />
@@ -26,7 +26,7 @@
                         :key="index"
                         :class="{active:dialog.username==dialogTarget.username}"
                         @click="openDialog(dialog)">
-                        <img :src="dialog.userimg">
+                        <img :src="dialog.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
                         <div class="user-msg-box">
                             <div class="user-msg-title">
                                 <span><user-view :username="dialog.username" placement="right" @on-result="userViewResult(dialog, $event)"/></span>
@@ -53,7 +53,7 @@
                         <div class="team-label">{{key}}</div>
                         <ul>
                             <li v-for="(item, index) in teamListsS(lists)" :key="index" @click="openDialog(item, true)">
-                                <img :src="item.userimg">
+                                <img :src="item.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
                                 <div class="team-username"><user-view :username="item.username" placement="right" @on-result="userViewResult(item, $event)"/></div>
                             </li>
                         </ul>
@@ -1180,6 +1180,16 @@
             },
 
             messageSubmit() {
+                let dialogUser = this.dialogLists.filter((item) => { return item.username == this.dialogTarget.username });
+                if (dialogUser.length > 0) {
+                    let user = dialogUser[0];
+                    if (typeof user.unread === "number" && user.unread > 0) {
+                        this.unreadTotal -= user.unread;
+                        this.$set(user, 'unread', 0);
+                        $A.WSOB.sendTo('read', user.username);
+                    }
+                }
+                //
                 let text = this.messageText.trim();
                 if ($A.count(text) > 0) {
                     let data = {

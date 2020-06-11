@@ -117,4 +117,5 @@ return [
     "一次最多只能添加%个账号！" => "Only % accounts can be added at a time!",
     "项目流程最多不能超过%个！" => "The maximum number of project flows should not exceed %!",
     "列表最多不能超过%个！" => "No more than % lists!",
+    "当前环境禁止修改！" => "No changes to the current environment!",
 ];

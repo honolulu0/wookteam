@@ -1,6 +1,6 @@
 <template>
     <div class="user-view-inline">
-        <Tooltip :disabled="nickname === null" :delay="delay" :transfer="transfer" :placement="placement" @on-popper-show="popperShow">
+        <Tooltip :disabled="loadIng" :delay="delay" :transfer="transfer" :placement="placement" @on-popper-show="popperShow">
             {{nickname || username}}
             <div slot="content">
                 <div>{{$L('用户名')}}: {{username}}</div>
@@ -37,6 +37,8 @@
         },
         data() {
             return {
+                loadIng: true,
+
                 nickname: null,
                 profession: ''
             }
@@ -63,6 +65,7 @@
                         this.nickname = '';
                         this.profession = '';
                     }
+                    this.loadIng = false;
                     this.$emit("on-result", data);
                 }, cacheTime);
             }

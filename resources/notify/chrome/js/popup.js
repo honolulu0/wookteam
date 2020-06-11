@@ -10,6 +10,13 @@ chrome.runtime.sendMessage({
     showLists(response);
 });
 
+function onClick(index) {
+    chrome.runtime.sendMessage({
+        act: 'clickInstances',
+        index: index,
+    });
+}
+
 function onDelete(index) {
     chrome.runtime.sendMessage({
         act: 'delInstances',
@@ -55,11 +62,13 @@ function showLists(lists) {
                     chrome.windows.update(item.windowId, {focused: true});
                     chrome.tabs.highlight({tabs: item.index, windowId: item.windowId});
                     chrome.tabs.update({url: $A.urlAddParams($A.removeURLParameter(item.url, ['open', 'rand']), {open: 'chat', rand: Math.round(new Date().getTime())})});
+                    onClick(index);
                     return has = true;
                 }
             });
             if (!has) {
-                chrome.tabs.create({ url: 'http://' + index + '/#/todo?token=' + token + '&open=chat' })
+                chrome.tabs.create({ url: 'http://' + index + '/#/todo?token=' + token + '&open=chat' });
+                onClick(index);
             }
         });
     })

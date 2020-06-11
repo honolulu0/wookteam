@@ -16,15 +16,15 @@
                         <div class="item-text-view" v-html="textMsg(info.text)"></div>
                     </div>
                     <template v-if="info.type==='taskB'">
-                        <div v-if="info.other.type==='task'" class="item-link" @click="taskDetail(info.other.id)">{{$L('来自关注任务')}}:<a href="javascript:void(0)">{{info.other.title}}</a></div>
-                        <div v-if="info.other.type==='file'" class="item-link">{{$L('来自关注任务')}}:<a target="_blank" :href="fileDownUrl(info.other.id)">{{info.other.name}}</a></div>
+                        <div v-if="info.other.type==='task'" class="item-link" @click="taskDetail(info.other.id)"><span>{{$L('来自关注任务')}}:</span><a href="javascript:void(0)">{{info.other.title}}</a></div>
+                        <div v-if="info.other.type==='file'" class="item-link"><span>{{$L('来自关注任务')}}:</span><a target="_blank" :href="fileDownUrl(info.other.id)">{{info.other.name}}</a></div>
                     </template>
-                    <div v-else-if="info.type==='report'" class="item-link" @click="reportDetail(info.other.id, info.other.title)">{{$L('来自工作报告')}}:<a href="javascript:void(0)">{{info.other.title}}</a></div>
+                    <div v-else-if="info.type==='report'" class="item-link" @click="reportDetail(info.other.id, info.other.title)"><span>{{$L('来自工作报告')}}:</span><a href="javascript:void(0)">{{info.other.title}}</a></div>
                 </div>
-                <img class="item-userimg" @click="clickUser" :src="info.userimg"/>
+                <img class="item-userimg" @click="clickUser" :src="info.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'"/>
             </div>
             <div v-else-if="info.self===false" class="list-item">
-                <img class="item-userimg" @click="clickUser" :src="info.userimg"/>
+                <img class="item-userimg" @click="clickUser" :src="info.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'"/>
                 <div class="item-left">
                     <div class="item-username" @click="clickUser">
                         <em class="item-name"><user-view :username="info.username" placement="right"/></em>
@@ -35,10 +35,10 @@
                         <div class="item-text-view" v-html="textMsg(info.text)"></div>
                     </div>
                     <template v-if="info.type==='taskB'">
-                        <div v-if="info.other.type==='task'" class="item-link" @click="taskDetail(info.other.id)">{{$L('来自关注任务')}}:<a href="javascript:void(0)">{{info.other.title}}</a></div>
-                        <div v-if="info.other.type==='file'" class="item-link">{{$L('来自关注任务')}}:<a target="_blank" :href="fileDownUrl(info.other.id)">{{info.other.name}}</a></div>
+                        <div v-if="info.other.type==='task'" class="item-link" @click="taskDetail(info.other.id)"><span>{{$L('来自关注任务')}}:</span><a href="javascript:void(0)">{{info.other.title}}</a></div>
+                        <div v-if="info.other.type==='file'" class="item-link"><span>{{$L('来自关注任务')}}:</span><a target="_blank" :href="fileDownUrl(info.other.id)">{{info.other.name}}</a></div>
                     </template>
-                    <div v-else-if="info.type==='report'" class="item-link" @click="reportDetail(info.other.id, info.other.title)">{{$L('来自工作报告')}}:<a href="javascript:void(0)">{{info.other.title}}</a></div>
+                    <div v-else-if="info.type==='report'" class="item-link" @click="reportDetail(info.other.id, info.other.title)"><span>{{$L('来自工作报告')}}:</span><a href="javascript:void(0)">{{info.other.title}}</a></div>
                 </div>
             </div>
         </div>
@@ -181,7 +181,9 @@
 
     /*信息底标*/
     .item-link {
-        display: block;
+        display: flex;
+        align-items: center;
+        max-width: 100%;
         font-size: 12px;
         color: #ffffff;
         background-color: #cacaca;
@@ -193,9 +195,16 @@
         border-radius: 4px;
         transform: scale(0.96);
         transform-origin: left center;
+        > span {
+            white-space: nowrap;
+        }
         > a {
             color: #3D90E2;
             padding-left: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
         }
     }
 

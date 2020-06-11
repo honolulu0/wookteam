@@ -34,6 +34,9 @@ class SystemController extends Controller
     {
         $type = trim(Request::input('type'));
         if ($type == 'save') {
+            if (env("SYSTEM_SETTING") == 'disabled') {
+                return Base::retError('当前环境禁止修改！');
+            }
             $user = Users::authE();
             if (Base::isError($user)) {
                 return $user;

@@ -115,6 +115,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
     } else if (request.act === "getInstances") {
         sendResponse(instances);
+    } else if (request.act === "clickInstances") {
+        if (typeof instances[request.index] === "object") {
+            instances[request.index].ws.sendTo('unread', function (res) {
+                if (res.status === 1) {
+                    instances[request.index].unread = $A.runNum(res.message);
+                    updateBadgeNum();
+                }
+                sendResponse(res);
+            })
+        }
     } else if (request.act === "delInstances") {
         configLists = $A.jsonParse($A.getStorage("configLists"), {});
         if (typeof configLists[request.index] === "object") {
