@@ -81,7 +81,7 @@ Installed, project url: **`http://IP:APP_PORT`**.
 
 ### Shortcuts for running command
 
-> You can use the following command to execute it
+> You can do this using the following command
 
 ```bash
 ./cmd artisan "your command"    // To run a artisan command

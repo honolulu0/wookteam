@@ -81,7 +81,7 @@ LARAVELS_LISTEN_PORT=5200
 
 ### 运行命令的快捷方式
 
-> 你可以使用一下命令来执行
+> 你可以使用以下命令来执行
 
 ```bash
 ./cmd artisan "your command"    // 运行 artisan 命令
