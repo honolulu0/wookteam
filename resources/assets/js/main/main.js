@@ -908,6 +908,12 @@ import '../../sass/main.scss';
                     case 'report':
                         desc = content.text + " " + $A.app.$L("[来自工作报告]");
                         break;
+                    case 'video':
+                        desc = $A.app.$L('[视频通话]');
+                        break;
+                    case 'voice':
+                        desc = $A.app.$L('[语音通话]');
+                        break;
                     default:
                         desc = $A.app.$L('[未知类型]');
                         break;

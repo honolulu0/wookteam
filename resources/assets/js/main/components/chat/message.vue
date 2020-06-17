@@ -1,8 +1,8 @@
 <template>
     <div :data-id="info.id">
 
-        <!--文本、任务、报告-->
-        <div v-if="info.type==='text' || info.type==='taskB' || info.type==='report'">
+        <!--文本、任务、报告、视频通话-->
+        <div v-if="info.type==='text' || info.type==='taskB' || info.type==='report' || info.type==='video' || info.type==='voice'">
             <div v-if="info.self===true" class="list-right">
                 <div v-if="info.error" class="item-error" @click="clickError(info.error)">
                     <Icon type="md-alert" />
@@ -12,14 +12,19 @@
                         <em class="item-name"><user-view :username="info.username" placement="left"/></em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
-                    <div class="item-text">
-                        <div class="item-text-view" v-html="textMsg(info.text)"></div>
+                    <div class="item-text" :class="{'text-error':info.error}">
+                        <div class="item-text-view">{{textMsg(info.text)}}</div>
                     </div>
                     <template v-if="info.type==='taskB'">
                         <div v-if="info.other.type==='task'" class="item-link" @click="taskDetail(info.other.id)"><span>{{$L('来自关注任务')}}:</span><a href="javascript:void(0)">{{info.other.title}}</a></div>
                         <div v-if="info.other.type==='file'" class="item-link"><span>{{$L('来自关注任务')}}:</span><a target="_blank" :href="fileDownUrl(info.other.id)">{{info.other.name}}</a></div>
                     </template>
                     <div v-else-if="info.type==='report'" class="item-link" @click="reportDetail(info.other.id, info.other.title)"><span>{{$L('来自工作报告')}}:</span><a href="javascript:void(0)">{{info.other.title}}</a></div>
+                    <div v-else-if="info.type==='video' || info.type==='voice'" class="item-link">
+                        <Icon v-if="info.type==='voice'" type="ios-call-outline"/>
+                        <Icon v-else type="ios-videocam-outline"/>
+                        <span>{{$L('通话时长：%', formatSecond(info.other.second))}}</span>
+                    </div>
                 </div>
                 <img class="item-userimg" @click="clickUser" :src="info.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'"/>
             </div>
@@ -31,14 +36,19 @@
                         <em v-if="info.__usertag" class="item-tag">{{info.__usertag}}</em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
-                    <div class="item-text">
-                        <div class="item-text-view" v-html="textMsg(info.text)"></div>
+                    <div class="item-text" :class="{'text-error':info.error}">
+                        <div class="item-text-view">{{textMsg(info.text)}}</div>
                     </div>
                     <template v-if="info.type==='taskB'">
                         <div v-if="info.other.type==='task'" class="item-link" @click="taskDetail(info.other.id)"><span>{{$L('来自关注任务')}}:</span><a href="javascript:void(0)">{{info.other.title}}</a></div>
                         <div v-if="info.other.type==='file'" class="item-link"><span>{{$L('来自关注任务')}}:</span><a target="_blank" :href="fileDownUrl(info.other.id)">{{info.other.name}}</a></div>
                     </template>
                     <div v-else-if="info.type==='report'" class="item-link" @click="reportDetail(info.other.id, info.other.title)"><span>{{$L('来自工作报告')}}:</span><a href="javascript:void(0)">{{info.other.title}}</a></div>
+                    <div v-else-if="info.type==='video' || info.type==='voice'" class="item-link">
+                        <Icon v-if="info.type==='voice'" type="ios-call-outline"/>
+                        <Icon v-else type="ios-videocam-outline"/>
+                        <span>{{$L('通话时长：%', formatSecond(info.other.second))}}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -170,6 +180,11 @@
         border-radius: 6px;
         padding: 8px;
         background-color: #ffffff;
+        max-height: 580px;
+        overflow: auto;
+        &.text-error {
+            box-shadow: 0 0 4px 0 #ffa1a1;
+        }
         .item-text-view {
             max-width: 520px;
             color: #242424;
@@ -195,6 +210,10 @@
         border-radius: 4px;
         transform: scale(0.96);
         transform-origin: left center;
+        > i {
+            font-size: 14px;
+            padding-right: 2px;
+        }
         > span {
             white-space: nowrap;
         }
@@ -275,6 +294,16 @@
 
             fileDownUrl(id) {
                 return $A.aUrl('project/files/download?fileid=' + id);
+            },
+
+            formatSecond(d) {
+                if (d > 3600) {
+                    return Math.ceil(d / 3600) + '小时';
+                } else if (d > 60) {
+                    return Math.ceil(d / 60) + '分钟';
+                } else {
+                    return d + '秒';
+                }
             }
         }
     }

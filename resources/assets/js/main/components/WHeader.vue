@@ -60,6 +60,12 @@
                         <Radio label="close">{{$L('禁止')}}</Radio>
                     </RadioGroup>
                 </FormItem>
+                <FormItem :label="$L('音视频通话')" prop="callav">
+                    <RadioGroup v-model="formSystem.callav">
+                        <Radio label="open">{{$L('开启')}}</Radio>
+                        <Radio label="close">{{$L('关闭')}}</Radio>
+                    </RadioGroup>
+                </FormItem>
                 <FormItem>
                     <Button :loading="loadIng > 0" type="primary" @click="handleSubmit('formSystem')">{{$L('提交')}}</Button>
                     <Button :loading="loadIng > 0" @click="handleReset('formSystem')" style="margin-left: 8px">{{$L('重置')}}</Button>
@@ -297,6 +303,7 @@
                 formSystem: {
                     github: 'show',
                     reg: 'open',
+                    callav: 'open',
                 },
 
                 formDatum: {
@@ -444,6 +451,7 @@
                             this.formSystem = res.data;
                             this.formSystem.github = this.formSystem.github || 'show';
                             this.formSystem.reg = this.formSystem.reg || 'open';
+                            this.formSystem.callav = this.formSystem.callav || 'open';
                             if (save) {
                                 this.$Message.success(this.$L('修改成功'));
                             }

@@ -271,7 +271,7 @@ class WebSocketService implements WebSocketHandlerInterface
              * 发给整个团队
              */
             case 'team':
-                if (Base::val($data['body'], 'type') === 'taskA') {
+                if ($data['body']['type'] === 'taskA') {
                     $taskId = intval(Base::val($data['body'], 'taskDetail.id'));
                     if ($taskId > 0) {
                         $userLists = $this->getTaskUsers($taskId);

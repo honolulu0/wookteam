@@ -1,6 +1,5 @@
 <template>
     <div class="chat-index">
-
         <!--左边选项-->
         <ul class="chat-menu">
             <li class="self">
@@ -25,6 +24,7 @@
                     <li v-for="(dialog, index) in dialogListsS"
                         :key="index"
                         :class="{active:dialog.username==dialogTarget.username}"
+                        :data-id="dialog.id"
                         @click="openDialog(dialog)">
                         <img :src="dialog.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
                         <div class="user-msg-box">
@@ -87,12 +87,14 @@
                 <div class="manage-lists-message-new" v-if="messageNew > 0" @click="messageBottomGo(true)">{{$L('有%条新消息', messageNew)}}</div>
             </ScrollerY>
             <div class="manage-send" @click="clickDialog(dialogTarget.username)">
-                <textarea ref="textarea" class="manage-input" v-model="messageText" :placeholder="$L('请输入要发送的消息')" @keydown="messageSend($event)"></textarea>
+                <textarea ref="textarea" class="manage-input" maxlength="20000" v-model="messageText" :placeholder="$L('请输入要发送的消息')" @keydown="messageSend($event)"></textarea>
             </div>
             <div class="manage-quick">
                 <emoji-picker @emoji="messageInsertText" :search="messageEmojiSearch">
                     <div slot="emoji-invoker" slot-scope="{ events: { click: clickEvent } }" @click.stop="clickEvent">
-                        <Icon class="quick-item" type="ios-happy-outline"  />
+                        <Tooltip :content="$L('表情')" placement="top">
+                            <Icon class="quick-item" type="ios-happy-outline"  />
+                        </Tooltip>
                     </div>
                     <div slot="emoji-picker" slot-scope="{ emojis, insert, display }">
                         <div class="emoji-box">
@@ -108,10 +110,39 @@
                         </div>
                     </div>
                 </emoji-picker>
-                <Icon class="quick-item" type="ios-photos-outline" @click="$refs.messageUpload.handleClick()"/>
-                <img-upload ref="messageUpload" class="message-upload" type="callback" @on-callback="messageInsertImage" num="3" :otherParams="{from:'chat'}"></img-upload>
+                <Tooltip :content="$L('图片')" placement="top">
+                    <Icon class="quick-item" type="ios-photos-outline" @click="$refs.messageUpload.handleClick()"/>
+                    <img-upload ref="messageUpload" class="message-upload" type="callback" @on-callback="messageInsertImage" num="3" :otherParams="{from:'chat'}"></img-upload>
+                </Tooltip>
+                <template v-if="systemConfig.callav=='open'">
+                    <Tooltip :content="$L('语音聊天')" placement="top">
+                        <Icon class="quick-item voicecam" type="ios-call-outline" @click="videoConnect(null, false)"/>
+                    </Tooltip>
+                    <Tooltip :content="$L('视频聊天')" placement="top">
+                        <Icon class="quick-item videocam" type="ios-videocam-outline" @click="videoConnect(null, true)"/>
+                    </Tooltip>
+                </template>
             </div>
         </div>
+
+        <!--语音、视频通话-->
+        <div class="chat-video" :style="{display:(videoUserName)?'block':'none',backgroundImage:'url(' + videoUserImg +')'}">
+            <div v-if="videoChat" class="video-opacity">{{$L('正在视频通话...')}}</div>
+            <div v-else class="video-opacity">{{$L('正在语音通话...')}}</div>
+            <video ref="remoteVideo" class="video-active" autoplay></video>
+            <video ref="localVideo" class="video-mini" autoplay muted="true"></video>
+            <div class="video-close"><Icon type="ios-close-circle-outline" @click="videoClose(videoUserName)"/></div>
+        </div>
+
+        <!--提示音-->
+        <audio class="chat-audio" ref="messageAudio" preload="none">
+            <source :src="messageAudio + 'message.mp3'" type="audio/mpeg">
+            <source :src="messageAudio + 'message.wav'" type="audio/wav">
+        </audio>
+        <audio class="chat-audio" ref="callAudio" preload="none">
+            <source :src="messageAudio + 'call.mp3'" type="audio/mpeg">
+            <source :src="messageAudio + 'call.wav'" type="audio/wav">
+        </audio>
 
     </div>
 </template>
@@ -129,6 +160,15 @@
         .ivu-notice-with-desc {
             flex: 1;
             padding: 0 12px;
+        }
+        .chat-notice-btn-box {
+            margin-top: 8px;
+            margin-bottom: -4px;
+            .ivu-btn {
+                margin-right: 12px;
+                font-size: 12px;
+                min-width: 42px;
+            }
         }
         .ivu-notice-desc {
             font-size: 13px;
@@ -515,13 +555,24 @@
                 left: 0;
                 right: 0;
                 bottom: 79px;
-                padding: 8px;
+                padding: 8px 0;
                 display: flex;
                 align-items: center;
                 .quick-item {
                     color: #444444;
                     font-size: 24px;
-                    margin-right: 12px;
+                    margin: 0 7px;
+                    &.voicecam {
+                        font-size: 26px;
+                        height: 24px;
+                        line-height: 24px;
+                    }
+                    &.videocam {
+                        color: #666666;
+                        font-size: 30px;
+                        height: 24px;
+                        line-height: 24px;
+                    }
                 }
                 .emoji-box {
                     position: absolute;
@@ -590,8 +641,111 @@
                 }
             }
         }
+        .chat-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            z-index: 9;
+            &:before {
+                content: "";
+                position: absolute;
+                left: -10%;
+                right: -10%;
+                top: -10%;
+                bottom: -10%;
+                background: inherit;
+                filter: blur(25px);
+                z-index: 1;
+            }
+            &:after {
+                content: "";
+                position: absolute;
+                left: -10%;
+                right: -10%;
+                top: -10%;
+                bottom: -10%;
+                background: rgba(0, 0, 0, 0.82);
+                z-index: 2;
+            }
+            .video-opacity {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 26px;
+                color: #aaaaaa;
+                padding: 24px;
+                z-index: 3;
+                animation:opacity 2s infinite alternate ;
+                @keyframes opacity {
+                    0% {
+                        opacity: 0.1;
+                    }
+                    100% {
+                        opacity: 1;
+                    }
+                }
+            }
+            .video-mini,
+            .video-active {
+                position: absolute;
+                max-width: 640px;
+                max-height: 100%;
+                object-fit: cover;
+                transition: opacity 1s;
+            }
+            .video-active {
+                top: 0;
+                left: 50%;
+                width: 100%;
+                height: 100%;
+                transform: rotateY(180deg) translateX(50%);
+                z-index: 4;
+            }
+            .video-mini {
+                top: 0;
+                right: 0;
+                width: 260px;
+                height: 180px;
+                transform: scale(-1, 1);
+                z-index: 5;
+            }
+            .video-close {
+                position: absolute;
+                max-width: 720px;
+                bottom: 18px;
+                left: 50%;
+                width: 100%;
+                transform: translateX(-50%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 6;
+                > i {
+                    font-weight: 600;
+                    font-size: 46px;
+                    color: #ffffff;
+                    cursor: pointer;
+                    &:hover {
+                        color: #ff0000;
+                    }
+                }
+            }
+        }
+        .chat-audio {
+            width: 0;
+            height: 0;
+            display: none;
+        }
     }
 </style>
+
 <script>
     import EmojiPicker from 'vue-emoji-picker'
     import DrawerTabsContainer from "../DrawerTabsContainer";
@@ -621,6 +775,8 @@
 
                 chatTap: 'dialog',
 
+                messageAudio: window.location.origin + '/audio/',
+
                 dialogSearch: '',
                 dialogTarget: {},
                 dialogLists: [],
@@ -643,6 +799,18 @@
                 messageHasMorePages: false,
 
                 unreadTotal: 0,
+
+                videoUserName: '',      //视频对话用户名
+                videoUserImg: '',       //视频对话用户头像
+                videoStartTime: 0,      //视频开始时间
+                videoInitiator: false,  //是否发起人
+                videoChat: false,       //是否视频通话（否则音频通话）
+                videoRtc: null,         //视频Rtc
+                videoLocalStream: null, //视频流
+
+                systemConfig: $A.jsonParse($A.storage("systemSetting"), {
+                    callav: '',
+                }),
             }
         },
 
@@ -674,6 +842,15 @@
                 }
             }, false);
             resCall();
+            this.getSetting();
+            //
+            if (this.openWindow) {
+                $A.WSOB.connection();
+                if (!this.openAlready) {
+                    this.openAlready = true;
+                    this.getDialogLists();
+                }
+            }
             //
             $A.WSOB.setOnMsgListener("chat/index", (msgDetail) => {
                 if (msgDetail.username == $A.getUserName()) {
@@ -687,6 +864,11 @@
                         } else {
                             this.openAlready = false;
                             this.dialogTarget = {};
+                        }
+                        break;
+                    case 'info':
+                        if (msgDetail.body.type == 'video') {
+                            this.videoMessage(msgDetail)
                         }
                         break;
                     case 'user':
@@ -733,6 +915,11 @@
                                 }
                             });
                         }
+                        try {
+                            this.$refs.messageAudio.play();
+                        } catch (e) {
+
+                        }
                         break;
                 }
             });
@@ -769,6 +956,21 @@
                         this.getDialogLists();
                     }
                 }
+                //
+                let tmpRand = $A.randomString(8);
+                this.__openWindowRand = tmpRand;
+                setTimeout(() => {
+                    if (this.__openWindowRand !== tmpRand) {
+                        return;
+                    }
+                    $A.WSOB.sendTo('unread', (res) => {
+                        if (res.status === 1) {
+                            this.unreadTotal = $A.runNum(res.message);
+                        } else {
+                            this.unreadTotal = 0;
+                        }
+                    });
+                }, 500);
             },
 
             unreadTotal(val) {
@@ -808,6 +1010,24 @@
         },
 
         methods: {
+            getSetting() {
+                $A.aAjax({
+                    url: 'system/setting',
+                    error: () => {
+                        $A.storage("systemSetting", {});
+                    },
+                    success: (res) => {
+                        if (res.ret === 1) {
+                            this.systemConfig = res.data;
+                            this.systemConfig.callav = this.systemConfig.callav || 'open';
+                            $A.storage("systemSetting", this.systemConfig);
+                        } else {
+                            $A.storage("systemSetting", {});
+                        }
+                    }
+                });
+            },
+
             formatCDate(v) {
                 let string = '';
                 if ($A.runNum(v) > 0) {
@@ -1190,6 +1410,7 @@
                     }
                 }
                 //
+                this.autoBottom = true;
                 let text = this.messageText.trim();
                 if ($A.count(text) > 0) {
                     let data = {
@@ -1219,6 +1440,280 @@
                 this.$set(user, 'nickname', data.nickname);
                 this.$set(user, 'userimg', data.userimg);
             },
+
+            videoConnect(username, videoChat) {
+                this.videoChat = videoChat;
+                navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+                try {
+                    navigator.mediaDevices.getUserMedia({
+                        audio: true,
+                        video: this.videoChat
+                    }).then((stream) => {
+                        this.videoLocalStream = stream;
+                        this.$refs.localVideo.srcObject = stream;
+                        this.$refs.localVideo.removeEventListener('loadedmetadata', this.videoListener);
+                        //
+                        if (username === null) {
+                            // 发起者
+                            this.videoUserName = this.dialogTarget.username;
+                            this.videoUserImg = this.dialogTarget.userimg;
+                            this.videoStartTime = 0;
+                            this.videoInitiator = true;
+                            this.$refs.localVideo.addEventListener('loadedmetadata', this.videoListener);
+                        } else {
+                            // 接受者
+                            this.videoIcecandidate(this.videoLocalStream, username);
+                            this.videoRtc.createOffer({
+                                offerToReceiveAudio: true,
+                                offerToReceiveVideo: this.videoChat
+                            }).then((desc) => {
+                                this.videoRtc.setLocalDescription(desc).then(() => {
+                                    $A.WSOB.sendTo('info', username, {
+                                        'type': 'video',
+                                        'subtype': 'offer',
+                                        'data': this.videoRtc.localDescription
+                                    });
+                                }).catch((e) => {
+                                    this.$Modal.warning({title: this.$L('温馨提示'), content: e});
+                                    this.videoClose(username, this.$L('对方：') + e);
+                                });
+                            }).catch((e) => {
+                                this.$Modal.warning({title: this.$L('温馨提示'), content: e});
+                                this.videoClose(username, this.$L('对方：') + e);
+                            });
+                        }
+                    }).catch((e) => {
+                        this.$Modal.warning({title: this.$L('温馨提示'), content: e});
+                        username && this.videoClose(username, this.$L('对方：') + e);
+                    });
+                } catch (e) {
+                    this.$Modal.warning({title: this.$L('温馨提示'), content: this.$L('当前浏览器不支持音视频通话！')});
+                    username && this.videoClose(username, this.$L('对方：') + this.$L('浏览器不支持音视频通话！'));
+                }
+            },
+
+            videoListener() {
+                $A.WSOB.sendTo('info', this.videoUserName, {
+                    'type': 'video',
+                    'subtype': 'call',
+                    'username': this.userInfo.username,
+                    'userimg': this.userInfo.userimg,
+                    'video': this.videoChat,
+                }, (res) => {
+                    if (res.status !== 1) {
+                        this.videoClose(this.videoUserName, this.$L('呼叫失败！'));
+                    }
+                });
+            },
+
+            videoIcecandidate(localStream, username) {
+                this.videoRtc = new RTCPeerConnection({"iceServers":[{"urls":["turn:business.swoole.com:3478?transport=udp","turn:business.swoole.com:3478?transport=tcp"],"username":"ceshi","credential":"ceshi"}]});
+                this.videoRtc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        $A.WSOB.sendTo('info', username, {
+                            'type': 'video',
+                            'subtype': 'candidate',
+                            'data': event.candidate
+                        });
+                    }
+                };
+                try {
+                    this.videoRtc.addStream(localStream);
+                } catch (e) {
+                    let tracks = localStream.getTracks();
+                    for (let i = 0; i < tracks.length; i++) {
+                        this.videoRtc.addTrack(tracks[i], localStream);
+                    }
+                }
+                this.videoRtc.onaddstream = (e) => {
+                    this.$refs.remoteVideo.srcObject = e.stream;
+                };
+            },
+
+            videoClose(username, reason) {
+                if (username && reason !== false) {
+                    $A.WSOB.sendTo('info', username, {
+                        'type': 'video',
+                        'subtype': 'close',
+                        'reason': reason,
+                    });
+                }
+                if (this.videoInitiator) {
+                    this.videoInitiator = false;
+                    if (this.videoStartTime > 0) {
+                        let second = Math.round(new Date().getTime() / 1000) - this.videoStartTime;
+                        if (second >= 2) {
+                            $A.WSOB.sendTo('user', this.videoUserName, {
+                                type: this.videoChat ? 'video' : 'voice',
+                                username: this.userInfo.username,
+                                userimg: this.userInfo.userimg,
+                                indate: Math.round(new Date().getTime() / 1000),
+                                text: this.videoChat ? '视频通话' : '语音通话',
+                                other: {
+                                    second: second
+                                }
+                            }, 'special');
+                        }
+                    }
+                }
+                if (username == this.videoUserName) {
+                    this.videoUserName = '';
+                    this.videoUserImg = '';
+                    this.videoStartTime = 0;
+                    if (this.videoLocalStream !== null) {
+                        this.videoLocalStream.getTracks().forEach((track) => {
+                            track.stop();
+                        });
+                        this.videoLocalStream = null;
+                    }
+                    this.$refs.localVideo.srcObject = null;
+                    this.$refs.remoteVideo.srcObject = null;
+                }
+            },
+
+            videoMessage(msgDetail) {
+                let body = msgDetail.body;
+                let username = msgDetail.username;
+                if (['offer', 'candidate', 'answer'].indexOf(body.subtype) !== -1) {
+                    if (!this.videoLocalStream) {
+                        this.videoClose(username);
+                        return;
+                    }
+                }
+                //
+                switch (body.subtype) {
+                    case 'call':
+                        let callIng = true;
+                        let callAudio = this.$refs.callAudio;
+                        if (callAudio.getAttribute("data-listener") !== 'yes') {
+                            callAudio.setAttribute("data-listener", "yes");
+                            callAudio.addEventListener('ended', () => {
+                                if (callIng) {
+                                    $A.WSOB.sendTo('info', username, {
+                                        'type': 'video',
+                                        'subtype': 'judge',
+                                    });
+                                    callAudio.play();
+                                }
+                            }, false);
+                        }
+                        callAudio.currentTime = 0;
+                        callAudio.play();
+                        //
+                        this.$Notice.close('chat-call');
+                        this.$Notice.open({
+                            name: 'chat-call',
+                            duration: 0,
+                            onClose: () => {
+                                callIng = false;
+                                callAudio.pause();
+                                this.videoClose(username, this.$L('对方：拒绝接听'));
+                            },
+                            render: h => {
+                                return h('div', {
+                                    class: 'chat-notice-box',
+                                }, [
+                                    h('img', {class: 'chat-notice-userimg', attrs: {src: body.userimg}}),
+                                    h('div', {class: 'ivu-notice-with-desc'}, [
+                                        h('div', {class: 'ivu-notice-title'}, [
+                                            h('UserView', {props: {username: username}})
+                                        ]),
+                                        h('div', {class: 'ivu-notice-desc'}, this.$L(body.video ? "邀请视频通话..." : "邀请语音通话...")),
+                                        h('div', {class: 'chat-notice-btn-box'}, [
+                                            h('Button', {
+                                                props: {type: 'success', size: 'small'},
+                                                on: {
+                                                    click: () => {
+                                                        callIng = false;
+                                                        callAudio.pause();
+                                                        this.$Notice.close('chat-call');
+                                                        this.$emit("on-open-notice", username);
+                                                        this.clickDialog(username);
+                                                        this.videoConnect(username, body.video);
+                                                        this.videoUserName = username;
+                                                        this.videoUserImg = body.userimg;
+                                                        this.videoStartTime = 0;
+                                                        this.videoInitiator = false;
+                                                    }
+                                                }
+                                            }, this.$L("接受")),
+                                            h('Button', {
+                                                props: {type: 'error', size: 'small'},
+                                                on: {
+                                                    click: () => {
+                                                        callIng = false;
+                                                        callAudio.pause();
+                                                        this.$Notice.close('chat-call');
+                                                        this.videoClose(username, this.$L('对方：拒绝接听'));
+                                                    }
+                                                }
+                                            }, this.$L("拒绝")),
+                                        ])
+                                    ])
+                                ])
+                            }
+                        });
+                        break;
+
+                    case 'judge':
+                        if (username != this.videoUserName) {
+                            $A.WSOB.sendTo('info', username, {
+                                'type': 'video',
+                                'subtype': 'close',
+                            });
+                        }
+                        break;
+
+                    case 'close':
+                        this.$refs.callAudio.pause();
+                        this.$Notice.close('chat-call');
+                        this.videoClose(username, false);
+                        body.reason && this.$Message.warning(body.reason);
+                        break;
+
+                    case 'offer':
+                        this.videoIcecandidate(this.videoLocalStream, username);
+                        this.videoRtc.setRemoteDescription(new RTCSessionDescription(body.data)).then(() => {
+                            if (this.videoStartTime === 0) {
+                                this.videoRtc.createAnswer().then((desc) => {
+                                    this.videoRtc.setLocalDescription(desc).then(() => {
+                                        $A.WSOB.sendTo('info', username, {
+                                            'type': 'video',
+                                            'subtype': 'answer',
+                                            'data': this.videoRtc.localDescription
+                                        });
+                                    }).catch((e) => {
+                                        this.$Modal.warning({title: this.$L('温馨提示'), content: e});
+                                    });
+                                }).catch((e) => {
+                                    this.$Modal.warning({title: this.$L('温馨提示'), content: e});
+                                });
+                                this.videoStartTime = Math.round(new Date().getTime() / 1000);
+                            }
+                        }).catch((e) => {
+                            this.$Modal.warning({title: this.$L('温馨提示'), content: e});
+                        });
+                        break;
+
+                    case 'answer':
+                        if (this.videoRtc) {
+                            this.videoRtc.setRemoteDescription(new RTCSessionDescription(body.data)).then(() => {
+                            }).catch((e) => {
+                                this.$Modal.warning({title: this.$L('温馨提示'), content: e});
+                            });
+                        }
+                        break;
+
+                    case 'candidate':
+                        if (this.videoRtc) {
+                            this.videoRtc.addIceCandidate(new RTCIceCandidate(body.data)).then(() => {
+                            }).catch((e) => {
+                                this.$Modal.warning({title: this.$L('温馨提示'), content: e});
+                            });
+                        }
+                        break;
+                }
+            }
         }
     }
 </script>

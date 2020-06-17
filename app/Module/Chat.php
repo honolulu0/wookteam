@@ -125,9 +125,18 @@ class Chat
             case 'report':
                 $lastText = $message['text'] . " [来自工作报告]";
                 break;
+            case 'video':
+                $lastText = '[视频通话]';
+                break;
+            case 'voice':
+                $lastText = '[语音通话]';
+                break;
             default:
                 $lastText = '[未知类型]';
                 break;
+        }
+        if (mb_strlen($message['text']) > 20000) {
+            return Base::retError("发送内容长度已超出最大限制！");
         }
         $field = ($dialog['recField'] == 1 ? 'unread1' : 'unread2');
         $unread = intval(DB::table('chat_dialog')->where('id', $dialog['id'])->value($field));
@@ -139,7 +148,7 @@ class Chat
                 ]);
                 $unread += 1;
             }
-            $upArray['lasttext'] = $lastText;
+            $upArray['lasttext'] = mb_substr($lastText, 0, 100);
             $upArray['lastdate'] = $indate;
             if ($dialog['del1']) {
                 $upArray['del1'] = 0;
