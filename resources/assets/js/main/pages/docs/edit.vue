@@ -10,6 +10,16 @@
                 <!--<div class="header-menu" @click="handleClick('share')"><Icon type="md-share" /></div>
                 <div class="header-menu" @click="handleClick('view')"><Icon type="md-eye" /></div>-->
                 <div class="header-menu" @click="handleClick('history')"><Icon type="md-time" /></div>
+                <Poptip class="header-menu synch">
+                    <Icon type="md-contacts" :title="$L('正在协作会员')"/><em v-if="synchUsers.length > 0">{{synchUsers.length}}</em>
+                    <ul class="synch-lists" slot="content">
+                        <li class="title">{{$L('正在协作会员')}}:</li>
+                        <li v-for="item in synchUsersS">
+                            <img class="synch-userimg" :src="item.userimg"/>
+                            <user-view class="synch-username" placement="right" :username="item.username"/>
+                        </li>
+                    </ul>
+                </Poptip>
                 <div class="header-title">{{docDetail.title}}</div>
                 <div v-if="docDetail.type=='mind'" class="header-hint">{{$L('选中节点，按enter键添加子节点，tab键添加同级节点')}}</div>
                 <Button :disabled="(disabledBtn || loadIng > 0) && hid == 0" class="header-button" size="small" type="primary" @click="handleClick('save')">{{$L('保存')}}</Button>
@@ -122,10 +132,40 @@
                     .ivu-icon {
                         font-size: 16px;
                     }
+                    &.synch {
+                        em {
+                            padding-left: 2px;
+                        }
+                    }
                     &:hover,
                     &.active {
                         color: #fff;
                         background: #059DFD;
+                    }
+                    .synch-lists {
+                        max-height: 500px;
+                        overflow: auto;
+                        li {
+                            display: flex;
+                            align-items: center;
+                            padding: 6px 0;
+                            border-bottom: 1px dashed #eeeeee;
+                            &.title {
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: #333333;
+                            }
+                            .synch-userimg {
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 50%;
+                            }
+                            .synch-username {
+                                padding-left: 8px;
+                                font-size: 14px;
+                                color: #555555;
+                            }
+                        }
                     }
                 }
                 .header-title {
@@ -198,6 +238,12 @@
                 historyColumns: [],
                 historyLists: [],
                 historyNoDataText: "",
+
+                userInfo: {},
+
+                routeName: '',
+                synergyNum: 0,
+                synchUsers: [],
             }
         },
         created() {
@@ -256,10 +302,16 @@
             }];
         },
         mounted() {
-
+            this.routeName = this.$route.name;
+            this.userInfo = $A.getUserInfo((res, isLogin) => {
+                if (this.userInfo.id != res.id) {
+                    this.userInfo = res;
+                }
+            }, false);
         },
         activated() {
             this.refreshSid();
+            this.synergy();
         },
         deactivated() {
             this.docDrawerShow = false;
@@ -350,9 +402,44 @@
         computed: {
             disabledBtn() {
                 return this.bakContent == $A.jsonStringify(this.docContent);
+            },
+            synchUsersS() {
+                let temp = Math.round(new Date().getTime() / 1000);
+                return this.synchUsers.filter(item => {
+                    return item.indate + 10 > temp;
+                });
             }
         },
         methods: {
+            synergy() {
+                if (this.routeName !== this.$route.name) {
+                    let tmpNum = this.synergyNum;
+                    setTimeout(() => {
+                        if (tmpNum === this.synergyNum) {
+                            this.synergyNum++;
+                            this.synergy();
+                        }
+                    }, 5000);
+                    return;
+                }
+                $A.WSOB.sendTo('docs', null, {
+                    type: 'enter',
+                    sid: this.sid,
+                    username: this.userInfo.username,
+                    userimg: this.userInfo.userimg,
+                    indate: Math.round(new Date().getTime() / 1000),
+                }, (res) => {
+                    this.synchUsers = res.status === 1 ? res.message : [];
+                    let tmpNum = this.synergyNum;
+                    setTimeout(() => {
+                        if (tmpNum === this.synergyNum) {
+                            this.synergyNum++;
+                            this.synergy();
+                        }
+                    }, 5000);
+                });
+            },
+
             refreshSid() {
                 this.sid = this.$route.params.sid;
                 if (typeof this.$route.params.other === "object") {

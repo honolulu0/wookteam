@@ -50,13 +50,24 @@ class ChatController extends Controller
         if (count($lists) <= 0) {
             return Base::retError('暂无对话记录');
         }
+        $hasUnset = false;
         foreach ($lists AS $key => $item) {
-            $lists[$key] = array_merge($item, Users::username2basic($item['user1'] == $user['username'] ? $item['user2'] : $item['user1']));
+            $tmpUserInfo = Users::username2basic($item['user1'] == $user['username'] ? $item['user2'] : $item['user1']);
+            if (empty($tmpUserInfo)) {
+                DB::table('chat_dialog')->where('id', $item['id'])->update(['del1' => 1, 'del2' => 1]);
+                $hasUnset = true;
+                unset($lists[$key]);
+                continue;
+            }
+            $lists[$key] = array_merge($item, $tmpUserInfo);
             $lists[$key]['lastdate'] = $item['lastdate'] ?: $item['indate'];
             $unread = 0;
             if ($item['user1'] == $user['username']) $unread+= $item['unread1'];
             if ($item['user2'] == $user['username']) $unread+= $item['unread2'];
             $lists[$key]['unread'] = $unread;
+        }
+        if ($hasUnset) {
+            $lists = array_values($lists);
         }
         return Base::retSuccess('success', $lists);
     }

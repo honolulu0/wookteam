@@ -449,6 +449,14 @@ class ProjectController extends Controller
             'delete' => 1,
             'deletedate' => Base::time()
         ]);
+        DB::table('project_task')->where('projectid', $projectDetail['id'])->update([
+            'delete' => 1,
+            'deletedate' => Base::time()
+        ]);
+        DB::table('project_files')->where('projectid', $projectDetail['id'])->update([
+            'delete' => 1,
+            'deletedate' => Base::time()
+        ]);
         DB::table('project_log')->insert([
             'type' => '日志',
             'projectid' => $projectDetail['id'],
@@ -1079,7 +1087,6 @@ class ProjectController extends Controller
             $whereArray[] = ['project_task.createuser', '=', $user['username']];
             if ($projectid > 0) {
                 $whereArray[] = ['project_lists.id', '=', $projectid];
-                $whereArray[] = ['project_lists.delete', '=', 0];
             }
             if (trim(Request::input('username'))) {
                 $whereArray[] = ['project_task.username', '=', trim(Request::input('username'))];
@@ -1087,7 +1094,6 @@ class ProjectController extends Controller
         } else if (intval(Request::input('attention')) === 1) {
             if ($projectid > 0) {
                 $whereArray[] = ['project_lists.id', '=', $projectid];
-                $whereArray[] = ['project_lists.delete', '=', 0];
             }
             if (trim(Request::input('username'))) {
                 $whereArray[] = ['project_task.username', '=', trim(Request::input('username'))];
@@ -1095,7 +1101,6 @@ class ProjectController extends Controller
         } else {
             if ($projectid > 0) {
                 $whereArray[] = ['project_lists.id', '=', $projectid];
-                $whereArray[] = ['project_lists.delete', '=', 0];
                 if (trim(Request::input('username'))) {
                     $whereArray[] = ['project_task.username', '=', trim(Request::input('username'))];
                 }

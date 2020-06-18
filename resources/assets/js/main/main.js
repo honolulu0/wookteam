@@ -704,9 +704,10 @@ import '../../sass/main.scss';
              * - unread: 未读信息总数量
              * - read: 已读会员信息
              * - roger: 收到信息回执
-             * - user: 指定target
-             * - update: 指定target
+             * - user: 发送消息，指定target
+             * - info: 发送消息（不保存），指定target
              * - team: 团队会员
+             * - docs: 知识库
              * @param target            发送目标
              * @param body              发送内容（对象或数组）
              * @param callback          发送回调
@@ -749,7 +750,7 @@ import '../../sass/main.scss';
                     }
                     return this;
                 }
-                if (['refresh', 'unread', 'read', 'roger', 'user', 'info', 'team'].indexOf(messageType) === -1) {
+                if (['refresh', 'unread', 'read', 'roger', 'user', 'info', 'team', 'docs'].indexOf(messageType) === -1) {
                     this.__log("[WS] Wrong message messageType: " + messageType);
                     typeof callback === "function" && callback({status: 0, message: '错误的消息类型: ' + messageType});
                     return this;

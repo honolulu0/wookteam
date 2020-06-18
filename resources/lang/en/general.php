@@ -118,4 +118,7 @@ return [
     "项目流程最多不能超过%个！" => "The maximum number of project flows should not exceed %!",
     "列表最多不能超过%个！" => "No more than % lists!",
     "当前环境禁止修改！" => "No changes to the current environment!",
+    "[语音通话]" => "[Voice call]",
+    "[视频通话]" => "[Video call]",
+    "发送内容长度已超出最大限制！" => "The content length has exceeded the maximum limit!",
 ];

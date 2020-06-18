@@ -292,6 +292,31 @@ class WebSocketService implements WebSocketHandlerInterface
                     Task::deliver($pushTask);
                 }
                 break;
+
+            /**
+             * 知识库协作
+             */
+            case 'docs':
+                $back['message'] = [];
+                if ($data['body']['type'] === 'enter') {
+                    $sid = intval($data['body']['sid']);
+                    if ($sid > 0) {
+                        $array = Base::json2array(Cache::get("docs::" . $sid));
+                        if ($array) {
+                            foreach ($array AS $uname => $vbody) {
+                                if (intval($vbody['indate']) + 10 < time()) {
+                                    unset($array[$uname]);
+                                }
+                            }
+                        }
+                        $array[$data['body']['username']] = $data['body'];
+                        Cache::put("docs::" . $sid, Base::array2json($array), 30);
+                        //
+                        ksort($array);
+                        $back['message'] = array_values($array);
+                    }
+                }
+                break;
         }
         if ($data['messageId']) {
             $pushLists = [];
