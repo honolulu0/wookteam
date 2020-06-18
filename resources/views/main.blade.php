@@ -11,9 +11,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'WebPage') }}</title>
     <link rel="stylesheet" type="text/css" href="{{ mix('css/app.css') }}"/>
-    <link rel="stylesheet" href="{{ mix('css/iview.css') }}">
-    <script src="{{ mix('js/jquery.min.js') }}"></script>
-    <script src="{{ mix('js/bootstrap.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('css/iview.css') }}">
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     <script>
         window.csrfToken = { csrfToken : "{{ csrf_token() }}" };
         window.webSocketConfig = { URL: "{{ env('LARAVELS_PROXY_URL') }}" };
