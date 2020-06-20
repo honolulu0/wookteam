@@ -300,23 +300,49 @@ class WebSocketService implements WebSocketHandlerInterface
              */
             case 'docs':
                 $back['message'] = [];
-                if ($data['body']['type'] === 'enter') {
-                    $sid = intval($data['body']['sid']);
-                    if ($sid > 0) {
-                        $array = Base::json2array(Cache::get("docs::" . $sid));
-                        if ($array) {
-                            foreach ($array AS $uname => $vbody) {
-                                if (intval($vbody['indate']) + 10 < time()) {
-                                    unset($array[$uname]);
-                                }
-                            }
+                $body = $data['body'];
+                $type = $body['type'];
+                $sid = intval($body['sid']);
+                if ($sid <= 0) {
+                    return;
+                }
+                $array = Base::json2array(Cache::get("docs::" . $sid));
+                if ($array) {
+                    foreach ($array as $uname => $vbody) {
+                        if (intval($vbody['indate']) + 20 < time()) {
+                            unset($array[$uname]);
                         }
-                        $array[$data['body']['username']] = $data['body'];
-                        Cache::put("docs::" . $sid, Base::array2json($array), 30);
-                        //
-                        ksort($array);
-                        $back['message'] = array_values($array);
                     }
+                }
+                if ($type == 'enter' || $type == 'refresh') {
+                    $array[$body['username']] = $body;
+                } elseif ($type == 'quit') {
+                    unset($array[$body['username']]);
+                }
+                //
+                Cache::put("docs::" . $sid, Base::array2json($array), 30);
+                ksort($array);
+                $back['message'] = array_values($array);
+                //
+                if ($type == 'enter' || $type == 'quit') {
+                    $pushLists = [];
+                    foreach ($back['message'] AS $tuser) {
+                        foreach ($this->getUserOfName($tuser['username']) AS $item) {
+                            $pushLists[] = [
+                                'fd' => $item['fd'],
+                                'msg' => [
+                                    'messageType' => 'docs',
+                                    'body' => [
+                                        'type' => 'users',
+                                        'sid' => $sid,
+                                        'lists' => $back['message']
+                                    ]
+                                ]
+                            ];
+                        }
+                    }
+                    $pushTask = new PushTask($pushLists);
+                    Task::deliver($pushTask);
                 }
                 break;
         }

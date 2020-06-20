@@ -196,7 +196,7 @@ class Chat
             $array = [];
         }
         //messageType来自客户端（前端->后端）：refresh/unread/read/roger/user/info/team/docs
-        //messageType来自服务端（后端->前端）：error/open/kick/user/back/unread
+        //messageType来自服务端（后端->前端）：error/open/kick/user/back/unread/docs
         if (!isset($array['messageType'])) $array['messageType'] = '';  //消息类型
         if (!isset($array['messageId'])) $array['messageId'] = '';      //消息ID（用于back给客户端）
         if (!isset($array['contentId'])) $array['contentId'] = 0;       //消息数据ID（用于roger给服务端）

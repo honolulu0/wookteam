@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Module\Base;
 use App\Module\Users;
+use App\Tasks\PushTask;
+use Cache;
 use DB;
+use Hhxsv5\LaravelS\Swoole\Task\Task;
 use Request;
 
 /**
@@ -384,6 +387,40 @@ class DocsController extends Controller
             'username' => $user['username'],
             'indate' => Base::time()
         ]);
+        //通知正在编辑的成员
+        $sid = $id;
+        $array = Base::json2array(Cache::get("docs::" . $sid));
+        if ($array) {
+            foreach ($array as $uname => $vbody) {
+                if (intval($vbody['indate']) + 20 < time()) {
+                    unset($array[$uname]);
+                }
+            }
+        }
+        $pushLists = [];
+        foreach ($array AS $tuser) {
+            $uLists = Base::DBC2A(DB::table('ws')->select(['fd', 'username', 'channel'])->where('username', $tuser['username'])->get());
+            foreach ($uLists AS $item) {
+                if ($item['username'] == $user['username']) {
+                    continue;
+                }
+                $pushLists[] = [
+                    'fd' => $item['fd'],
+                    'msg' => [
+                        'messageType' => 'docs',
+                        'body' => [
+                            'type' => 'update',
+                            'sid' => $sid,
+                            'nickname' => $user['nickname'] ?: $user['username'],
+                            'time' => time(),
+                        ]
+                    ]
+                ];
+            }
+        }
+        $pushTask = new PushTask($pushLists);
+        Task::deliver($pushTask);
+        //
         return Base::retSuccess('保存成功！');
     }
 }
