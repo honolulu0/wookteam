@@ -21,11 +21,20 @@
                     </ul>
                 </Poptip>
                 <div class="header-title">{{docDetail.title}}</div>
-                <div v-if="docDetail.type=='mind'" class="header-hint">{{$L('选中节点，按enter键添加子节点，tab键添加同级节点')}}</div>
+                <div v-if="docDetail.type=='document'" class="header-hint">
+                    <ButtonGroup size="small" shape="circle">
+                        <Button :type="`${docContent.type!='md'?'primary':'default'}`" @click="$set(docContent, 'type', 'text')">{{$L('文本编辑器')}}</Button>
+                        <Button :type="`${docContent.type=='md'?'primary':'default'}`" @click="$set(docContent, 'type', 'md')">{{$L('MD编辑器')}}</Button>
+                    </ButtonGroup>
+                </div>
+                <div v-else-if="docDetail.type=='mind'" class="header-hint">{{$L('选中节点，按enter键添加子节点，tab键添加同级节点')}}</div>
                 <Button :disabled="(disabledBtn || loadIng > 0) && hid == 0" class="header-button" size="small" type="primary" @click="handleClick('save')">{{$L('保存')}}</Button>
             </div>
             <div class="docs-body">
-                <t-editor v-if="docDetail.type=='document'" class="body-text" v-model="docContent.content" height="100%"></t-editor>
+                <template v-if="docDetail.type=='document'">
+                    <MDEditor v-if="docContent.type=='md'" class="body-text" v-model="docContent.content" height="100%"></MDEditor>
+                    <TEditor v-else class="body-text" v-model="docContent.content" height="100%"></TEditor>
+                </template>
                 <minder v-else-if="docDetail.type=='mind'" class="body-mind" v-model="docContent"></minder>
                 <sheet v-else-if="docDetail.type=='sheet'" class="body-sheet" v-model="docContent.content"></sheet>
                 <flow v-else-if="docDetail.type=='flow'" class="body-flow" v-model="docContent.content"></flow>
@@ -51,6 +60,22 @@
 <style lang="scss">
     .docs-edit {
         .body-text {
+            .mdeditor-box {
+                position: relative;
+                width: 100%;
+                .markdown {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+                    overflow: auto;
+                    transform: translateZ(0);
+                    &.border {
+                        border: 0 !important;
+                    }
+                }
+            }
             .teditor-loadedstyle {
                 .tox-tinymce {
                     border: 0;
@@ -183,6 +208,10 @@
                     font-size: 12px;
                     color: #666;
                     white-space: nowrap;
+                    .ivu-btn {
+                        font-size: 12px;
+                        padding: 0 10px;
+                    }
                 }
                 .header-button {
                     font-size: 12px;
@@ -210,6 +239,7 @@
     import minder from '../../components/docs/minder'
     Vue.use(minder)
 
+    const MDEditor = resolve => require(['../../components/MDEditor/index'], resolve);
     const TEditor = resolve => require(['../../components/TEditor'], resolve);
     const Sheet = resolve => require(['../../components/docs/sheet/index'], resolve);
     const Flow = resolve => require(['../../components/docs/flow/index'], resolve);
@@ -217,7 +247,7 @@
     const WDrawer = resolve => require(['../../components/iview/WDrawer'], resolve);
 
     export default {
-        components: {WDrawer, Flow, Sheet, TEditor, NestedDraggable},
+        components: {WDrawer, Flow, Sheet, MDEditor, TEditor, NestedDraggable},
         data () {
             return {
                 loadIng: 0,
@@ -308,12 +338,35 @@
                     this.userInfo = res;
                 }
             }, false);
+            //
+            $A.WSOB.setOnMsgListener("chat/index", ['docs'], (msgDetail) => {
+                if (this.routeName !== this.$route.name) {
+                    return;
+                }
+                let body = msgDetail.body;
+                if (body.sid != this.sid) {
+                    return;
+                }
+                if (body.type === 'users') {
+                    this.synchUsers = body.lists;
+                    this.synchUsers.splice(this.synchUsers.length);
+                } else if (body.type === 'update') {
+                    this.$Modal.confirm({
+                        title: this.$L("更新提示"),
+                        content: this.$L('团队成员（%）更新了内容，<br/>更新时间：%。<br/><br/>点击【确定】加载最新内容。', body.nickname, $A.formatDate("Y-m-d H:i:s", body.time)),
+                        onOk: () => {
+                            this.refreshDetail();
+                        }
+                    });
+                }
+            });
         },
         activated() {
             this.refreshSid();
-            this.synergy();
+            this.synergy(true);
         },
         deactivated() {
+            this.synergy(false);
             this.docDrawerShow = false;
             if ($A.getToken() === false) {
                 this.sid = 0;
@@ -326,10 +379,7 @@
                     return;
                 }
                 this.hid = $A.runNum($A.strExists(val, '-') ? $A.getMiddle(val, "-", null) : 0);
-                this.docDetail = { };
-                this.docContent = { };
-                this.bakContent = null;
-                this.getDetail();
+                this.refreshDetail();
             },
 
             docDrawerTab(act) {
@@ -411,33 +461,41 @@
             }
         },
         methods: {
-            synergy() {
-                if (this.routeName !== this.$route.name) {
-                    let tmpNum = this.synergyNum;
-                    setTimeout(() => {
-                        if (tmpNum === this.synergyNum) {
-                            this.synergyNum++;
-                            this.synergy();
-                        }
-                    }, 5000);
-                    return;
+            synergy(enter) {
+                if (enter === false) {
+                    $A.WSOB.sendTo('docs', {
+                        type: 'quit',
+                        sid: this.sid,
+                        username: this.userInfo.username,
+                    });
+                } else {
+                    if (this.routeName !== this.$route.name) {
+                        let tmpNum = this.synergyNum;
+                        setTimeout(() => {
+                            if (tmpNum === this.synergyNum) {
+                                this.synergyNum++;
+                                this.synergy();
+                            }
+                        }, 10000);
+                    } else {
+                        $A.WSOB.sendTo('docs', null, {
+                            type: enter === true ? 'enter' : 'refresh',
+                            sid: this.sid,
+                            username: this.userInfo.username,
+                            userimg: this.userInfo.userimg,
+                            indate: Math.round(new Date().getTime() / 1000),
+                        }, (res) => {
+                            this.synchUsers = res.status === 1 ? res.message : [];
+                            let tmpNum = this.synergyNum;
+                            setTimeout(() => {
+                                if (tmpNum === this.synergyNum) {
+                                    this.synergyNum++;
+                                    this.synergy();
+                                }
+                            }, 10000);
+                        });
+                    }
                 }
-                $A.WSOB.sendTo('docs', null, {
-                    type: 'enter',
-                    sid: this.sid,
-                    username: this.userInfo.username,
-                    userimg: this.userInfo.userimg,
-                    indate: Math.round(new Date().getTime() / 1000),
-                }, (res) => {
-                    this.synchUsers = res.status === 1 ? res.message : [];
-                    let tmpNum = this.synergyNum;
-                    setTimeout(() => {
-                        if (tmpNum === this.synergyNum) {
-                            this.synergyNum++;
-                            this.synergy();
-                        }
-                    }, 5000);
-                });
             },
 
             refreshSid() {
@@ -449,6 +507,13 @@
 
             getSid() {
                 return $A.runNum($A.getMiddle(this.sid, null, '-'));
+            },
+
+            refreshDetail() {
+                this.docDetail = { };
+                this.docContent = { };
+                this.bakContent = null;
+                this.getDetail();
             },
 
             getDetail() {
