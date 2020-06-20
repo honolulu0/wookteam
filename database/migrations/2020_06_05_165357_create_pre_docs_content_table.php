@@ -18,7 +18,7 @@ class CreatePreDocsContentTable extends Migration
 			$table->increments('id');
 			$table->integer('bookid')->nullable()->default(0)->comment('知识库ID');
 			$table->integer('sid')->nullable()->default(0)->index('IDEX_sid')->comment('章节ID');
-			$table->text('content')->nullable()->comment('内容');
+			$table->longtext('content')->nullable()->comment('内容');
 			$table->string('username', 100)->nullable()->default('');
 			$table->bigInteger('indate')->nullable()->default(0);
 		});

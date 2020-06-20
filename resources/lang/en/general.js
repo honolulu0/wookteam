@@ -420,4 +420,8 @@ export default {
     "[语音通话]": "[Voice call]",
     "[视频通话]": "[Video call]",
     "正在协作会员": "Collaborating member",
+    "文本编辑器": "Text Cell",
+    "MD编辑器": "Markdown Cell",
+    "更新提示": "Update",
+    "团队成员（%）更新了内容，<br/>更新时间：%。<br/><br/>点击【确定】加载最新内容。": "Team members (%) updated content, <br/> update time: %. <br/><br/> click \"ok\" to load the latest content.",
 }
