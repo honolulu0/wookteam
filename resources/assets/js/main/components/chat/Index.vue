@@ -844,6 +844,11 @@
             resCall();
             this.getSetting();
             //
+            window.onChatOpenUserName = (username) => {
+                this.$emit("on-open-notice", username);
+                this.clickDialog(username, true);
+            }
+            //
             if (this.openWindow) {
                 $A.WSOB.connection();
                 if (!this.openAlready) {
@@ -1247,10 +1252,24 @@
                 }
             },
 
-            clickDialog(username) {
+            clickDialog(username, autoPush = false) {
                 let lists = this.dialogLists.filter((item) => {return item.username == username});
                 if (lists.length > 0) {
                     this.openDialog(lists[0]);
+                } else if (autoPush === true) {
+                    $A.aAjax({
+                        url: 'users/team/lists',
+                        data: {
+                            username: username,
+                        },
+                        success: (res) => {
+                            if (res.ret === 1 && $A.isPlainObject(res.data)) {
+                                this.$nextTick(() => {
+                                    typeof this.dialogTarget.username === "undefined" && this.openDialog(res.data, true)
+                                });
+                            }
+                        }
+                    });
                 }
             },
 

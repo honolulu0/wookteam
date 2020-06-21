@@ -73,4 +73,32 @@ class Project
         array_multisort($inOrder, SORT_ASC, $taskLists);
         return $taskLists;
     }
+
+    /**
+     * 获取跟任务有关系的用户（关注的、在项目里的、负责人、创建者）
+     * @param $taskId
+     * @return array
+     */
+    public static function taskSomeUsers($taskId)
+    {
+        $taskDeatil = Base::DBC2A(DB::table('project_task')->select(['follower', 'createuser', 'username', 'projectid'])->where('id', $taskId)->first());
+        if (empty($taskDeatil)) {
+            return [];
+        }
+        //关注的用户
+        $userArray = Base::string2array($taskDeatil['follower']);
+        //创建者
+        $userArray[] = $taskDeatil['createuser'];
+        //负责人
+        $userArray[] = $taskDeatil['username'];
+        //在项目里的用户
+        if ($taskDeatil['projectid'] > 0) {
+            $tempLists = Base::DBC2A(DB::table('project_users')->select(['username'])->where(['projectid' => $taskDeatil['projectid'], 'type' => '成员' ])->get());
+            foreach ($tempLists AS $item) {
+                $userArray[] = $item['username'];
+            }
+        }
+        //
+        return $userArray;
+    }
 }

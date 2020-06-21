@@ -11,12 +11,15 @@
                 <div class="header-menu" @click="handleClick('view')"><Icon type="md-eye" /></div>-->
                 <div class="header-menu" @click="handleClick('history')"><Icon type="md-time" /></div>
                 <Poptip class="header-menu synch">
-                    <Icon type="md-contacts" :title="$L('正在协作会员')"/><em v-if="synchUsers.length > 0">{{synchUsers.length}}</em>
+                    <div class="synch-container">
+                        <Icon type="md-contacts" :title="$L('正在协作会员')"/><em v-if="synchUsers.length > 0">{{synchUsers.length}}</em>
+                    </div>
                     <ul class="synch-lists" slot="content">
                         <li class="title">{{$L('正在协作会员')}}:</li>
-                        <li v-for="item in synchUsersS">
+                        <li v-for="(item, key) in synchUsersS" :key="key" @click="handleSynch(item.username)">
                             <img class="synch-userimg" :src="item.userimg"/>
                             <user-view class="synch-username" placement="right" :username="item.username"/>
+                            <span v-if="item.username==userInfo.username" class="synch-self">{{$L('自己')}}</span>
                         </li>
                     </ul>
                 </Poptip>
@@ -158,8 +161,13 @@
                         font-size: 16px;
                     }
                     &.synch {
-                        em {
-                            padding-left: 2px;
+                        .synch-container {
+                            width: 50px;
+                            height: 38px;
+                            line-height: 38px;
+                            em {
+                                padding-left: 2px;
+                            }
                         }
                     }
                     &:hover,
@@ -184,6 +192,17 @@
                                 width: 24px;
                                 height: 24px;
                                 border-radius: 50%;
+                            }
+                            .synch-self {
+                                padding: 1px 3px;
+                                margin-left: 5px;
+                                height: 18px;
+                                line-height: 16px;
+                                background-color: #FF5722;
+                                color: #ffffff;
+                                font-size: 12px;
+                                border-radius: 3px;
+                                transform: scale(0.95);
                             }
                             .synch-username {
                                 padding-left: 8px;
@@ -548,6 +567,15 @@
                     this.goForward({name: 'docs-edit', params: {sid: detail.id, other: detail || {}}}, true);
                     this.refreshSid();
                     this.docDrawerShow = false;
+                }
+            },
+
+            handleSynch(username) {
+                if (username == this.userInfo.username) {
+                    return;
+                }
+                if (typeof window.onChatOpenUserName === "function") {
+                    window.onChatOpenUserName(username);
                 }
             },
 

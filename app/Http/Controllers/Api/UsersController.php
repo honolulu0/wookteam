@@ -313,6 +313,7 @@ class UsersController extends Controller
      * @apiParam {Object} [sorts]               排序方式，格式：{key:'', order:''}
      * - key: username|id(默认)
      * - order: asc|desc
+     * @apiParam {String} [username]            指定获取某个成员（返回对象）
      * @apiParam {Number} [firstchart]          是否获取首字母，1:获取
      * @apiParam {Number} [page]                当前页，默认:1
      * @apiParam {Number} [pagesize]            每页显示数量，默认:10，最大:100
@@ -326,6 +327,12 @@ class UsersController extends Controller
             $user = $user['data'];
         }
         //
+        $username = trim(Request::input('username'));
+        $whereArray = [];
+        if ($username) {
+            $whereArray[] = ['username', '=', $username];
+        }
+        //
         $orderBy = '`id` DESC';
         $sorts = Base::json2array(Request::input('sorts'));
         if (in_array($sorts['order'], ['asc', 'desc'])) {
@@ -336,7 +343,7 @@ class UsersController extends Controller
             }
         }
         //
-        $lists = DB::table('users')->select(['id', 'identity', 'username', 'nickname', 'userimg', 'profession', 'regdate'])->orderByRaw($orderBy)->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+        $lists = DB::table('users')->where($whereArray)->select(['id', 'identity', 'username', 'nickname', 'userimg', 'profession', 'regdate'])->orderByRaw($orderBy)->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的团队成员');
@@ -345,6 +352,9 @@ class UsersController extends Controller
             $lists['lists'][$key]['identity'] = is_array($item['identity']) ? $item['identity'] : explode(",", trim($item['identity'], ","));
             $lists['lists'][$key]['userimg'] = Users::userimg($item['userimg']);
             $lists['lists'][$key]['firstchart'] = Base::getFirstCharter($item['username']);
+        }
+        if ($username) {
+            return Base::retSuccess('success', $lists['lists'][0]);
         }
         return Base::retSuccess('success', $lists);
     }

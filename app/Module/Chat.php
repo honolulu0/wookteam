@@ -210,4 +210,21 @@ class Chat
         if (!is_array($array['body']) || empty($array['body'])) $array['body'] = ['_' => time()];
         return $array;
     }
+
+    /**
+     * 获取跟任务有关系的（在线）用户（关注的、在项目里的、负责人、创建者）
+     * @param $taskId
+     * @return array
+     */
+    public static function getTaskUsers($taskId)
+    {
+        $tmpLists = Project::taskSomeUsers($taskId);
+        if (empty($tmpLists)) {
+            return [];
+        }
+        //
+        return Base::DBC2A(DB::table('ws')->select(['fd', 'username', 'channel'])->where([
+            ['update', '>', time() - 600],
+        ])->whereIn('username', array_values(array_unique($tmpLists)))->get());
+    }
 }

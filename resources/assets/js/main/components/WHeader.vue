@@ -43,7 +43,7 @@
             </div>
         </div>
         <WDrawer v-model="systemDrawerShow" maxWidth="640" :title="$L('系统设置')">
-            <Form ref="formSystem" :model="formSystem" :label-width="100">
+            <Form ref="formSystem" :model="formSystem" :label-width="120">
                 <FormItem :label="$L('首页Logo')" prop="userimg">
                     <ImgUpload v-model="formSystem.logo" :num="1"></ImgUpload>
                     <span style="color:#777">{{$L('建议尺寸：%', '300x52')}}</span>
@@ -65,6 +65,18 @@
                         <Radio label="open">{{$L('开启')}}</Radio>
                         <Radio label="close">{{$L('关闭')}}</Radio>
                     </RadioGroup>
+                </FormItem>
+                <FormItem :label="$L('完成自动归档')" prop="autoArchived">
+                    <RadioGroup :value="formSystem.autoArchived" @on-change="formArchived">
+                        <Radio label="open">{{$L('开启')}}</Radio>
+                        <Radio label="close">{{$L('关闭')}}</Radio>
+                    </RadioGroup>
+                    <Tooltip v-if="formSystem.autoArchived=='open'" class="setting-auto-day" placement="right">
+                        <Input v-model="formSystem.archivedDay" type="number">
+                            <span slot="append">{{$L('天')}}</span>
+                        </Input>
+                        <div slot="content">{{$L('任务完成 % 天后自动归档。', formSystem.archivedDay)}}</div>
+                    </Tooltip>
                 </FormItem>
                 <FormItem>
                     <Button :loading="loadIng > 0" type="primary" @click="handleSubmit('formSystem')">{{$L('提交')}}</Button>
@@ -250,6 +262,13 @@
             }
         }
     }
+    .setting-auto-day {
+        display: block;
+        width: 110px;
+        margin-top: 12px;
+        line-height: 32px;
+        margin-bottom: -10px;
+    }
     .setting-bg {
         margin-top: 6px;
         margin-bottom: -24px;
@@ -304,6 +323,8 @@
                     github: 'show',
                     reg: 'open',
                     callav: 'open',
+                    autoArchived: 'close',
+                    archivedDay: 7,
                 },
 
                 formDatum: {
@@ -452,6 +473,8 @@
                             this.formSystem.github = this.formSystem.github || 'show';
                             this.formSystem.reg = this.formSystem.reg || 'open';
                             this.formSystem.callav = this.formSystem.callav || 'open';
+                            this.formSystem.autoArchived = this.formSystem.autoArchived || 'close';
+                            this.formSystem.archivedDay = this.formSystem.archivedDay || 7;
                             if (save) {
                                 this.$Message.success(this.$L('修改成功'));
                             }
@@ -536,6 +559,9 @@
             },
             handleReset(name) {
                 this.$refs[name].resetFields();
+            },
+            formArchived(value) {
+                this.formSystem = { ...this.formSystem, autoArchived: value };
             }
         },
     }

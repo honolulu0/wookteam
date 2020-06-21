@@ -28,7 +28,7 @@ class SystemController extends Controller
      *
      * @apiParam {String} type
      * - get: 获取（默认）
-     * - save: 保存设置（参数：logo、github、reg）
+     * - save: 保存设置（参数：logo、github、reg、callav、autoArchived、archivedDay）
      */
     public function setting()
     {
@@ -48,11 +48,19 @@ class SystemController extends Controller
             }
             $all = Request::input();
             foreach ($all AS $key => $value) {
-                if (!in_array($key, ['logo', 'github', 'reg'])) {
+                if (!in_array($key, ['logo', 'github', 'reg', 'callav', 'autoArchived', 'archivedDay'])) {
                     unset($all[$key]);
                 }
             }
             $all['logo'] = is_array($all['logo']) ? $all['logo'][0]['path'] : $all['logo'];
+            $all['archivedDay'] = intval($all['archivedDay']);
+            if ($all['autoArchived'] == 'open') {
+                if ($all['archivedDay'] <= 0) {
+                    return Base::retError(['自动归档时间不可小于%天！', 1]);
+                } elseif ($all['archivedDay'] > 100) {
+                    return Base::retError(['自动归档时间不可大于%天！', 100]);
+                }
+            }
             $setting = Base::setting('system', Base::newTrim($all));
         } else {
             $setting = Base::setting('system');

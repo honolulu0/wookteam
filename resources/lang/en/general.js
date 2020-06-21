@@ -424,4 +424,7 @@ export default {
     "MD编辑器": "Markdown Cell",
     "更新提示": "Update",
     "团队成员（%）更新了内容，<br/>更新时间：%。<br/><br/>点击【确定】加载最新内容。": "Team members (%) updated content, <br/> update time: %. <br/><br/> click \"ok\" to load the latest content.",
+    "完成自动归档": "Auto archiving",
+    "天": "Day",
+    "任务完成 % 天后自动归档。": "Tasks are automatically archived % days after completion.",
 }

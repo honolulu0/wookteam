@@ -121,4 +121,6 @@ return [
     "[语音通话]" => "[Voice call]",
     "[视频通话]" => "[Video call]",
     "发送内容长度已超出最大限制！" => "The content length has exceeded the maximum limit!",
+    "自动归档时间不可小于%天！" => "Automatic filing time can not be less than % days!",
+    "自动归档时间不可大于%天！" => "The automatic filing time cannot be more than % days!",
 ];

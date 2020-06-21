@@ -36,7 +36,7 @@
                     </li>
                     <li class="text-status detail-icon">
                         <span>{{$L('任务状态：')}}</span>
-                        <em v-if="detail.complete" class="complete">{{$L('已完成')}}</em>
+                        <em v-if="detail.complete" class="complete">{{$L('已完成')}}<span class="completedate">({{$A.formatDate("Y-m-d H:i", detail.completedate)}})</span></em>
                         <em v-else class="unfinished">{{$L('未完成')}}</em>
                     </li>
                 </ul>
@@ -102,7 +102,7 @@
                     <div slot="content">
                         <div style="width:280px">
                             {{$L('选择关注人')}}
-                            <UserInput :multiple="true" :transfer="false" v-model="detail.attentionLists" :placeholder="$L('输入关键词搜索')" style="margin:5px 0 3px"></UserInput>
+                            <UserInput :projectid="detail.projectid" :multiple="true" :transfer="false" v-model="detail.attentionLists" :placeholder="$L('输入关键词搜索')" style="margin:5px 0 3px"></UserInput>
                             <Button :loading="!!loadData.attention" :disabled="!detail.attentionLists" class="btn" type="primary" style="text-align:center;width:72px;height:28px;font-size:13px" @click="handleTask('attention')">确 定</Button>
                         </div>
                     </div>
@@ -756,6 +756,11 @@
                             }
                             &.complete {
                                 color: #666666;
+                                .completedate {
+                                    font-size: 12px;
+                                    padding-left: 4px;
+                                    opacity: 0.6;
+                                }
                             }
                             &.overdue {
                                 color: #ff0000;

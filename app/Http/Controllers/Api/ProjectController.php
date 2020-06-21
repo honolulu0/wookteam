@@ -1719,6 +1719,7 @@ class ProjectController extends Controller
                                     'id' => $task['id'],
                                     'title' => $task['title'],
                                     'operator' => $user['username'],
+                                    'action' => 'attention',
                                 ])
                             ]);
                         }
@@ -1754,6 +1755,7 @@ class ProjectController extends Controller
                                     'id' => $task['id'],
                                     'title' => $task['title'],
                                     'operator' => $user['username'],
+                                    'action' => 'unattention',
                                 ])
                             ]);
                         }
@@ -1836,12 +1838,16 @@ class ProjectController extends Controller
             if (count($lists['lists']) == 0) {
                 return Base::retError('no lists');
             }
+            $array = [];
             foreach ($lists['lists'] AS $key => $item) {
                 $item = array_merge($item, Users::username2basic($item['username']));
                 $item['other'] = Base::string2array($item['other'], ['type' => '']);
-                $lists['lists'][$key] = $item;
+                if (!in_array($item['other']['action'], ['attention', 'unattention'])) {
+                    $array[] = $item;
+                }
                 $pushlid = $item['id'];
             }
+            $lists['lists'] = $array;
             if ($pushlid != $task['pushlid']) {
                 DB::table('project_task')->where('id', $taskid)->update([
                     'pushlid' => $pushlid

@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Module\Base;
 use App\Module\Chat;
+use App\Module\Project;
 use App\Module\Users;
 use App\Tasks\ChromeExtendTask;
 use App\Tasks\PushTask;
@@ -276,7 +277,7 @@ class WebSocketService implements WebSocketHandlerInterface
                 if ($data['body']['type'] === 'taskA') {
                     $taskId = intval(Base::val($data['body'], 'taskDetail.id'));
                     if ($taskId > 0) {
-                        $userLists = $this->getTaskUsers($taskId);
+                        $userLists = Chat::getTaskUsers($taskId);
                     } else {
                         $userLists = $this->getTeamUsers();
                     }
@@ -438,7 +439,7 @@ class WebSocketService implements WebSocketHandlerInterface
     }
 
     /**
-     * 获取团队用户
+     * 获取团队所有在线用户
      * @return array|string
      */
     private function getTeamUsers()
@@ -446,35 +447,5 @@ class WebSocketService implements WebSocketHandlerInterface
         return Base::DBC2A(DB::table('ws')->select(['fd', 'username', 'channel'])->where([
             ['update', '>', time() - 600],
         ])->get());
-    }
-
-    /**
-     * 获取跟任务有关系的用户（关注的、在项目里的、负责人、创建者）
-     * @param $taskId
-     * @return array
-     */
-    private function getTaskUsers($taskId)
-    {
-        $taskDeatil = Base::DBC2A(DB::table('project_task')->select(['follower', 'createuser', 'username', 'projectid'])->where('id', $taskId)->first());
-        if (empty($taskDeatil)) {
-            return [];
-        }
-        //关注的用户
-        $userArray = Base::string2array($taskDeatil['follower']);
-        //创建者
-        $userArray[] = $taskDeatil['createuser'];
-        //负责人
-        $userArray[] = $taskDeatil['username'];
-        //在项目里的用户
-        if ($taskDeatil['projectid'] > 0) {
-            $tempLists = Base::DBC2A(DB::table('project_users')->select(['username'])->where(['projectid' => $taskDeatil['projectid'], 'type' => '成员' ])->get());
-            foreach ($tempLists AS $item) {
-                $userArray[] = $item['username'];
-            }
-        }
-        //
-        return Base::DBC2A(DB::table('ws')->select(['fd', 'username', 'channel'])->where([
-            ['update', '>', time() - 600],
-        ])->whereIn('username', array_values(array_unique($userArray)))->get());
     }
 }

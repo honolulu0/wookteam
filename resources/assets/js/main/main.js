@@ -421,7 +421,7 @@ import '../../sass/main.scss';
                                 other: item.other
                             };
                             res.data.follower.forEach((username) => {
-                                if (username != msgData.username) {
+                                if (username != msgData.username && username != $A.getUserName()) {
                                     $A.WSOB.sendTo('user', username, msgData, 'special');
                                 }
                             });

@@ -161,7 +161,7 @@
                     .docs-header {
                         display: flex;
                         align-items: center;
-                        margin: 6px 24px 12px;
+                        margin: 6px 24px 0;
                         padding: 12px 0;
                         border-bottom: 1px solid #eeeeee;
                         .docs-h1 {
@@ -182,7 +182,7 @@
                     }
                     .docs-section {
                         flex: 1;
-                        margin: 0 26px;
+                        padding: 12px 26px;
                         overflow: auto;
                         transform: translateZ(0);
                         .none {
