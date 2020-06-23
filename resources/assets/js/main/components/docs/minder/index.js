@@ -1,5 +1,5 @@
-import 'vue-kityminder-gg/static/kity'
-import 'vue-kityminder-gg/static/kityminder-core'
+import './static/kity'
+import './static/kityminder.core.min'
 import "hotboxkit/less/hotbox.less"
 import Editor from './minder'
 
@@ -17,4 +17,4 @@ const install = function (Vue, opts = {}) {
 if (typeof window !== 'undefined' && window.Vue) {
     install(window.Vue);
 }
-export default Object.assign(MindEditor, {install});
+export default Object.assign(MindEditor, {install});   // eslint-disable-line no-undef

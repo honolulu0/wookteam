@@ -141,3 +141,8 @@ systemctl restart supervisord
 ```
 
 到此安装完毕，希望你使用愉快！
+
+## 默认账号
+
+- admin/123456
+- system/123456

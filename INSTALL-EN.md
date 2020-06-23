@@ -21,62 +21,39 @@ $ cd wookteam
 $ cp .env.docker .env
 ```
 
-#### 2. Modify`.env`
-
-`APP_PORT`= (whatever port you want to run the app)
-
-`DB_HOST`= (Value should be`mariadb`)
-
-`DB_DATABASE`= (Add value as you wish)
-
-`DB_USERNAME`= (Add value as you wish)
-
-`DB_PASSWORD`= (Add value as you wish)
-
-`DB_ROOT_PASSWORD`= (Add value as you wish)
-
-> example：
-
-```env
-APP_PORT=80
-......
-DB_CONNECTION=mysql
-DB_HOST=mariadb
-DB_PORT=3306
-DB_DATABASE=wookteam
-DB_USERNAME=wookteam
-DB_PASSWORD=123456
-DB_ROOT_PASSWORD=123456
-......
-LARAVELS_LISTEN_IP=0.0.0.0
-LARAVELS_LISTEN_PORT=5200
-```
-
-#### 3. Build image & install
+#### 2. Build image & install
 
 ```bash
-./cmd build php
-./cmd composer install
-./cmd up -d
-./cmd artisan key:generate
-./cmd artisan migrate --seed
-./cmd npm install
-./cmd npm run prod
-./cmd supervisorctl restart all
+$ ./cmd build php
+$ ./cmd composer install
+$ ./cmd artisan key:generate
+$ ./cmd artisan migrate --seed
+$ ./cmd php bin/wookteam --port=8080
+$ ./cmd up -d
+$ ./cmd npm install
+$ ./cmd npm run prod
+$ ./cmd supervisorctl restart all
 ```
 
-Installed, project url: **`http://IP:APP_PORT`**.
+Installed, project url: **`http://IP:PORT`** (`PORT` is the parameter `8080` in the build).
 
-#### To stop the app server
+### Change port
 
 ```bash
-./cmd stop
+$ ./cmd php bin/wookteam --port=8080
+$ ./cmd up -d
+```
+
+#### Stop server
+
+```bash
+$ ./cmd stop
 ```
 
 > P.S: Once application is setup, whenever you want to start the server (if it is stopped) run below command
 
 ```bash
-./cmd start
+$ ./cmd start
 ```
 
 ### Shortcuts for running command
@@ -84,21 +61,14 @@ Installed, project url: **`http://IP:APP_PORT`**.
 > You can do this using the following command
 
 ```bash
-./cmd artisan "your command"    // To run a artisan command
-
-./cmd php "your command"   // To run a php command
-
-./cmd composer "your command"   // To run a composer command
-
-./cmd supervisorctl "your command"   // To run a supervisorctl command
-
-./cmd test "your command"   // To run a phpunit command
-
-./cmd npm "your command"    // To run a npm command
-
-./cmd yarn "your command"   // To run a yarn command
-
-./cmd mysql "your command"  // To run a mysql command
+$ ./cmd artisan "your command"          // To run a artisan command
+$ ./cmd php "your command"              // To run a php command
+$ ./cmd composer "your command"         // To run a composer command
+$ ./cmd supervisorctl "your command"    // To run a supervisorctl command
+$ ./cmd test "your command"             // To run a phpunit command
+$ ./cmd npm "your command"              // To run a npm command
+$ ./cmd yarn "your command"             // To run a yarn command
+$ ./cmd mysql "your command"            // To run a mysql command
 ```
 
 ## Setup (if you're not using docker)
@@ -236,7 +206,7 @@ server {
 }
 ```
 
-## Account
+## Default Account
 
 - admin/123456
 - system/123456

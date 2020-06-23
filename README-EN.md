@@ -6,12 +6,14 @@
 - `wookteam` Support team online chat communication, subscribe task dynamic real-time push.
 - **`wookteam` All open source.**
 
-## Website
-
-- [https://www.wookteam.com](https://www.wookteam.com)
+## Installation
 - [Install(Using Docker)](./INSTALL-EN.md#setup-using-docker)
 - [Install(Bt Panel)](./INSTALL-BT.md)
 - [Install(Server)](./INSTALL-EN.md#setup-if-youre-not-using-docker)
+
+## Website
+
+- [https://www.wookteam.com](https://www.wookteam.com)
 
 ## Demo
 
@@ -29,7 +31,7 @@
 - Communication: Swoole
 - Theme style: Kooteam
 
-## 国际化
+## Internationalization
 
 - `WookTeam`Support internationalization, support: simplified Chinese, English, English translation from Google translation. If you have a better grammar you are welcome to write it. [Translation data](https://docs.google.com/spreadsheets/d/1m0de8-5vCwjKRwW_lsgzsi8wmOmQRl_bIMGN988Keak/edit?usp=sharing)
 
