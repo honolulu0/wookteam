@@ -71,6 +71,23 @@ class IndexController extends Controller
     }
 
     /**
+     * 获取websocket地址
+     * @return array|mixed
+     */
+    public function get__wsurl() {
+        $wsurl = env('LARAVELS_PROXY_URL');
+        if (!$wsurl) {
+            $wsurl = url('');
+            $wsurl = str_replace('https://', 'wss://', $wsurl);
+            $wsurl = str_replace('http://', 'ws://', $wsurl);
+            $wsurl.= '/ws';
+        }
+        return Base::retSuccess('success', [
+            'wsurl' => $wsurl,
+        ]);
+    }
+
+    /**
      * 首页
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
