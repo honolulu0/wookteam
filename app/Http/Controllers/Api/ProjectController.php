@@ -1190,7 +1190,9 @@ class ProjectController extends Controller
             if (count($lists['lists']) == 0) {
                 return Base::retError('未能找到此任务或无法管理此任务！');
             }
-            return Base::retSuccess('success', $lists['lists'][0]);
+            $data = $lists['lists'][0];
+            $data['projectTitle'] = $data['projectid'] > 0 ? DB::table('project_lists')->where('id', $data['projectid'])->value('title') : '';
+            return Base::retSuccess('success', $data);
         } else {
             return Base::retSuccess('success', $lists);
         }
