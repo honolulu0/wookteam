@@ -1227,7 +1227,7 @@ class ProjectController extends Controller
             ];
         }
         foreach ($array AS $key => $val) {
-            $level = intval(Base::leftDelete($val, 'level_'));
+            $level = intval(Base::leftDelete($key, 'level_'));
             $array[$key] = DB::table('project_task')->where($whereArray)->where('level', $level)->count();
         }
         return Base::retSuccess('success', $array);
