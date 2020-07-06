@@ -1199,6 +1199,41 @@ class ProjectController extends Controller
     }
 
     /**
+     * 项目任务-获取数量
+     *
+     * @apiParam {Number} [level]               任务等级（1~4，留空获取所有）
+     */
+    public function task__levelnum()
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
+        } else {
+            $user = $user['data'];
+        }
+        //
+        $whereArray = [];
+        $whereArray[] = ['project_task.delete', '=', 0];
+        $whereArray[] = ['project_task.username', '=', $user['username']];
+        $array = [
+            'level_1' => 0,
+            'level_2' => 0,
+            'level_3' => 0,
+            'level_4' => 0,
+        ];
+        if (intval(Request::input('level')) > 0) {
+            $array = [
+                'level_1' => 0,
+            ];
+        }
+        foreach ($array AS $key => $val) {
+            $level = intval(Base::leftDelete($val, 'level_'));
+            $array[$val] = DB::table('project_task')->where($whereArray)->where('level', $level)->count();
+        }
+        return Base::retSuccess('success', $array);
+    }
+
+    /**
      * 项目任务-添加任务
      *
      * @apiParam {String} title                 任务标题
