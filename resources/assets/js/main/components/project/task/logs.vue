@@ -222,20 +222,22 @@
                             if (resetLoad === true) {
                                 this.lists = {};
                             }
-                            res.data.lists.forEach((item) => {
-                                timeData = item.timeData;
-                                key = timeData.ymd + " " + timeData.week;
-                                if (typeof this.lists[key] !== "object") {
-                                    this.$set(this.lists, key, {
-                                        key: key,
-                                        ymd: timeData.ymd,
-                                        lists: [],
-                                    });
-                                }
-                                this.lists[key].lists.push(item);
+                            this.$nextTick(() => {
+                                res.data.lists.forEach((item) => {
+                                    timeData = item.timeData;
+                                    key = timeData.ymd + " " + timeData.week;
+                                    if (typeof this.lists[key] !== "object") {
+                                        this.$set(this.lists, key, {
+                                            key: key,
+                                            ymd: timeData.ymd,
+                                            lists: [],
+                                        });
+                                    }
+                                    this.lists[key].lists.push(item);
+                                });
+                                this.hasMorePages = res.data.hasMorePages;
+                                this.totalNum = res.data.total;
                             });
-                            this.hasMorePages = res.data.hasMorePages;
-                            this.totalNum = res.data.total;
                         } else {
                             this.lists = {};
                             this.hasMorePages = false;

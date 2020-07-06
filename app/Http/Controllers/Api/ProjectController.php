@@ -1215,6 +1215,7 @@ class ProjectController extends Controller
         $whereArray = [];
         $whereArray[] = ['project_task.delete', '=', 0];
         $whereArray[] = ['project_task.username', '=', $user['username']];
+        $whereArray[] = ['project_task.archived', '=', 0];
         $array = [
             'level_1' => 0,
             'level_2' => 0,
