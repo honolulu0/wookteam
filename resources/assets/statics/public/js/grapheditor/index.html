@@ -74,11 +74,19 @@
             var editorUi = new EditorUi(new Editor(urlParams['chrome'] == '0', themes));
             var graph = editorUi.editor.graph;
 
+            var backupXml;
+            var newXml;
+
             graph.getModel().addListener(mxEvent.CHANGE, mxUtils.bind(editorUi, function() {
+                newXml = mxUtils.getPrettyXml(editorUi.editor.getGraphXml());
+                if (backupXml.replace(/^<mxGraphModel(.*?)>/, '') == newXml.replace(/^<mxGraphModel(.*?)>/, '')) {
+                    return;
+                }
+                backupXml = newXml;
                 window.parent.postMessage({
                     act: 'change',
                     params: {
-                        xml: mxUtils.getPrettyXml(editorUi.editor.getGraphXml())
+                        xml: newXml
                     }
                 }, '*');
             }));
@@ -88,8 +96,53 @@
                 switch (data.act) {
                     case 'setXml':
                         try {
+                            backupXml = data.params.xml;
                             var defaultXml = mxUtils.parseXml(data.params.xml);
                             editorUi.editor.setGraphXml(defaultXml.documentElement);
+                        } catch (e) {
+
+                        }
+                        break;
+
+                    case 'exportPNG':
+                        try {
+                            (function (name, scale, type) {
+                                name = name || '未命名';
+                                type = type || 'png';
+                                scale = scale || 1;
+                                var graph = editorUi.editor.graph;
+                                var bounds = graph.getGraphBounds();
+                                var width = Math.ceil(bounds.width / graph.view.scale * scale);
+                                var height = Math.ceil(bounds.height / graph.view.scale * scale);
+                                var source = '<?xml version="1.0" standalone="no"?>\r\n' + mxUtils.getXml(graph.getSvg(null, scale, 0))
+                                var image = new Image()
+                                image.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(source)
+                                var canvas = document.createElement('canvas')
+                                canvas.width = width
+                                canvas.height = height
+                                var context = canvas.getContext('2d')
+                                context.fillStyle = '#fff'
+                                context.fillRect(0, 0, 10000, 10000)
+                                image.onload = function () {
+                                    context.drawImage(image, 0, 0)
+                                    if (type == 'imageContent') {
+                                        window.parent.postMessage({
+                                            act: 'imageContent',
+                                            params: {
+                                                name: name,
+                                                width: width,
+                                                height: height,
+                                                content: canvas.toDataURL(`image/${type}`)
+                                            }
+                                        }, '*');
+                                    } else {
+                                        var a = document.createElement('a')
+                                        a.download = `${name}.${type}`
+                                        a.href = canvas.toDataURL(`image/${type}`)
+                                        a.click()
+                                    }
+                                }
+                            })(data.params.name, data.params.scale, data.params.type);
                         } catch (e) {
 
                         }

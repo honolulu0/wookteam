@@ -1,6 +1,6 @@
 <template>
     <drawer-tabs-container>
-        <div class="project-complete">
+        <div class="project-users">
             <!-- 按钮 -->
             <Button :loading="loadIng > 0" type="primary" icon="md-add" @click="addUser">{{$L('添加成员')}}</Button>
             <!-- 列表 -->
@@ -12,7 +12,7 @@
 </template>
 
 <style lang="scss" scoped>
-    .project-complete {
+    .project-users {
         padding: 0 12px;
         .tableFill {
             margin: 12px 0 20px;

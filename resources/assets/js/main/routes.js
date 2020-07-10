@@ -29,6 +29,11 @@ export default [
         meta: { slide: false },
         component: resolve => require(['./pages/docs/edit.vue'], resolve)
     }, {
+        path: '/docs/view/:sid',
+        name: 'docs-view',
+        meta: { slide: false },
+        component: resolve => require(['./pages/docs/view.vue'], resolve)
+    }, {
         path: '/team',
         name: 'team',
         meta: { slide: false, tabActive: 'team' },

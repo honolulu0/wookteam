@@ -44,29 +44,29 @@
         </div>
         <WDrawer v-model="systemDrawerShow" maxWidth="640" :title="$L('系统设置')">
             <Form ref="formSystem" :model="formSystem" :label-width="120">
-                <FormItem :label="$L('首页Logo')" prop="userimg">
+                <FormItem :label="$L('首页Logo')">
                     <ImgUpload v-model="formSystem.logo" :num="1"></ImgUpload>
                     <span style="color:#777">{{$L('建议尺寸：%', '300x52')}}</span>
                 </FormItem>
-                <FormItem :label="$L('Github图标')" prop="userimg">
+                <FormItem :label="$L('Github图标')">
                     <RadioGroup v-model="formSystem.github">
                         <Radio label="show">{{$L('显示')}}</Radio>
                         <Radio label="hidden">{{$L('隐藏')}}</Radio>
                     </RadioGroup>
                 </FormItem>
-                <FormItem :label="$L('允许注册')" prop="userimg">
+                <FormItem :label="$L('允许注册')">
                     <RadioGroup v-model="formSystem.reg">
                         <Radio label="open">{{$L('允许')}}</Radio>
                         <Radio label="close">{{$L('禁止')}}</Radio>
                     </RadioGroup>
                 </FormItem>
-                <FormItem :label="$L('音视频通话')" prop="callav">
+                <FormItem :label="$L('音视频通话')">
                     <RadioGroup v-model="formSystem.callav">
                         <Radio label="open">{{$L('开启')}}</Radio>
                         <Radio label="close">{{$L('关闭')}}</Radio>
                     </RadioGroup>
                 </FormItem>
-                <FormItem :label="$L('完成自动归档')" prop="autoArchived">
+                <FormItem :label="$L('完成自动归档')">
                     <RadioGroup :value="formSystem.autoArchived" @on-change="formArchived">
                         <Radio label="open">{{$L('开启')}}</Radio>
                         <Radio label="close">{{$L('关闭')}}</Radio>

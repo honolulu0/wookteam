@@ -291,6 +291,20 @@ class Users
     }
 
     /**
+     * 获取会员昵称
+     * @param $username
+     * @return mixed
+     */
+    public static function nickname($username)
+    {
+        $info = self::username2basic($username);
+        if (empty($info)) {
+            return $username;
+        }
+        return $info['nickname'] ?: $info['username'];
+    }
+
+    /**
      * 用户头像，不存在时返回默认
      * @param string $var 头像地址 或 会员用户名
      * @return \Illuminate\Contracts\Routing\UrlGenerator|string

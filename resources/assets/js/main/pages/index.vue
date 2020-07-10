@@ -370,6 +370,8 @@
                     github: '',
                     reg: '',
                 }),
+
+                fromUrl: '',
             }
         },
         created() {
@@ -401,6 +403,10 @@
         },
         mounted() {
             this.getSetting();
+            this.fromUrl = decodeURIComponent($A.getObject(this.$route.query, 'from'));
+            if (this.fromUrl) {
+                this.loginChack();
+            }
         },
         deactivated() {
             this.loginShow = false;
@@ -461,7 +467,11 @@
                                     this.loginShow = false;
                                     this.$refs.login.resetFields();
                                     this.$Message.success(this.$L('登录成功'));
-                                    this.goForward({path: '/todo'}, true);
+                                    if (this.fromUrl) {
+                                        window.location.replace(this.fromUrl);
+                                    } else {
+                                        this.goForward({path: '/todo'}, true);
+                                    }
                                 } else {
                                     this.$Modal.error({
                                         title: this.$L("温馨提示"),

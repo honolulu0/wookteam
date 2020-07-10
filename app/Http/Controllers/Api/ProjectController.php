@@ -825,6 +825,9 @@ class ProjectController extends Controller
                 }
             }
         }
+        if ($logArray) {
+            DB::table('project_log')->insert($logArray);
+        }
         return Base::retSuccess('操作完成！');
     }
 

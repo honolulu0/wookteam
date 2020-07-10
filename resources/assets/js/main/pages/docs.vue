@@ -36,7 +36,8 @@
                                 <div class="docs-setting">
                                     <Button @click="[addSectionId=0,addSectionShow=true]">{{$L('新增章节')}}</Button>
                                     <Button @click="[addBookId=selectBookData.id,addBookShow=true]">{{$L('修改标题')}}</Button>
-                                    <!--<Button>{{$L('权限设置')}}</Button>-->
+                                    <Button @click="showShare">{{$L('分享')}}</Button>
+                                    <Button @click="[settingDrawerShow=true,settingDrawerTab='setting']">{{$L('设置')}}</Button>
                                     <Button type="warning" ghost @click="onBookDelete(selectBookData.id)">{{$L('删除')}}</Button>
                                 </div>
                             </div>
@@ -90,6 +91,16 @@
             </div>
         </Modal>
 
+        <WDrawer v-model="settingDrawerShow" maxWidth="750">
+            <Tabs v-if="settingDrawerShow" v-model="settingDrawerTab">
+                <TabPane :label="$L('文档设置')" name="setting">
+                    <book-setting :canload="settingDrawerShow && settingDrawerTab == 'setting'" :id="selectBookData.id"></book-setting>
+                </TabPane>
+                <TabPane :label="$L('文档成员')" name="member">
+                    <book-users :canload="settingDrawerShow && settingDrawerTab == 'member'" :id="selectBookData.id"></book-users>
+                </TabPane>
+            </Tabs>
+        </WDrawer>
     </div>
 </template>
 
@@ -200,8 +211,11 @@
 <script>
     import WContent from "../components/WContent";
     import NestedDraggable from "../components/docs/NestedDraggable";
+    import BookSetting from "../components/docs/setting";
+    import BookUsers from "../components/docs/users";
+    import WDrawer from "../components/iview/WDrawer";
     export default {
-        components: {NestedDraggable, WContent},
+        components: {WDrawer, BookUsers, BookSetting, NestedDraggable, WContent},
         data () {
             return {
                 loadIng: 0,
@@ -234,6 +248,9 @@
                 sectionTypeLists: [],
 
                 sortDisabled: false,
+
+                settingDrawerShow: false,
+                settingDrawerTab: 'setting',
             }
         },
 
@@ -441,6 +458,7 @@
                 $A.aAjax({
                     url: 'docs/section/lists',
                     data: {
+                        act: 'edit',
                         bookid: bookid
                     },
                     complete: () => {
@@ -457,7 +475,7 @@
                             return;
                         }
                         if (res.ret === 1) {
-                            this.sectionLists = res.data;
+                            this.sectionLists = res.data.tree;
                             this.sectionNoDataText = this.$L("没有相关的数据");
                         }else{
                             this.sectionLists = [];
@@ -578,6 +596,28 @@
                         });
                         break;
                 }
+            },
+
+            showShare() {
+                this.$Modal.confirm({
+                    render: (h) => {
+                        return h('div', [
+                            h('div', {
+                                style: {
+                                    fontSize: '16px',
+                                    fontWeight: '500',
+                                    marginBottom: '20px',
+                                }
+                            }, this.$L('文档链接')),
+                            h('Input', {
+                                props: {
+                                    value: $A.fillUrl('#/docs/view/b' + this.selectBookData.id),
+                                    readonly: true,
+                                },
+                            })
+                        ])
+                    },
+                });
             }
         },
     }

@@ -1,6 +1,8 @@
 <template>
     <drawer-tabs-container>
-        <div class="project-archived">
+        <div class="book-users">
+            <!-- 按钮 -->
+            <Button :loading="loadIng > 0" type="primary" icon="md-add" @click="addUser">{{$L('添加成员')}}</Button>
             <!-- 列表 -->
             <Table class="tableFill" ref="tableRef" :columns="columns" :data="lists" :loading="loadIng > 0" :no-data-text="noDataText" stripe></Table>
             <!-- 分页 -->
@@ -10,24 +12,20 @@
 </template>
 
 <style lang="scss" scoped>
-    .project-archived {
+    .book-users {
+        padding: 0 12px;
         .tableFill {
-            margin: 12px 12px 20px;
+            margin: 12px 0 20px;
         }
     }
 </style>
 <script>
     import DrawerTabsContainer from "../DrawerTabsContainer";
-    import Task from "../../mixins/task";
-
-    /**
-     * 项目已归档任务
-     */
     export default {
-        name: 'ProjectArchived',
+        name: 'BookUsers',
         components: {DrawerTabsContainer},
         props: {
-            projectid: {
+            id: {
                 default: 0
             },
             canload: {
@@ -35,9 +33,6 @@
                 default: true
             },
         },
-        mixins: [
-            Task
-        ],
         data () {
             return {
                 loadYet: false,
@@ -55,51 +50,52 @@
         created() {
             this.noDataText = this.$L("数据加载中.....");
             this.columns = [{
-                "title": this.$L("任务名称"),
-                "key": 'title',
-                "minWidth": 120,
+                "title": this.$L("头像"),
+                "minWidth": 60,
+                "maxWidth": 100,
                 render: (h, params) => {
-                    return this.renderTaskTitle(h, params);
-                }
-            }, {
-                "title": this.$L("创建人"),
-                "key": 'createuser',
-                "minWidth": 80,
-                render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.createuser
-                        }
+                    return h('img', {
+                        style: {
+                            width: "32px",
+                            height: "32px",
+                            verticalAlign: "middle",
+                            objectFit: "cover",
+                            borderRadius: "50%"
+                        },
+                        attrs: {
+                            src: params.row.userimg
+                        },
                     });
                 }
             }, {
-                "title": this.$L("负责人"),
+                "title": this.$L("用户名"),
                 "key": 'username',
                 "minWidth": 80,
+                "ellipsis": true,
+            }, {
+                "title": this.$L("昵称"),
+                "minWidth": 80,
+                "ellipsis": true,
                 render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.username
-                        }
-                    });
+                    return h('span', params.row.nickname || '-');
                 }
             }, {
-                "title": this.$L("完成"),
-                "minWidth": 70,
-                "align": "center",
+                "title": this.$L("职位/职称"),
+                "minWidth": 100,
+                "ellipsis": true,
                 render: (h, params) => {
-                    return h('span', params.row.complete ? '√' : '-');
+                    return h('span', params.row.profession || '-');
                 }
             }, {
-                "title": this.$L("归档时间"),
+                "title": this.$L("加入时间"),
                 "width": 160,
                 render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.archiveddate));
+                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
                 }
             }, {
                 "title": this.$L("操作"),
                 "key": 'action',
-                "width": 100,
+                "width": 80,
                 "align": 'center',
                 render: (h, params) => {
                     return h('Button', {
@@ -113,15 +109,16 @@
                         on: {
                             click: () => {
                                 this.$Modal.confirm({
-                                    title: this.$L('取消归档'),
-                                    content: this.$L('你确定要取消归档吗？'),
+                                    title: this.$L('移出成员'),
+                                    content: this.$L('你确定要将此成员移出项目吗？'),
                                     loading: true,
                                     onOk: () => {
                                         $A.aAjax({
-                                            url: 'project/task/edit',
+                                            url: 'docs/users/join',
                                             data: {
-                                                act: 'unarchived',
-                                                taskid: params.row.id,
+                                                act: 'delete',
+                                                id: params.row.id,
+                                                username: params.row.username,
                                             },
                                             error: () => {
                                                 this.$Modal.remove();
@@ -133,10 +130,8 @@
                                                 setTimeout(() => {
                                                     if (res.ret === 1) {
                                                         this.$Message.success(res.msg);
-                                                        $A.triggerTaskInfoListener('unarchived', res.data);
-                                                        $A.triggerTaskInfoChange(params.row.id);
-                                                    } else {
-                                                        this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                                                    }else{
+                                                        this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });
                                                     }
                                                 }, 350);
                                             }
@@ -145,7 +140,7 @@
                                 });
                             }
                         }
-                    }, this.$L('取消归档'));
+                    }, this.$L('删除'));
                 }
             }];
         },
@@ -154,46 +149,10 @@
                 this.loadYet = true;
                 this.getLists(true);
             }
-            $A.setOnTaskInfoListener('components/project/archived', (act, detail) => {
-                if (detail.projectid != this.projectid) {
-                    return;
-                }
-                //
-                this.lists.some((task, i) => {
-                    if (task.id == detail.id) {
-                        this.lists.splice(i, 1, detail);
-                        return true;
-                    }
-                });
-                //
-                switch (act) {
-                    case "delete":      // 删除任务
-                    case "unarchived":  // 取消归档
-                        this.lists.some((task, i) => {
-                            if (task.id == detail.id) {
-                                this.lists.splice(i, 1);
-                                return true;
-                            }
-                        });
-                        break;
-
-                    case "archived":    // 归档
-                        let has = false;
-                        this.lists.some((task) => {
-                            if (task.id == detail.id) {
-                                return has = true;
-                            }
-                        });
-                        if (!has) {
-                            this.lists.unshift(detail);
-                        }
-                        break;
-                }
-            });
         },
 
         watch: {
-            projectid() {
+            id() {
                 if (this.loadYet) {
                     this.getLists(true);
                 }
@@ -223,7 +182,7 @@
                 if (resetLoad === true) {
                     this.listPage = 1;
                 }
-                if (this.projectid == 0) {
+                if (this.id == 0) {
                     this.lists = [];
                     this.listTotal = 0;
                     this.noDataText = this.$L("没有相关的数据");
@@ -232,12 +191,11 @@
                 this.loadIng++;
                 this.noDataText = this.$L("数据加载中.....");
                 $A.aAjax({
-                    url: 'project/task/lists',
+                    url: 'docs/users/lists',
                     data: {
                         page: Math.max(this.listPage, 1),
                         pagesize: Math.max($A.runNum(this.listPageSize), 10),
-                        projectid: this.projectid,
-                        archived: '已归档',
+                        id: this.id,
                     },
                     complete: () => {
                         this.loadIng--;
@@ -258,6 +216,68 @@
                     }
                 });
             },
+
+            addUser() {
+                this.userValue = "";
+                this.$Modal.confirm({
+                    render: (h) => {
+                        return h('div', [
+                            h('div', {
+                                style: {
+                                    fontSize: '16px',
+                                    fontWeight: '500',
+                                    marginBottom: '20px',
+                                }
+                            }, this.$L('添加成员')),
+                            h('UserInput', {
+                                props: {
+                                    value: this.userValue,
+                                    multiple: true,
+                                    nousername: $A.getUserName(),
+                                    nobookid: this.id,
+                                    placeholder: this.$L('请输入昵称/用户名搜索')
+                                },
+                                on: {
+                                    input: (val) => {
+                                        this.userValue = val;
+                                    }
+                                }
+                            })
+                        ])
+                    },
+                    loading: true,
+                    onOk: () => {
+                        if (this.userValue) {
+                            let username = this.userValue;
+                            $A.aAjax({
+                                url: 'docs/users/join',
+                                data: {
+                                    act: 'join',
+                                    id: this.id,
+                                    username: username,
+                                },
+                                error: () => {
+                                    this.$Modal.remove();
+                                    alert(this.$L('网络繁忙，请稍后再试！'));
+                                },
+                                success: (res) => {
+                                    this.$Modal.remove();
+                                    this.getLists();
+                                    setTimeout(() => {
+                                        if (res.ret === 1) {
+                                            this.$Message.success(res.msg);
+                                        } else {
+                                            this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                                        }
+                                    }, 350);
+                                }
+                            });
+                        } else {
+                            this.$Modal.remove();
+                        }
+                    },
+                });
+            }
         }
     }
 </script>

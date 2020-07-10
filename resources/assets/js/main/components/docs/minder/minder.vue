@@ -5,40 +5,40 @@
                 <i class="ft icon" :title="$L('缩放')">&#xE7B3;</i>
                 <div slot="content">
                     <ul class="quickul">
-                        <li @click="minder.execCommand('Zoom', 200)">200%</li>
-                        <li @click="minder.execCommand('Zoom', 150)">150%</li>
-                        <li @click="minder.execCommand('Zoom', 100)">100%</li>
-                        <li @click="minder.execCommand('Zoom', 50)">50%</li>
-                        <li @click="minder.execCommand('Zoom', 25)">25%</li>
+                        <li @click="execCommand('Zoom', 200)">200%</li>
+                        <li @click="execCommand('Zoom', 150)">150%</li>
+                        <li @click="execCommand('Zoom', 100)">100%</li>
+                        <li @click="execCommand('Zoom', 50)">50%</li>
+                        <li @click="execCommand('Zoom', 25)">25%</li>
                     </ul>
                 </div>
             </Tooltip>
-            <Tooltip placement="top" theme="light">
+            <Tooltip v-if="readOnly!==true" placement="top" theme="light">
                 <i class="ft icon" :title="$L('图形')">&#xE621;</i>
                 <div slot="content">
                     <ul class="quickul mold">
-                        <li @click="minder.execCommand('template', 'default')"><span class="default"></span></li>
-                        <li @click="minder.execCommand('template', 'structure')"><span class="structure"></span></li>
-                        <li @click="minder.execCommand('template', 'filetree')"><span class="filetree"></span></li>
-                        <li @click="minder.execCommand('template', 'right')"><span class="right"></span></li>
-                        <li @click="minder.execCommand('template', 'fish-bone')"><span class="fish-bone"></span></li>
-                        <li @click="minder.execCommand('template', 'tianpan')"><span class="tianpan"></span></li>
+                        <li @click="execCommand('template', 'default')"><span class="default"></span></li>
+                        <li @click="execCommand('template', 'structure')"><span class="structure"></span></li>
+                        <li @click="execCommand('template', 'filetree')"><span class="filetree"></span></li>
+                        <li @click="execCommand('template', 'right')"><span class="right"></span></li>
+                        <li @click="execCommand('template', 'fish-bone')"><span class="fish-bone"></span></li>
+                        <li @click="execCommand('template', 'tianpan')"><span class="tianpan"></span></li>
                     </ul>
                 </div>
             </Tooltip>
-            <Tooltip placement="top" theme="light">
+            <Tooltip v-if="readOnly!==true" placement="top" theme="light">
                 <i class="ft icon" :title="$L('样式')">&#xE678;</i>
                 <div slot="content">
                     <ul class="quickul">
-                        <li @click="minder.execCommand('theme', 'fresh-blue')">{{$L('天空蓝')}}</li>
-                        <li @click="minder.execCommand('theme', 'wire')">{{$L('线框')}}</li>
-                        <li @click="minder.execCommand('theme', 'fish')">{{$L('鱼骨图')}}</li>
-                        <li @click="minder.execCommand('theme', 'classic')">{{$L('脑图经典')}}</li>
-                        <li @click="minder.execCommand('theme', 'classic-compact')">{{$L('紧凑经典')}}</li>
-                        <li @click="minder.execCommand('theme', 'snow')">{{$L('温柔冷光')}}</li>
-                        <li @click="minder.execCommand('theme', 'snow-compact')">{{$L('紧凑冷光')}}</li>
-                        <li @click="minder.execCommand('theme', 'tianpan')">{{$L('经典天盘')}}</li>
-                        <li @click="minder.execCommand('theme', 'tianpan-compact')">{{$L('紧凑天盘')}}</li>
+                        <li @click="execCommand('theme', 'fresh-blue')">{{$L('天空蓝')}}</li>
+                        <li @click="execCommand('theme', 'wire')">{{$L('线框')}}</li>
+                        <li @click="execCommand('theme', 'fish')">{{$L('鱼骨图')}}</li>
+                        <li @click="execCommand('theme', 'classic')">{{$L('脑图经典')}}</li>
+                        <li @click="execCommand('theme', 'classic-compact')">{{$L('紧凑经典')}}</li>
+                        <li @click="execCommand('theme', 'snow')">{{$L('温柔冷光')}}</li>
+                        <li @click="execCommand('theme', 'snow-compact')">{{$L('紧凑冷光')}}</li>
+                        <li @click="execCommand('theme', 'tianpan')">{{$L('经典天盘')}}</li>
+                        <li @click="execCommand('theme', 'tianpan-compact')">{{$L('紧凑天盘')}}</li>
                     </ul>
                 </div>
             </Tooltip>
@@ -46,12 +46,12 @@
                 <i class="ft icon" :title="$L('折叠')">&#xE779;</i>
                 <div slot="content">
                     <ul class="quickul">
-                        <li @click="minder.execCommand('ExpandToLevel', 1)">{{$L('展开到一级节点')}}</li>
-                        <li @click="minder.execCommand('ExpandToLevel', 2)">{{$L('展开到二级节点')}}</li>
-                        <li @click="minder.execCommand('ExpandToLevel', 3)">{{$L('展开到三级节点')}}</li>
-                        <li @click="minder.execCommand('ExpandToLevel', 4)">{{$L('展开到四级节点')}}</li>
-                        <li @click="minder.execCommand('ExpandToLevel', 5)">{{$L('展开到五级节点')}}</li>
-                        <li @click="minder.execCommand('ExpandToLevel', 99)">{{$L('展开全部节点')}}</li>
+                        <li @click="execCommand('ExpandToLevel', 1)">{{$L('展开到一级节点')}}</li>
+                        <li @click="execCommand('ExpandToLevel', 2)">{{$L('展开到二级节点')}}</li>
+                        <li @click="execCommand('ExpandToLevel', 3)">{{$L('展开到三级节点')}}</li>
+                        <li @click="execCommand('ExpandToLevel', 4)">{{$L('展开到四级节点')}}</li>
+                        <li @click="execCommand('ExpandToLevel', 5)">{{$L('展开到五级节点')}}</li>
+                        <li @click="execCommand('ExpandToLevel', 99)">{{$L('展开全部节点')}}</li>
                     </ul>
                 </div>
             </Tooltip>
@@ -60,9 +60,6 @@
             </Tooltip>
             <Tooltip placement="top" :content="$L('移动')">
                 <div @click="[minder.execCommand('Hand'),isHand=!isHand]"><i class="ft icon" :class="{active:isHand}">&#xE6CF;</i></div>
-            </Tooltip>
-            <Tooltip placement="top" :content="$L('导出PNG图片')">
-                <div @click="exportHandle(0)"><Icon type="md-photos"/></div>
             </Tooltip>
         </div>
         <div :id="id"></div>
@@ -169,7 +166,6 @@
     }
 </style>
 <script>
-    const Editor = require('vue-kityminder-gg/src/editor');
     import {generateMixed} from 'vue-kityminder-gg/src/utils/index.js';
     import 'vue-kityminder-gg/examples/styles/minder.css';
     import JSPDF from 'jspdf';
@@ -207,6 +203,10 @@
                 type: Boolean,
                 default: true
             },
+            readOnly: {
+                type: Boolean,
+                default: false
+            },
             id: {
                 type: String,
                 default: 'minder-component-' + generateMixed(12)
@@ -219,23 +219,39 @@
             };
         },
         methods: {
-            exportHandle(n) {
-                if (n === 0) {
+            execCommand(var1, var2) {
+                if (this.readOnly === true) {
+                    this.minder.enable();
+                    this.$nextTick(() => {
+                        this.minder.execCommand(var1, var2);
+                        this.$nextTick(() => {
+                            this.minder.disable();
+                            if (this.isHand) {
+                                this.minder.execCommand('Hand');
+                            }
+                        });
+                    });
+                } else {
+                    this.minder.execCommand(var1, var2);
+                }
+            },
+            exportHandle(n, filename) {
+                filename = filename || (this.value.root.data.text || this.$L('无标题'));
+                if (n === 0 || n === 'png') {
                     this.minder.exportData('png').then((content) => {
                         let element = document.createElement('a');
                         element.setAttribute('href', content);
-                        let filename = this.value.root.data.text || this.$L('无标题');
                         element.setAttribute('download', filename);
                         element.style.display = 'none';
                         document.body.appendChild(element);
                         element.click();
                         document.body.removeChild(element);
                     });
-                } else if (n === 1) {
+                } else if (n === 1 || n === 'pdf') {
                     this.minder.exportData('png').then((content) => {
-                        var doc = new JSPDF();
+                        let doc = new JSPDF();
                         doc.addImage(content, 'PNG', 0, 0, 0, 0);
-                        doc.save(`${this.value.root.data.text || this.$L('无标题')}.pdf`);
+                        doc.save(`${filename}.pdf`);
                     });
                 }
             },
@@ -245,8 +261,15 @@
                         if (this.minder !== null) {
                             return;
                         }
+                        window.__minderReadOnly = this.readOnly;
+                        const Editor = require('./editor');
                         this.minder = window.editor = new Editor(document.getElementById(this.id)).minder;
                         this.minder.importJson(this.value);
+                        if (this.readOnly === true) {
+                            this.minder.disable();
+                            this.minder.execCommand('Hand');
+                            this.isHand = true;
+                        }
                         this.$emit('minderHandle', this.minder);
                         this.minder.on('contentchange', val => {
                             this.$emit('input', this.minder.exportJson());

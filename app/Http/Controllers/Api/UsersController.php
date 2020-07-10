@@ -141,12 +141,13 @@ class UsersController extends Controller
      *
      * @apiParam {Object} where            搜索条件
      * - where.usernameequal
-     * - where.username
      * - where.nousername
-     * - where.identity
+     * - where.username
      * - where.noidentity
-     * - where.projectid
+     * - where.identity
      * - where.noprojectid
+     * - where.projectid
+     * - where.nobookid
      * @apiParam {Number} [take]           获取数量，10-100
      */
     public function searchinfo()
@@ -181,6 +182,10 @@ class UsersController extends Controller
         if (intval($keys['noprojectid']) > 0) {
             $whereRaw.= $whereRaw ? ' AND ' : '';
             $whereRaw.= "`username` NOT IN (SELECT username FROM `" . env('DB_PREFIX') . "project_users` WHERE `type`='成员' AND `projectid`=" . intval($keys['noprojectid']) .")";
+        }
+        if (intval($keys['nobookid']) > 0) {
+            $whereRaw.= $whereRaw ? ' AND ' : '';
+            $whereRaw.= "`username` NOT IN (SELECT username FROM `" . env('DB_PREFIX') . "docs_users` WHERE `bookid`=" . intval($keys['nobookid']) .")";
         }
         //
         $lists = DBCache::table('users')->select(['id', 'username', 'nickname', 'userimg', 'profession'])

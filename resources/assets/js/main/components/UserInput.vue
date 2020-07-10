@@ -134,6 +134,9 @@
             projectid: {
                 default: ''
             },
+            nobookid: {
+                default: ''
+            },
             placeholder: {
                 default: ''
             },
@@ -238,6 +241,9 @@
                         }
                         if (this.projectid) {
                             where['projectid'] = this.projectid;
+                        }
+                        if (this.nobookid) {
+                            where['nobookid'] = this.nobookid;
                         }
                         this.noDataText = this.$L("数据加载中.....");
                         $A.aAjax({
@@ -374,6 +380,9 @@
                 }
                 if (this.projectid) {
                     where['projectid'] = this.projectid;
+                }
+                if (this.nobookid) {
+                    where['nobookid'] = this.nobookid;
                 }
                 this.noDataText = this.$L("数据加载中.....");
                 $A.aAjax({

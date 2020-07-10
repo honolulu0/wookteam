@@ -6,12 +6,20 @@
         <div class="edit-box">
             <div class="edit-header">
                 <div class="header-menu active" @click="handleClick('back')"><Icon type="md-arrow-back" /></div>
-                <div class="header-menu" @click="handleClick('menu')"><Icon type="md-menu" /></div>
-                <!--<div class="header-menu" @click="handleClick('share')"><Icon type="md-share" /></div>
-                <div class="header-menu" @click="handleClick('view')"><Icon type="md-eye" /></div>-->
-                <div class="header-menu" @click="handleClick('history')"><Icon type="md-time" /></div>
+                <Tooltip class="header-menu" :content="$L('知识库目录')">
+                    <div class="menu-container" @click="handleClick('menu')"><Icon type="md-menu" /></div>
+                </Tooltip>
+                <Tooltip class="header-menu" :content="$L('分享文档')">
+                    <div class="menu-container" @click="handleClick('share')"><Icon type="md-share" /></div>
+                </Tooltip>
+                <Tooltip class="header-menu" :content="$L('浏览文档')">
+                    <a class="menu-container" target="_blank" :href="handleClick('view')"><Icon type="md-eye" /></a>
+                </Tooltip>
+                <Tooltip class="header-menu" :content="$L('历史版本')">
+                    <div class="menu-container" @click="handleClick('history')"><Icon type="md-time" /></div>
+                </Tooltip>
                 <Poptip class="header-menu synch">
-                    <div class="synch-container">
+                    <div class="menu-container">
                         <Icon type="md-contacts" :title="$L('正在协作会员')"/><em v-if="synchUsers.length > 0">{{synchUsers.length}}</em>
                     </div>
                     <ul class="synch-lists" slot="content">
@@ -23,6 +31,13 @@
                         </li>
                     </ul>
                 </Poptip>
+                <Tooltip class="header-menu" :class="{lock:isLock}" max-width="500">
+                    <div slot="content" style="white-space:nowrap">
+                        <span v-if="isLock&&docDetail.lockname!=userInfo.username">【<UserView :username="docDetail.lockname"/>】{{$L('已锁定')}}</span>
+                        <span v-else>{{$L('锁定后其他会员将无法修改保存文档。')}}</span>
+                    </div>
+                    <div class="menu-container" @click="handleClick(isLock?'unlock':'lock')"><Icon :type="isLock?'md-lock':'md-unlock'" /></div>
+                </Tooltip>
                 <div class="header-title">{{docDetail.title}}</div>
                 <div v-if="docDetail.type=='document'" class="header-hint">
                     <ButtonGroup size="small" shape="circle">
@@ -30,7 +45,28 @@
                         <Button :type="`${docContent.type=='md'?'primary':'default'}`" @click="$set(docContent, 'type', 'md')">{{$L('MD编辑器')}}</Button>
                     </ButtonGroup>
                 </div>
-                <div v-else-if="docDetail.type=='mind'" class="header-hint">{{$L('选中节点，按enter键添加子节点，tab键添加同级节点')}}</div>
+                <div v-if="docDetail.type=='mind'" class="header-hint">
+                    {{$L('选中节点，按enter键添加同级节点，tab键添加子节点')}}
+                </div>
+                <Dropdown v-if="docDetail.type=='mind' || docDetail.type=='flow' || docDetail.type=='sheet'"
+                          trigger="click"
+                          class="header-hint"
+                          @on-click="exportMenu">
+                    <a href="javascript:void(0)">
+                        {{$L('导出')}}
+                        <Icon type="ios-arrow-down"></Icon>
+                    </a>
+                    <DropdownMenu v-if="docDetail.type=='sheet'" slot="list">
+                        <DropdownItem name="xlsx">{{$L('导出XLSX')}}</DropdownItem>
+                        <DropdownItem name="xlml">{{$L('导出XLS')}}</DropdownItem>
+                        <DropdownItem name="csv">{{$L('导出CSV')}}</DropdownItem>
+                        <DropdownItem name="txt">{{$L('导出TXT')}}</DropdownItem>
+                    </DropdownMenu>
+                    <DropdownMenu v-else slot="list">
+                        <DropdownItem name="png">{{$L('导出PNG图片')}}</DropdownItem>
+                        <DropdownItem name="pdf">{{$L('导出PDF文件')}}</DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
                 <Button :disabled="(disabledBtn || loadIng > 0) && hid == 0" class="header-button" size="small" type="primary" @click="handleClick('save')">{{$L('保存')}}</Button>
             </div>
             <div class="docs-body">
@@ -38,9 +74,9 @@
                     <MDEditor v-if="docContent.type=='md'" class="body-text" v-model="docContent.content" height="100%"></MDEditor>
                     <TEditor v-else class="body-text" v-model="docContent.content" height="100%"></TEditor>
                 </template>
-                <minder v-else-if="docDetail.type=='mind'" class="body-mind" v-model="docContent"></minder>
-                <sheet v-else-if="docDetail.type=='sheet'" class="body-sheet" v-model="docContent.content"></sheet>
-                <flow v-else-if="docDetail.type=='flow'" class="body-flow" v-model="docContent.content"></flow>
+                <minder v-else-if="docDetail.type=='mind'" ref="myMind" class="body-mind" v-model="docContent"></minder>
+                <sheet v-else-if="docDetail.type=='sheet'" ref="mySheet" class="body-sheet" v-model="docContent.content"></sheet>
+                <flow v-else-if="docDetail.type=='flow'" ref="myFlow" class="body-flow" v-model="docContent.content"></flow>
             </div>
         </div>
 
@@ -145,7 +181,7 @@
                 background-color: #ffffff;
                 box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
                 position: relative;
-                z-index: 9;
+                z-index: 99;
                 .header-menu {
                     width: 50px;
                     height: 100%;
@@ -155,25 +191,37 @@
                     justify-content: center;
                     margin-right: 3px;
                     cursor: pointer;
-                    color: #777777;
                     position: relative;
+                    .menu-container {
+                        display: inline-block;
+                        width: 50px;
+                        height: 38px;
+                        line-height: 38px;
+                        color: #777777;
+                        transition: color .2s ease;
+                    }
                     .ivu-icon {
                         font-size: 16px;
                     }
                     &.synch {
-                        .synch-container {
-                            width: 50px;
-                            height: 38px;
-                            line-height: 38px;
+                        .menu-container {
                             em {
                                 padding-left: 2px;
                             }
+                        }
+                    }
+                    &.lock {
+                        .menu-container {
+                            color: #059DFD;
                         }
                     }
                     &:hover,
                     &.active {
                         color: #fff;
                         background: #059DFD;
+                        .menu-container {
+                            color: #fff;
+                        }
                     }
                     .synch-lists {
                         max-height: 500px;
@@ -230,6 +278,9 @@
                     .ivu-btn {
                         font-size: 12px;
                         padding: 0 10px;
+                    }
+                    .ivu-dropdown-item {
+                        font-size: 12px !important;
                     }
                 }
                 .header-button {
@@ -293,6 +344,8 @@
                 routeName: '',
                 synergyNum: 0,
                 synchUsers: [],
+
+                timeValue: Math.round(new Date().getTime() / 1000),
             }
         },
         created() {
@@ -358,6 +411,10 @@
                 }
             }, false);
             //
+            setInterval(() => {
+                this.timeValue = Math.round(new Date().getTime() / 1000);
+            });
+            //
             $A.WSOB.setOnMsgListener("chat/index", ['docs'], (msgDetail) => {
                 if (this.routeName !== this.$route.name) {
                     return;
@@ -366,17 +423,53 @@
                 if (body.sid != this.sid) {
                     return;
                 }
-                if (body.type === 'users') {
-                    this.synchUsers = body.lists;
-                    this.synchUsers.splice(this.synchUsers.length);
-                } else if (body.type === 'update') {
-                    this.$Modal.confirm({
-                        title: this.$L("更新提示"),
-                        content: this.$L('团队成员（%）更新了内容，<br/>更新时间：%。<br/><br/>点击【确定】加载最新内容。', body.nickname, $A.formatDate("Y-m-d H:i:s", body.time)),
-                        onOk: () => {
-                            this.refreshDetail();
+                switch (body.type) {
+                    case 'users':
+                        this.synchUsers = body.lists;
+                        this.synchUsers.splice(this.synchUsers.length);
+                        break;
+
+                    case 'update':
+                        this.$Modal.confirm({
+                            title: this.$L("更新提示"),
+                            content: this.$L('团队成员（%）更新了内容，<br/>更新时间：%。<br/><br/>点击【确定】加载最新内容。', body.nickname, $A.formatDate("Y-m-d H:i:s", body.time)),
+                            onOk: () => {
+                                this.refreshDetail();
+                            }
+                        });
+                        break;
+
+                    case 'lock':
+                    case 'unlock':
+                        if (this.docDetail.lockname == body.lockname) {
+                            return;
                         }
-                    });
+                        this.$set(this.docDetail, 'lockname', body.lockname);
+                        this.$set(this.docDetail, 'lockdate', body.lockdate);
+                        this.$Notice.close('docs-lock')
+                        this.$Notice[body.type=='lock'?'warning':'info']({
+                            name: 'docs-lock',
+                            duration: 0,
+                            render: h => {
+                                return h('div', {
+                                    style: {
+                                        lineHeight: '18px'
+                                    }
+                                }, [
+                                    h('span', {
+                                        style: {
+                                            fontWeight: 500
+                                        }
+                                    }, body.nickname + ':'),
+                                    h('span', {
+                                        style: {
+                                            paddingLeft: '6px'
+                                        }
+                                    }, this.$L(body.type == 'lock' ? '锁定文档' : '解锁文档'))
+                                ])
+                            }
+                        });
+                        break;
                 }
             });
         },
@@ -385,6 +478,12 @@
             this.synergy(true);
         },
         deactivated() {
+            if (this.isLock && this.docDetail.lockname == this.userInfo.username) {
+                this.docDetail.lockname = '';
+                this.handleClick('unlock');
+            }
+            this.$Notice.close('docs-lock');
+            //
             this.synergy(false);
             this.docDrawerShow = false;
             if ($A.getToken() === false) {
@@ -410,6 +509,7 @@
                             $A.aAjax({
                                 url: 'docs/section/lists',
                                 data: {
+                                    act: 'edit',
                                     bookid: bookid
                                 },
                                 error: () => {
@@ -423,7 +523,7 @@
                                         return;
                                     }
                                     if (res.ret === 1) {
-                                        this.sectionLists = res.data;
+                                        this.sectionLists = res.data.tree;
                                         this.sectionNoDataText = this.$L("没有相关的数据");
                                     }else{
                                         this.sectionLists = [];
@@ -473,10 +573,12 @@
                 return this.bakContent == $A.jsonStringify(this.docContent);
             },
             synchUsersS() {
-                let temp = Math.round(new Date().getTime() / 1000);
                 return this.synchUsers.filter(item => {
-                    return item.indate + 10 > temp;
+                    return item.indate + 10 > this.timeValue;
                 });
+            },
+            isLock() {
+                return !!(this.docDetail.lockname && this.docDetail.lockdate > this.timeValue - 60);
             }
         },
         methods: {
@@ -540,6 +642,7 @@
                 $A.aAjax({
                     url: 'docs/section/content',
                     data: {
+                        act: 'edit',
                         id: this.sid,
                     },
                     complete: () => {
@@ -554,6 +657,7 @@
                             this.docDetail = res.data;
                             this.docContent = $A.jsonParse(res.data.content);
                             this.bakContent = $A.jsonStringify(this.docContent);
+                            this.continueLock(1000);
                         } else {
                             this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
                             this.goBack();
@@ -641,6 +745,7 @@
                                     this.historyNoDataText = '';
                                 } else {
                                     this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                                    this.bakContent = '';
                                 }
                             }
                         });
@@ -653,10 +758,94 @@
                         break;
 
                     case "share":
-                    case "view":
-                        this.$Message.info(this.$L("敬请期待！"));
+                        this.$Modal.confirm({
+                            render: (h) => {
+                                return h('div', [
+                                    h('div', {
+                                        style: {
+                                            fontSize: '16px',
+                                            fontWeight: '500',
+                                            marginBottom: '20px',
+                                        }
+                                    }, this.$L('文档链接')),
+                                    h('Input', {
+                                        props: {
+                                            value: this.handleClick('view'),
+                                            readonly: true,
+                                        },
+                                    })
+                                ])
+                            },
+                        });
                         break;
 
+                    case "lock":
+                    case "unlock":
+                        $A.aAjax({
+                            url: 'docs/section/lock?id=' + this.getSid(),
+                            data: {
+                                act: act,
+                            },
+                            error: () => {
+                                alert(this.$L('网络繁忙，请稍后再试！'));
+                            },
+                            success: (res) => {
+                                if (res.ret === 1) {
+                                    if (this.docDetail.lockname != res.data.lockname) {
+                                        this.$Message.success(res.msg);
+                                    }
+                                    this.$set(this.docDetail, 'lockname', res.data.lockname);
+                                    this.$set(this.docDetail, 'lockdate', res.data.lockdate);
+                                    this.continueLock(20000);
+                                } else {
+                                    this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                                }
+                            }
+                        });
+                        break;
+
+                    case "view":
+                        return $A.fillUrl('#/docs/view/' + this.docDetail.id);
+
+                }
+            },
+
+            continueLock(time) {
+                if (!this.isLock) {
+                    return;
+                }
+                if (this.docDetail.lockname != this.userInfo.username) {
+                    return;
+                }
+                this.__continueLock = $A.randomString(6);
+                let tempString = this.__continueLock;
+                setTimeout(() => {
+                    if (tempString != this.__continueLock) {
+                        return;
+                    }
+                    if (!this.isLock) {
+                        return;
+                    }
+                    if (this.docDetail.lockname != this.userInfo.username) {
+                        return;
+                    }
+                    this.handleClick('lock');
+                }, time);
+            },
+
+            exportMenu(act) {
+                switch (this.docDetail.type) {
+                    case 'mind':
+                        this.$refs.myMind.exportHandle(act == 'pdf' ? 1 : 0, this.docDetail.title);
+                        break;
+
+                    case 'flow':
+                        this.$refs.myFlow[act == 'pdf' ? 'exportPDF' : 'exportPNG'](this.docDetail.title, 1);
+                        break;
+
+                    case 'sheet':
+                        this.$refs.mySheet.exportExcel(this.docDetail.title, act);
+                        break;
                 }
             }
         },

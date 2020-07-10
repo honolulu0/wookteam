@@ -123,4 +123,10 @@ return [
     "发送内容长度已超出最大限制！" => "The content length has exceeded the maximum limit!",
     "自动归档时间不可小于%天！" => "Automatic filing time can not be less than % days!",
     "自动归档时间不可大于%天！" => "The automatic filing time cannot be more than % days!",
+    "已被会员【%】锁定！" => "Has been locked by the member [%]!",
+    "锁定成功" => "Locked",
+    "已解除锁定" => "Unlocked",
+    "知识库仅对会员开放，请登录后再试！" => "Knowledge base is open to members only, please login and try again!",
+    "知识库仅对成员开放！" => "Knowledge base is open to members only!",
+    "知识库仅对作者开放！" => "Knowledge base for authors only!",
 ];

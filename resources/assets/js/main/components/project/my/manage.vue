@@ -1,6 +1,6 @@
 <template>
     <drawer-tabs-container>
-        <div class="project-complete">
+        <div class="project-my-manage">
             <!-- 列表 -->
             <Table class="tableFill" ref="tableRef" :columns="columns" :data="lists" :loading="loadIng > 0" :no-data-text="noDataText" stripe></Table>
             <!-- 分页 -->
@@ -10,7 +10,7 @@
 </template>
 
 <style lang="scss" scoped>
-    .project-complete {
+    .project-my-manage {
         .tableFill {
             margin: 12px 12px 20px;
         }

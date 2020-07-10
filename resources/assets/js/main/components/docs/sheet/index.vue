@@ -1,7 +1,18 @@
 <template>
-    <div ref="xspreadsheet" class="xspreadsheet"></div>
+    <div ref="xspreadsheet" class="xspreadsheet" :class="{'xspreadsheet-readonly':readOnly}"></div>
 </template>
 
+<style lang="scss">
+    .xspreadsheet-readonly {
+        .x-spreadsheet-menu {
+            > li:first-child {
+              > div.x-spreadsheet-icon {
+                  display: none;
+              }
+            }
+        }
+    }
+</style>
 <style lang="scss" scoped>
     .xspreadsheet {
         position: absolute;
@@ -15,6 +26,7 @@
 <script>
     import Spreadsheet from 'x-data-spreadsheet';
     import zhCN from 'x-data-spreadsheet/dist/locale/zh-cn';
+    import XLSX from 'xlsx';
 
     export default {
         name: "Sheet",
@@ -24,6 +36,10 @@
                 default: function () {
                     return {}
                 }
+            },
+            readOnly: {
+                type: Boolean,
+                default: false
             },
         },
         data() {
@@ -36,7 +52,7 @@
         mounted() {
             Spreadsheet.locale('zh-cn', zhCN);
             //
-            this.sheet = new Spreadsheet(this.$refs.xspreadsheet, {
+            let options = {
                 view: {
                     height: () => {
                         try {
@@ -53,11 +69,48 @@
                         }
                     },
                 },
-            }).loadData(this.value).change(data => {
-                this.$emit('input', data);
+            };
+            if (this.readOnly) {
+                options.mode = 'read'
+                options.showToolbar = false
+                options.showContextmenu = false;
+            }
+            this.sheet = new Spreadsheet(this.$refs.xspreadsheet, options).loadData(this.value).change(data => {
+                if (!this.readOnly) {
+                    this.$emit('input', data);
+                }
             });
             //
             this.sheet.validate()
         },
+        methods: {
+            exportExcel(name, bookType){
+                var new_wb = this.xtos(this.sheet.getData());
+                XLSX.writeFile(new_wb, name + "." + (bookType == 'xlml' ? 'xls' : bookType), {
+                    bookType: bookType || "xlsx"
+                });
+            },
+
+            xtos(sdata) {
+                var out = XLSX.utils.book_new();
+                sdata.forEach(function(xws) {
+                    var aoa = [[]];
+                    var rowobj = xws.rows;
+                    for(var ri = 0; ri < rowobj.len; ++ri) {
+                        var row = rowobj[ri];
+                        if(!row) continue;
+                        aoa[ri] = [];
+                        Object.keys(row.cells).forEach(function(k) {
+                            var idx = +k;
+                            if(isNaN(idx)) return;
+                            aoa[ri][idx] = row.cells[k].text;
+                        });
+                    }
+                    var ws = XLSX.utils.aoa_to_sheet(aoa);
+                    XLSX.utils.book_append_sheet(out, ws, xws.name);
+                });
+                return out;
+            },
+        }
     }
 </script>

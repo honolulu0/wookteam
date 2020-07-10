@@ -35,6 +35,7 @@
     }
 </style>
 <script>
+    import JSPDF from "jspdf";
 
     export default {
         name: "Flow",
@@ -42,13 +43,17 @@
             value: {
                 type: ''
             },
+            readOnly: {
+                type: Boolean,
+                default: false
+            },
         },
         data() {
             return {
                 loadIng: true,
 
                 flow: null,
-                url: window.location.origin + '/js/grapheditor/index.html',
+                url: window.location.origin + '/js/grapheditor/' + (this.readOnly ? 'viewer' : 'index') + '.html',
             }
         },
         mounted() {
@@ -61,7 +66,6 @@
         },
         methods: {
             handleMessage (event) {
-                // 根据上面制定的结构来解析iframe内部发回来的数据
                 const data = event.data;
                 switch (data.act) {
                     case 'ready':
@@ -77,7 +81,37 @@
                     case 'change':
                         this.$emit('input', data.params.xml);
                         break
+
+                    case 'imageContent':
+                        let pdf = new JSPDF({
+                            format: [data.params.width, data.params.height]
+                        });
+                        pdf.addImage(data.params.content, 'PNG', 0, 0, 0, 0);
+                        pdf.save(`${data.params.name}.pdf`);
+                        break
                 }
+            },
+
+            exportPNG(name, scale = 10) {
+                this.flow.postMessage({
+                    act: 'exportPNG',
+                    params: {
+                        name: name || this.$L('无标题'),
+                        scale: scale,
+                        type: 'png',
+                    }
+                }, '*')
+            },
+
+            exportPDF(name, scale = 10) {
+                this.flow.postMessage({
+                    act: 'exportPNG',
+                    params: {
+                        name: name || this.$L('无标题'),
+                        scale: scale,
+                        type: 'imageContent',
+                    }
+                }, '*')
             }
         },
     }
