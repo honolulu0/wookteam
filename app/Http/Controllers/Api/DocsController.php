@@ -44,7 +44,7 @@ class DocsController extends Controller
         }
         //
         $lists = DB::table('docs_book')
-            ->where('role_edit', 'reg')
+            ->where('username', $user['username'])
             ->orWhere(function ($query) use ($user) {
                 $query->where('role_edit', 'private')->where('username', $user['username']);
             })
@@ -82,9 +82,11 @@ class DocsController extends Controller
         //
         $id = intval(Request::input('id'));
         $title = trim(Request::input('title'));
-        $role = Docs::checkRole($id, 'edit');
-        if (Base::isError($role)) {
-            return $role;
+        if ($id > 0) {
+            $role = Docs::checkRole($id, 'edit');
+            if (Base::isError($role)) {
+                return $role;
+            }
         }
         if (mb_strlen($title) < 2 || mb_strlen($title) > 100) {
             return Base::retError('标题限制2-100个字！');

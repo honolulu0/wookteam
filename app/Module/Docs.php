@@ -43,6 +43,10 @@ class Docs
                 }
             }
         }
+        if ($user['username'] == $row['username']) {
+            return Base::retSuccess('success');
+        }
+        //
         if ($row['role_' . $checkType] == 'member') {
             if (!DB::table('docs_users')->where('bookid', $bookid)->where('username', $user['username'])->exists()) {
                 return Base::retError('知识库仅对成员开放！', -1002);
