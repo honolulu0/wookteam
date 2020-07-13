@@ -2,6 +2,12 @@
 
 > 此教程是在`Centos 7`下安装的宝塔面板。
 
+- [安装教程(Docker)](DOCKER.md)
+- [安装教程(服务器)](SERVER.md)
+- **安装教程(宝塔面板)**
+
+## 安装设置
+
 ### 1、安装宝塔控制面板
 
 请移步至宝塔官方 https://www.bt.cn/
@@ -51,7 +57,7 @@ upstream swoole {
 
 如下图：
 
-![](./resources/assets/statics/other/bt/1.png)
+![](../resources/assets/statics/other/bt/1.png)
 
 - 网站伪静态设为：
 
@@ -136,8 +142,9 @@ stdout_logfile=/www/wwwroot/wookteam.com/%(program_name)s.log
 ```
 
 - 运行以下命令：
-```
-systemctl restart supervisord
+
+```bash
+$ systemctl restart supervisord
 ```
 
 到此安装完毕，希望你使用愉快！
@@ -146,3 +153,20 @@ systemctl restart supervisord
 
 - admin/123456
 - system/123456
+
+## 升级更新
+
+- 进入服务器，切换至网站目录，然后依次运行一下命令：
+
+```bash
+$ git fetch --all
+$ git reset --hard origin/master
+$ git pull
+$ composer install
+$ php artisan migrate
+
+$ npm install
+$ npm run production
+
+$ systemctl restart supervisord
+```

@@ -1,15 +1,15 @@
 # Introduction
 
-**[中文文档](./README.md)**
+**[中文文档](README.md)**
 
 - `wookteam` Is a lightweight online team collaboration tool, provides a variety of documentation tools, online mind mapping, online flow chart, project management, task distribution, knowledge base management tools.
 - `wookteam` Support team online chat communication, subscribe task dynamic real-time push.
 - **`wookteam` All open source.**
 
 ## Installation
-- [Install(Using Docker)](./INSTALL-EN.md#setup-using-docker)
-- [Install(Bt Panel)](./INSTALL-BT.md)
-- [Install(Server)](./INSTALL-EN.md#setup-if-youre-not-using-docker)
+- [Install(Docker)](install/en/DOCKER.md)
+- [Install(Server)](install/en/SERVER.md)
+- [Install(Bt Panel)](install/BT.md)
 
 ## Website
 
@@ -21,7 +21,7 @@
 
 ## WeChat
 
-- ![WeChat](./resources/assets/statics/other/wxqr.jpeg)
+- ![WeChat](resources/assets/statics/other/wxqr.jpeg)
 
 ## Technology
 
@@ -38,16 +38,16 @@
 ## Function
 
 **1. Four quadrants: Highlight priorities, help employees arrange their time properly, and improve work efficiency**
-![Four quadrants: Highlight priorities, help employees arrange their time properly, and improve work efficiency](./resources/assets/statics/images/index/todo.jpg)
+![Four quadrants: Highlight priorities, help employees arrange their time properly, and improve work efficiency](resources/assets/statics/images/index/todo.jpg)
 
 **2. Online flow chart: online flow chart tool, easy to use**
-![Online flow chart: online flow chart tool, easy to use](./resources/assets/statics/images/index/banner/1.jpg)
+![Online flow chart: online flow chart tool, easy to use](resources/assets/statics/images/index/banner/1.jpg)
 
 **3. Online mind mapping: Organize your thoughts and optimize your workflow**
-![Online mind mapping: Organize your thoughts and optimize your workflow](./resources/assets/statics/images/index/banner/2.jpg)
+![Online mind mapping: Organize your thoughts and optimize your workflow](resources/assets/statics/images/index/banner/2.jpg)
 
 **4. Project management: Custom project kanban, visual task scheduling**
-![Project management: Custom project kanban, visual task scheduling](./resources/assets/statics/images/index/project.jpg)
+![Project management: Custom project kanban, visual task scheduling](resources/assets/statics/images/index/project.jpg)
 
 **5. Online knowledge base: online flowcharts, online documentation, and visual catalogs, document management without worry**
-![Online knowledge base: online flowcharts, online documentation, and visual catalogs, document management without worry](./resources/assets/statics/images/index/wiki.jpg)
+![Online knowledge base: online flowcharts, online documentation, and visual catalogs, document management without worry](resources/assets/statics/images/index/wiki.jpg)

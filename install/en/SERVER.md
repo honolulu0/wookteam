@@ -1,98 +1,33 @@
-# 安装教程
+# Install
 
-**[English Documentation](./INSTALL-EN.md)**
+**[中文文档](../SERVER.md)**
 
-## 安装设置（使用Docker）
+- [Install(Docker)](DOCKER.md)
+- **Install(Server)**
+- [Install(Bt Panel)](../BT.md)
 
-> 必须安装 `Docker` 和 `Docker Compose`
-
-#### 1、克隆项目到您的本地或服务器
-
-```bash
-// 使用ssh
-$ git clone git@github.com:kuaifan/wookteam.git
-// 或者你也可以使用https
-$ git clone https://github.com/kuaifan/wookteam.git
-
-// 进入目录
-$ cd wookteam
-
-// 拷贝 .env
-$ cp .env.docker .env
-```
-
-#### 2、构建项目
-
-```bash
-$ ./cmd build php
-$ ./cmd composer install
-$ ./cmd artisan key:generate
-$ ./cmd artisan migrate --seed
-$ ./cmd php bin/wookteam --port=8080
-$ ./cmd up -d
-$ ./cmd npm install
-$ ./cmd npm run prod
-$ ./cmd supervisorctl restart all
-```
-
-到此安装完毕，项目地址为：**`http://IP:PORT`**（`PORT`为构建项目中的参数`8080`）。
-
-### 更换端口
-
-```bash
-$ ./cmd php bin/wookteam --port=8080
-$ ./cmd up -d
-```
-
-### 停止服务
-
-```bash
-$ ./cmd stop
-```
-
-> 一旦应用程序被设置，无论何时你想要启动服务器(如果它被停止)运行以下命令
-
-```bash
-$ ./cmd start
-```
-
-### 运行命令的快捷方式
-
-> 你可以使用以下命令来执行
-
-```bash
-$ ./cmd artisan "your command"          // 运行 artisan 命令
-$ ./cmd php "your command"              // 运行 php 命令
-$ ./cmd composer "your command"         // 运行 composer 命令
-$ ./cmd supervisorctl "your command"    // 运行 supervisorctl 命令
-$ ./cmd test "your command"             // 运行 phpunit 命令
-$ ./cmd npm "your command"              // 运行 npm 命令
-$ ./cmd yarn "your command"             // 运行 yarn 命令
-$ ./cmd mysql "your command"            // 运行 mysql 命令
-```
-
-## 安装设置（如果你没有使用docker）
+## Setup (Server)
 
 > Fork the repo if you are outside collaborator https://github.com/kuaifan/wookteam.
 
-#### 1、克隆项目到您的本地或服务器
+#### 1. Clone the project to your local or server
 
 ```bash
-// 使用ssh
+// using ssh
 $ git clone git@github.com:kuaifan/wookteam.git
-// 或者你也可以使用https
+// or you can use https
 $ git clone https://github.com/kuaifan/wookteam.git
 
-// 进入目录
+// enter directory
 $ cd wookteam
 
-// 拷贝 .env
+// copy .env
 $ cp .env.example .env
 ```
 
-#### 2、修改`.env`
+#### 2. Modify`.env`
 
-> 数据库信息、WebSocket
+> Database、WebSocket
 
 ```env
 DB_CONNECTION=mysql
@@ -106,11 +41,11 @@ LARAVELS_LISTEN_IP=127.0.0.1
 LARAVELS_LISTEN_PORT=5200
 ```
 
-#### 3、设置项目
+#### 3. Setup application
 
 ```bash
-$ git checkout master # 如果使用dev分支进行本地开发
-$ git pull origin master # 如果使用dev分支进行本地开发
+$ git checkout master # use dev branch for local development
+$ git pull origin master # use dev branch for local development
 
 $ composer install
 $ php artisan key:generate
@@ -120,15 +55,15 @@ $ npm install
 $ npm run production
 ```
 
-#### 4、运行 Laravels (WebSocket)
+#### 4. Run Laravels (WebSocket)
 
-> 请确认您的环境以及安装[Swoole](https://www.swoole.com/)。
+> Please confirm your environment and installation[Swoole](https://www.swoole.com/)。
 
 ```bash
 $ php bin/laravels start
 ```
 
-> 建议通过[Supervisord](http://supervisord.org/)监管主进程，前提是不能加`-d`选项并且设置`swoole.daemonize`为`false`。
+> It is recommended to supervise the main process through [Supervisord](http://supervisord.org/), the premise is without option `-d` and to set `swoole.daemonize` to `false`.
 
 ```
 [program:wookteam-test]
@@ -143,7 +78,7 @@ redirect_stderr=true
 stdout_logfile=/var/log/supervisor/%(program_name)s.log
 ```
 
-## 5、部署到Nginx
+## 5. Deployment To Nginx
 
 ```nginx
 map $http_upgrade $connection_upgrade {
@@ -206,7 +141,24 @@ server {
 }
 ```
 
-## 默认账号
+## Default Account
 
 - admin/123456
 - system/123456
+
+## Upgrade
+
+- Enter the directory and run the following command in turn:
+
+```bash
+$ git fetch --all
+$ git reset --hard origin/master
+$ git pull
+$ composer install
+$ php artisan migrate
+
+$ npm install
+$ npm run production
+
+$ php bin/laravels start # If use Supervisord restart Supervisord
+```

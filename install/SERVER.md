@@ -1,98 +1,33 @@
-# Install
+# 安装教程
 
-**[中文文档](./INSTALL.md)**
+**[English Documentation](en/SERVER.md)**
 
-## Setup (using Docker)
+- [安装教程(Docker)](DOCKER.md)
+- **安装教程(服务器)**
+- [安装教程(宝塔面板)](BT.md)
 
-> `Docker` & `Docker Compose` must be installed
-
-#### 1. Clone the repository
-
-```bash
-// using ssh
-$ git clone git@github.com:kuaifan/wookteam.git
-// or you can use https
-$ git clone https://github.com/kuaifan/wookteam.git
-
-// enter directory
-$ cd wookteam
-
-// copy .env
-$ cp .env.docker .env
-```
-
-#### 2. Build image & install
-
-```bash
-$ ./cmd build php
-$ ./cmd composer install
-$ ./cmd artisan key:generate
-$ ./cmd artisan migrate --seed
-$ ./cmd php bin/wookteam --port=8080
-$ ./cmd up -d
-$ ./cmd npm install
-$ ./cmd npm run prod
-$ ./cmd supervisorctl restart all
-```
-
-Installed, project url: **`http://IP:PORT`** (`PORT` is the parameter `8080` in the build).
-
-### Change port
-
-```bash
-$ ./cmd php bin/wookteam --port=8080
-$ ./cmd up -d
-```
-
-#### Stop server
-
-```bash
-$ ./cmd stop
-```
-
-> P.S: Once application is setup, whenever you want to start the server (if it is stopped) run below command
-
-```bash
-$ ./cmd start
-```
-
-### Shortcuts for running command
-
-> You can do this using the following command
-
-```bash
-$ ./cmd artisan "your command"          // To run a artisan command
-$ ./cmd php "your command"              // To run a php command
-$ ./cmd composer "your command"         // To run a composer command
-$ ./cmd supervisorctl "your command"    // To run a supervisorctl command
-$ ./cmd test "your command"             // To run a phpunit command
-$ ./cmd npm "your command"              // To run a npm command
-$ ./cmd yarn "your command"             // To run a yarn command
-$ ./cmd mysql "your command"            // To run a mysql command
-```
-
-## Setup (if you're not using docker)
+## 安装设置（服务器）
 
 > Fork the repo if you are outside collaborator https://github.com/kuaifan/wookteam.
 
-#### 1. Clone the project to your local or server
+#### 1、克隆项目到您的本地或服务器
 
 ```bash
-// using ssh
+// 使用ssh
 $ git clone git@github.com:kuaifan/wookteam.git
-// or you can use https
+// 或者你也可以使用https
 $ git clone https://github.com/kuaifan/wookteam.git
 
-// enter directory
+// 进入目录
 $ cd wookteam
 
-// copy .env
+// 拷贝 .env
 $ cp .env.example .env
 ```
 
-#### 2. Modify`.env`
+#### 2、修改`.env`
 
-> Database、WebSocket
+> 数据库信息、WebSocket
 
 ```env
 DB_CONNECTION=mysql
@@ -106,11 +41,11 @@ LARAVELS_LISTEN_IP=127.0.0.1
 LARAVELS_LISTEN_PORT=5200
 ```
 
-#### 3. Setup application
+#### 3、设置项目
 
 ```bash
-$ git checkout master # use dev branch for local development
-$ git pull origin master # use dev branch for local development
+$ git checkout master # 如果使用dev分支进行本地开发
+$ git pull origin master # 如果使用dev分支进行本地开发
 
 $ composer install
 $ php artisan key:generate
@@ -120,15 +55,15 @@ $ npm install
 $ npm run production
 ```
 
-#### 4. Run Laravels (WebSocket)
+#### 4、运行 Laravels (WebSocket)
 
-> Please confirm your environment and installation[Swoole](https://www.swoole.com/)。
+> 请确认您的环境以及安装[Swoole](https://www.swoole.com/)。
 
 ```bash
 $ php bin/laravels start
 ```
 
-> It is recommended to supervise the main process through [Supervisord](http://supervisord.org/), the premise is without option `-d` and to set `swoole.daemonize` to `false`.
+> 建议通过[Supervisord](http://supervisord.org/)监管主进程，前提是不能加`-d`选项并且设置`swoole.daemonize`为`false`。
 
 ```
 [program:wookteam-test]
@@ -143,7 +78,7 @@ redirect_stderr=true
 stdout_logfile=/var/log/supervisor/%(program_name)s.log
 ```
 
-## 5. Deployment To Nginx
+## 5、部署到Nginx
 
 ```nginx
 map $http_upgrade $connection_upgrade {
@@ -206,7 +141,25 @@ server {
 }
 ```
 
-## Default Account
+## 默认账号
 
 - admin/123456
 - system/123456
+
+## 升级更新
+
+- 进入目录，依次运行一下命令：
+
+```bash
+$ git fetch --all
+$ git reset --hard origin/master
+$ git pull
+$ composer install
+$ php artisan migrate
+
+$ npm install
+$ npm run production
+
+$ php bin/laravels start # 如果使用Supervisord则重启Supervisord
+```
+

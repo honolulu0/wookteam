@@ -1,6 +1,6 @@
 # 产品介绍
 
-**[English Documentation](./README-EN.md)**
+**[English Documentation](README-EN.md)**
 
 - `wookteam` 是一款轻量级的在线团队协作工具，提供各类文档工具、在线思维导图、在线流程图、项目管理、任务分发，知识库管理等工具。
 - `wookteam` 支持团队在线聊天沟通，订阅任务动态实时推送。
@@ -8,9 +8,9 @@
 
 ## 安装教程
 
-- [安装教程(Docker)](./INSTALL.md#安装设置使用docker)
-- [安装教程(宝塔面板)](./INSTALL-BT.md)
-- [安装教程(服务器)](./INSTALL.md#安装设置如果你没有使用docker)
+- [安装教程(Docker)](install/DOCKER.md)
+- [安装教程(服务器)](install/SERVER.md)
+- [安装教程(宝塔面板)](install/BT.md)
 
 ## 官网地址
 
@@ -22,7 +22,7 @@
 
 ## 微信咨询
 
-- ![二维码](./resources/assets/statics/other/wxqr.jpeg)
+- ![二维码](resources/assets/statics/other/wxqr.jpeg)
 
 ## 技术选型
 
@@ -39,16 +39,16 @@
 ## 功能简介
 
 **1. 待办四象限：突出事情优先级，帮助员工合理安排时间，提高工作效率**
-![待办四象限：突出事情优先级，帮助员工合理安排时间，提高工作效率](./resources/assets/statics/images/index/todo.jpg)
+![待办四象限：突出事情优先级，帮助员工合理安排时间，提高工作效率](resources/assets/statics/images/index/todo.jpg)
 
 **2. 在线流程图：在线流程图工具，使用方便**
-![在线流程图：在线流程图工具，使用方便](./resources/assets/statics/images/index/banner/1.jpg)
+![在线流程图：在线流程图工具，使用方便](resources/assets/statics/images/index/banner/1.jpg)
 
 **3. 在线思维导图：梳理思路，优化工作流程**
-![在线思维导图：梳理思路，优化工作流程](./resources/assets/statics/images/index/banner/2.jpg)
+![在线思维导图：梳理思路，优化工作流程](resources/assets/statics/images/index/banner/2.jpg)
 
 **4. 项目管理：自定义项目看板，可视化任务安排**
-![项目管理：自定义项目看板，可视化任务安排](./resources/assets/statics/images/index/project.jpg)
+![项目管理：自定义项目看板，可视化任务安排](resources/assets/statics/images/index/project.jpg)
 
 **5. 在线知识库：在线流程图，在线文档，以及可视化的目录编排，文档管理无忧**
-![在线知识库：在线流程图，在线文档，以及可视化的目录编排，文档管理无忧](./resources/assets/statics/images/index/wiki.jpg)
+![在线知识库：在线流程图，在线文档，以及可视化的目录编排，文档管理无忧](resources/assets/statics/images/index/wiki.jpg)
