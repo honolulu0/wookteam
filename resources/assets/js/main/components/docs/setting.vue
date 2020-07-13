@@ -3,19 +3,25 @@
         <div class="book-setting">
             <Form ref="formSystem" :model="formSystem" :label-width="80">
                 <FormItem :label="$L('修改权限')">
-                    <RadioGroup v-model="formSystem.role_edit">
-                        <Radio label="private">{{$L('私有文库')}}</Radio>
-                        <Radio label="member">{{$L('成员开放')}}</Radio>
-                        <Radio label="reg">{{$L('注册会员')}}</Radio>
-                    </RadioGroup>
+                    <div>
+                        <RadioGroup v-model="formSystem.role_edit">
+                            <Radio label="private">{{$L('私有文库')}}</Radio>
+                            <Radio label="member">{{$L('成员开放')}}</Radio>
+                            <Radio label="reg">{{$L('注册会员')}}</Radio>
+                        </RadioGroup>
+                    </div>
+                    <div class="form-placeholder">{{$L('管理文库的会员。')}}</div>
                 </FormItem>
                 <FormItem :label="$L('阅读权限')">
-                    <RadioGroup v-model="formSystem.role_view">
-                        <Radio label="private">{{$L('私有文库')}}</Radio>
-                        <Radio label="member">{{$L('成员开放')}}</Radio>
-                        <Radio label="reg">{{$L('注册会员')}}</Radio>
-                        <Radio label="all">{{$L('完全开放')}}</Radio>
-                    </RadioGroup>
+                    <div>
+                        <RadioGroup v-model="formSystem.role_view">
+                            <Radio label="private">{{$L('私有文库')}}</Radio>
+                            <Radio label="member">{{$L('成员开放')}}</Radio>
+                            <Radio label="reg">{{$L('注册会员')}}</Radio>
+                            <Radio label="all">{{$L('完全开放')}}</Radio>
+                        </RadioGroup>
+                    </div>
+                    <div class="form-placeholder">{{$L('可以打开阅读分享地址的会员。')}}</div>
                 </FormItem>
                 <FormItem>
                     <Button :loading="loadIng > 0" type="primary" @click="handleSubmit('formSystem')">{{$L('提交')}}</Button>
@@ -29,6 +35,9 @@
 <style lang="scss" scoped>
     .book-setting {
         padding: 0 12px;
+        .form-placeholder {
+            color: #999;
+        }
     }
 </style>
 <script>
