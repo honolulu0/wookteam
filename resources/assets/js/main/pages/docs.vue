@@ -110,6 +110,7 @@
             display: flex;
             flex-direction: column;
             width: 100%;
+            min-width: 1024px;
             height: 100%;
             padding: 15px;
             .docs-body {

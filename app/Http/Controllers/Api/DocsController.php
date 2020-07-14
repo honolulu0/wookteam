@@ -587,6 +587,24 @@ class DocsController extends Controller
             return Base::retError(['已被会员【%】锁定！', Users::nickname($row['lockname'])]);
         }
         $D = Base::getContentsParse('D');
+        if ($row['type'] == 'document') {
+            $data = Base::json2array($D['content']);
+            $isRep = false;
+            preg_match_all("/<img\s*src=\"data:image\/(png|jpg|jpeg);base64,(.*?)\"/s", $data['content'], $matchs);
+            foreach ($matchs[2] as $key => $text) {
+                $p = "uploads/docs/document/" . $id . "/";
+                Base::makeDir(public_path($p));
+                $p.= md5($text) . "." . $matchs[1][$key];
+                $r = file_put_contents(public_path($p), base64_decode($text));
+                if ($r) {
+                    $data['content'] = str_replace($matchs[0][$key], '<img src="' . Base::fillUrl($p) . '"', $data['content']);
+                    $isRep = true;
+                }
+            }
+            if ($isRep == true) {
+                $D['content'] = Base::array2json($data);
+            }
+        }
         DB::table('docs_content')->insert([
             'bookid' => $row['bookid'],
             'sid' => $id,

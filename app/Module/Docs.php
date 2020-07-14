@@ -78,23 +78,25 @@ class Docs
             }
         }
         $pushLists = [];
-        foreach ($array AS $tuser) {
-            $uLists = Base::DBC2A(DB::table('ws')->select(['fd', 'username', 'channel'])->where('username', $tuser['username'])->get());
-            foreach ($uLists AS $item) {
-                if ($item['username'] == $user['username']) {
-                    continue;
+        if ($array) {
+            foreach ($array AS $tuser) {
+                $uLists = Base::DBC2A(DB::table('ws')->select(['fd', 'username', 'channel'])->where('username', $tuser['username'])->get());
+                foreach ($uLists AS $item) {
+                    if ($item['username'] == $user['username']) {
+                        continue;
+                    }
+                    $pushLists[] = [
+                        'fd' => $item['fd'],
+                        'msg' => [
+                            'messageType' => 'docs',
+                            'body' => array_merge([
+                                'sid' => $sid,
+                                'nickname' => $user['nickname'] ?: $user['username'],
+                                'time' => time(),
+                            ], $bodyArray)
+                        ]
+                    ];
                 }
-                $pushLists[] = [
-                    'fd' => $item['fd'],
-                    'msg' => [
-                        'messageType' => 'docs',
-                        'body' => array_merge([
-                            'sid' => $sid,
-                            'nickname' => $user['nickname'] ?: $user['username'],
-                            'time' => time(),
-                        ], $bodyArray)
-                    ]
-                ];
             }
         }
         $pushTask = new PushTask($pushLists);

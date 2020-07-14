@@ -225,6 +225,7 @@
                     language: "zh_CN",
                     toolbar: this.toolbar,
                     plugins: this.plugins,
+                    paste_data_images: true,
                     menu: {
                         view: {
                             title: 'View',

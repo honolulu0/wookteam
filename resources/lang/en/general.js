@@ -455,4 +455,5 @@ export default {
     "仅作者和文档成员可以阅读分享地址。": "Only authors and document members can read the Shared address.",
     "所有会员都可以阅读分享地址。": "All members can read the Shared address.",
     "所有人（含游客）都可以阅读分享地址。": "Everyone (including visitors) can read the Shared address.",
+    "是否放弃保存修改的内容？": "Do you want to abandon saving the modified content?",
 }

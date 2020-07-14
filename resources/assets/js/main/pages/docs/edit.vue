@@ -67,7 +67,7 @@
                         <DropdownItem name="pdf">{{$L('导出PDF文件')}}</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
-                <Button :disabled="(disabledBtn || loadIng > 0) && hid == 0" class="header-button" size="small" type="primary" @click="handleClick('save')">{{$L('保存')}}</Button>
+                <Button :disabled="equalContent" :loading="loadIng > 0" class="header-button" size="small" type="primary" @click="handleClick('save')">{{$L('保存')}}</Button>
             </div>
             <div class="docs-body">
                 <template v-if="docDetail.type=='document'">
@@ -172,18 +172,20 @@
             position: absolute;
             width: 100%;
             height: 100%;
+            overflow-x: auto;
             .edit-header {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
                 width: 100%;
                 height: 38px;
+                min-width: 1024px;
                 background-color: #ffffff;
                 box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
                 position: relative;
                 z-index: 99;
                 .header-menu {
-                    width: 50px;
+                    width: 48px;
                     height: 100%;
                     text-align: center;
                     display: flex;
@@ -194,7 +196,7 @@
                     position: relative;
                     .menu-container {
                         display: inline-block;
-                        width: 50px;
+                        width: 48px;
                         height: 38px;
                         line-height: 38px;
                         color: #777777;
@@ -268,6 +270,8 @@
                     padding-left: 24px;
                     padding-right: 24px;
                     font-size: 16px;
+                    overflow: hidden;
+                    text-overflow:ellipsis;
                     white-space: nowrap;
                 }
                 .header-hint {
@@ -291,6 +295,7 @@
             .docs-body {
                 flex: 1;
                 width: 100%;
+                min-width: 1024px;
                 position: relative;
                 .body-text {
                     display: flex;
@@ -394,9 +399,7 @@
                                 if (params.index == 0) {
                                     data.sid = this.getSid();
                                 }
-                                this.goForward({name: 'docs-edit', params: data }, true);
-                                this.refreshSid();
-                                this.docDrawerShow = false;
+                                this.handleSection('openBefore', data);
                             }
                         }
                     }, this.$L('还原'));
@@ -413,6 +416,12 @@
             //
             setInterval(() => {
                 this.timeValue = Math.round(new Date().getTime() / 1000);
+            });
+            //
+            $(window).bind('beforeunload', () => {
+                if (!this.equalContent && this.routeName === this.$route.name) {
+                    return '是否放弃修改的内容返回？';
+                }
             });
             //
             $A.WSOB.setOnMsgListener("chat/index", ['docs'], (msgDetail) => {
@@ -474,6 +483,10 @@
             });
         },
         activated() {
+            this.docDrawerTab = '';
+            this.sectionNoDataText = '';
+            this.historyNoDataText = '';
+            //
             this.refreshSid();
             this.synergy(true);
         },
@@ -484,6 +497,10 @@
             }
             this.$Notice.close('docs-lock');
             //
+            if (!this.equalContent) {
+                this.handleClick('save');
+            }
+            //
             this.synergy(false);
             this.docDrawerShow = false;
             if ($A.getToken() === false) {
@@ -493,7 +510,7 @@
         watch: {
             sid(val) {
                 if (!val) {
-                    this.goBack({name:'docs'});
+                    this.goBackDirect();
                     return;
                 }
                 this.hid = $A.runNum($A.strExists(val, '-') ? $A.getMiddle(val, "-", null) : 0);
@@ -569,7 +586,7 @@
             }
         },
         computed: {
-            disabledBtn() {
+            equalContent() {
                 return this.bakContent == $A.jsonStringify(this.docContent);
             },
             synchUsersS() {
@@ -582,6 +599,11 @@
             }
         },
         methods: {
+            goBackDirect() {
+                this.bakContent = $A.jsonStringify(this.docContent);
+                this.goBack({name:'docs'});
+            },
+
             synergy(enter) {
                 if (enter === false) {
                     $A.WSOB.sendTo('docs', {
@@ -649,14 +671,14 @@
                         this.loadIng--;
                     },
                     error: () => {
-                        this.goBack({name:'docs'});
+                        this.goBackDirect();
                         alert(this.$L('网络繁忙，请稍后再试！'));
                     },
                     success: (res) => {
                         if (res.ret === 1) {
                             this.docDetail = res.data;
                             this.docContent = $A.jsonParse(res.data.content);
-                            this.bakContent = $A.jsonStringify(this.docContent);
+                            this.bakContent = this.hid == 0 ? $A.jsonStringify(this.docContent) : '';
                             this.continueLock(1000);
                         } else {
                             this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
@@ -666,10 +688,32 @@
             },
 
             handleSection(act, detail) {
-                if (act === 'open') {
-                    this.goForward({name: 'docs-edit', params: {sid: detail.id, other: detail || {}}}, true);
-                    this.refreshSid();
-                    this.docDrawerShow = false;
+                switch (act) {
+                    case 'open':
+                        this.handleSection('openBefore', {sid: detail.id, other: detail || {}})
+                        break;
+
+                    case 'openBefore':
+                        if (!this.equalContent) {
+                            this.$Modal.confirm({
+                                title: this.$L('温馨提示'),
+                                content: this.$L('是否放弃保存修改的内容？'),
+                                cancelText: this.$L('取消'),
+                                okText: this.$L('放弃保存'),
+                                onOk: () => {
+                                    this.handleSection('openConfirm', detail)
+                                }
+                            });
+                        } else {
+                            this.handleSection('openConfirm', detail)
+                        }
+                        break;
+
+                    case 'openConfirm':
+                        this.goForward({name: 'docs-edit', params: detail}, true);
+                        this.refreshSid();
+                        this.docDrawerShow = false;
+                        break;
                 }
             },
 
@@ -685,44 +729,20 @@
             handleClick(act) {
                 switch (act) {
                     case "back":
-                        if (this.bakContent == $A.jsonStringify(this.docContent) && this.hid == 0) {
-                            this.goBack({name:'docs'});
+                        if (this.equalContent) {
+                            this.goBackDirect();
                             return;
                         }
                         this.$Modal.confirm({
                             title: this.$L('温馨提示'),
                             content: this.$L('是否放弃修改的内容返回？'),
-                            loading: true,
                             cancelText: this.$L('放弃保存'),
                             onCancel: () => {
-                                this.goBack({name:'docs'});
+                                this.goBackDirect();
                             },
                             okText: this.$L('保存并返回'),
                             onOk: () => {
-                                this.bakContent = $A.jsonStringify(this.docContent);
-                                $A.apiAjax({
-                                    url: 'docs/section/save?id=' + this.getSid(),
-                                    method: 'post',
-                                    data: {
-                                        D: Object.assign(this.docDetail, {content: this.bakContent})
-                                    },
-                                    error: () => {
-                                        this.$Modal.remove();
-                                        alert(this.$L('网络繁忙，请稍后再试！'));
-                                    },
-                                    success: (res) => {
-                                        this.$Modal.remove();
-                                        this.goBack({name:'docs'});
-                                        setTimeout(() => {
-                                            if (res.ret === 1) {
-                                                this.$Message.success(res.msg);
-                                                this.historyNoDataText = '';
-                                            } else {
-                                                this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
-                                            }
-                                        }, 350);
-                                    }
-                                });
+                                this.handleClick('save');
                             }
                         });
                         break;
@@ -736,15 +756,20 @@
                                 D: Object.assign(this.docDetail, {content: this.bakContent})
                             },
                             error: () => {
+                                this.bakContent = '';
                                 alert(this.$L('网络繁忙，保存失败！'));
                             },
                             success: (res) => {
                                 if (res.ret === 1) {
                                     this.$Message.success(res.msg);
                                     this.historyNoDataText = '';
+                                    if (this.hid != 0) {
+                                        this.hid = 0;
+                                        this.goForward({name: 'docs-edit', params: {sid: this.getSid()}}, true);
+                                    }
                                 } else {
-                                    this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
                                     this.bakContent = '';
+                                    this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
                                 }
                             }
                         });
