@@ -79,7 +79,7 @@
 
             graph.getModel().addListener(mxEvent.CHANGE, mxUtils.bind(editorUi, function() {
                 newXml = mxUtils.getPrettyXml(editorUi.editor.getGraphXml());
-                if (backupXml.replace(/^<mxGraphModel(.*?)>/, '') == newXml.replace(/^<mxGraphModel(.*?)>/, '')) {
+                if (backupXml && backupXml.replace(/^<mxGraphModel(.*?)>/, '') == newXml.replace(/^<mxGraphModel(.*?)>/, '')) {
                     return;
                 }
                 backupXml = newXml;
