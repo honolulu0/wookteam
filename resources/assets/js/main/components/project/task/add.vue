@@ -199,7 +199,7 @@
                     return;
                 }
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/add',
                     data: {
                         projectid: this.projectid,

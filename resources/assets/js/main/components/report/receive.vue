@@ -191,7 +191,7 @@
                 whereData.sorts = $A.cloneData(this.sorts);
                 this.loadIng++;
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'report/receive',
                     data: whereData,
                     complete: () => {

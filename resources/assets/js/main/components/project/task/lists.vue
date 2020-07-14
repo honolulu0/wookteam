@@ -324,7 +324,7 @@
                 whereData.projectid = this.projectid;
                 whereData.sorts = $A.cloneData(this.sorts);
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/lists',
                     data: whereData,
                     complete: () => {

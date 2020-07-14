@@ -27,7 +27,7 @@
                     </Dropdown-menu>
                 </Dropdown>
                 <div class="right-info" @click="chatDrawerShow=true">
-                    <Icon class="right-mticon" type="md-notifications" size="24"/>
+                    <Icon class="right-mticon-9" type="md-text" size="24"/>
                     <em v-if="chatUnreadTotal > 0" class="right-info-num">{{chatUnreadTotal > 99 ? '99+' : chatUnreadTotal}}</em>
                 </div>
                 <Dropdown class="right-info" trigger="click" @on-click="setLanguage" transfer>
@@ -149,7 +149,7 @@
                 </TabPane>
             </Tabs>
         </WDrawer>
-        <WDrawer v-model="chatDrawerShow" :closable="false" maxWidth="1080">
+        <WDrawer v-model="chatDrawerShow" :closable="false" maxWidth="1080" class="w-header-chat-draver">
             <chat-index v-model="chatUnreadTotal" :openWindow="chatDrawerShow" @on-open-notice="chatDrawerShow=true"></chat-index>
             <div class="w-header-chat-close" @click="chatDrawerShow=false"><Icon type="ios-close" /></div>
         </WDrawer>
@@ -157,24 +157,30 @@
 </template>
 
 <style lang="scss">
-    .w-header-chat-close {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        z-index: 1;
-        color: #ffffff;
-        font-size: 32px;
-        width: 68px;
-        height: 58px;
-        line-height: 58px;
-        text-align: center;
-        cursor: pointer;
-        > i {
-            transition: all 0.2s;
+    .w-header-chat-draver {
+        .ivu-drawer-wrap,
+        .ivu-drawer-mask {
+            z-index: 1001;
         }
-        &:hover {
+        .w-header-chat-close {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 1;
+            color: #ffffff;
+            font-size: 32px;
+            width: 68px;
+            height: 58px;
+            line-height: 58px;
+            text-align: center;
+            cursor: pointer;
             > i {
-                transform: scale(1.12) rotate(90deg);
+                transition: all 0.2s;
+            }
+            &:hover {
+                > i {
+                    transform: scale(1.12) rotate(90deg);
+                }
             }
         }
     }
@@ -234,14 +240,24 @@
                 white-space: nowrap;
                 text-align: right;
                 line-height: 40px;
+                margin-right: -5px;
                 .right-info {
                     display: inline-block;
                     position: relative;
-                    margin-left: 12px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    margin-right: -5px;
                     cursor: pointer;
+                    &:hover {
+                        background: #0277c0;
+                    }
                     .right-mticon {
                         vertical-align: top;
                         margin-top: 8px;
+                    }
+                    .right-mticon-9 {
+                        vertical-align: top;
+                        margin-top: 9px;
                     }
                     .right-info-num {
                         position: absolute;
@@ -461,7 +477,7 @@
             },
             systemSetting(save) {
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'system/setting?type=' + (save ? 'save' : 'get'),
                     data: this.formSystem,
                     complete: () => {
@@ -496,7 +512,7 @@
                             }
                             case "formDatum": {
                                 this.loadIng++;
-                                $A.aAjax({
+                                $A.apiAjax({
                                     url: 'users/editdata',
                                     data: this.formDatum,
                                     complete: () => {
@@ -515,7 +531,7 @@
                             }
                             case "formPass": {
                                 this.loadIng++;
-                                $A.aAjax({
+                                $A.apiAjax({
                                     url: 'users/editpass',
                                     data: this.formPass,
                                     complete: () => {
@@ -536,7 +552,7 @@
                             }
                             case "formSetting": {
                                 this.loadIng++;
-                                $A.aAjax({
+                                $A.apiAjax({
                                     url: 'users/editdata',
                                     data: this.formSetting,
                                     complete: () => {

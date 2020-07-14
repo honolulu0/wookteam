@@ -43,7 +43,7 @@
                 this.contentShow = true;
                 this.contentTitle = this.reporttitle;
                 this.contentText = this.$L('详细内容加载中.....');
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'report/content?id=' + this.reportid,
                     error: () => {
                         alert(this.$L('网络繁忙，请稍后再试！'));

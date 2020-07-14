@@ -119,7 +119,7 @@
                                     content: this.$L('你确定要将此成员移出项目吗？'),
                                     loading: true,
                                     onOk: () => {
-                                        $A.aAjax({
+                                        $A.apiAjax({
                                             url: 'project/users/join',
                                             data: {
                                                 act: 'delete',
@@ -196,7 +196,7 @@
                 }
                 this.loadIng++;
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/users/lists',
                     data: {
                         page: Math.max(this.listPage, 1),
@@ -254,7 +254,7 @@
                     onOk: () => {
                         if (this.userValue) {
                             let username = this.userValue;
-                            $A.aAjax({
+                            $A.apiAjax({
                                 url: 'project/users/join',
                                 data: {
                                     act: 'join',

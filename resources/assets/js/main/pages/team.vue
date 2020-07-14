@@ -291,7 +291,7 @@
                 }
                 this.loadIng++;
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'users/team/lists',
                     data: {
                         page: Math.max(this.listPage, 1),
@@ -321,7 +321,7 @@
                 this.$refs.add.validate((valid) => {
                     if (valid) {
                         this.loadIng++;
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'users/team/add',
                             data: this.formAdd,
                             complete: () => {
@@ -351,7 +351,7 @@
                             content: this.$L('你确定要删除此团队成员吗？'),
                             loading: true,
                             onOk: () => {
-                                $A.aAjax({
+                                $A.apiAjax({
                                     url: 'users/team/delete?username=' + username,
                                     error: () => {
                                         this.$Modal.remove();
@@ -380,7 +380,7 @@
                             content: this.$L(act=='deladmin' ? '你确定取消管理员身份的操作吗？' : '你确定设置管理员的操作吗？'),
                             loading: true,
                             onOk: () => {
-                                $A.aAjax({
+                                $A.apiAjax({
                                     url: 'users/team/admin?act=' + (act=='deladmin'?'del':'set') + '&username=' + username,
                                     error: () => {
                                         this.$Modal.remove();

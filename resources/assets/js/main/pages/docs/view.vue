@@ -247,7 +247,7 @@
 
             getDetail() {
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'docs/section/content',
                     data: {
                         act: 'view',
@@ -282,7 +282,7 @@
             getSectionMenu() {
                 this.sectionNoDataText = this.$L("数据加载中.....");
                 let bookid = this.docDetail.bookid;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'docs/section/lists',
                     data: {
                         act: 'view',

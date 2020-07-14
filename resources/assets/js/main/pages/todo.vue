@@ -537,7 +537,7 @@
                 this.$set(taskData, 'loadIng', $A.runNum(taskData.loadIng) + 1);
                 this.taskSortDisabled = true;
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/lists',
                     data: {
                         level: index,
@@ -595,7 +595,7 @@
                     loadIng: true,
                 });
                 this.taskSortDisabled = true;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/add',
                     data: {
                         title: title,
@@ -673,7 +673,7 @@
                 }
                 this.taskSortData = newSort;
                 this.taskSortDisabled = true;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/sort/todo',
                     data: {
                         oldsort: oldSort,

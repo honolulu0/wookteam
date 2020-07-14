@@ -50,6 +50,13 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+            if ($exception->getStatusCode() == 404) {
+                if (!\App\Module\Base::leftExists($request->getRequestUri(), '/api')) {
+                    return response()->view('main');
+                }
+            }
+        }
         return parent::render($request, $exception);
     }
 }

@@ -297,7 +297,7 @@
             },
 
             getTaskDetail() {
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/lists',
                     data: {
                         taskid: this.taskid,
@@ -538,7 +538,7 @@
                 }
                 //
                 this.$set(this.loadData, ajaxData.act, true);
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/edit',
                     data: ajaxData,
                     complete: () => {

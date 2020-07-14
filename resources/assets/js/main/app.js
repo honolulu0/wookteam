@@ -34,7 +34,10 @@ const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
     return originalPush.call(this, location).catch(err => err)
 }
-const router = new VueRouter({routes});
+const router = new VueRouter({
+    mode: 'history',
+    routes
+});
 
 //进度条配置
 ViewUI.LoadingBar.config({
@@ -60,8 +63,13 @@ Vue.prototype.goForward = function(location, isReplace) {
 };
 
 //返回函数
-Vue.prototype.goBack = function(number) {
-    window.history.go(typeof number==='number'?number:-1)
+Vue.prototype.goBack = function (number) {
+    let history = $A.jsonParse(window.sessionStorage['__history__'] || '{}');
+    if ($A.runNum(history['::count']) > 2) {
+        this.$router.go(typeof number === 'number' ? number : -1);
+    } else {
+        this.$router.replace(typeof number === "object" ? number : {path: '/'});
+    }
 };
 
 Vue.prototype.$A = $A;

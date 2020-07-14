@@ -448,4 +448,11 @@ export default {
     "分享": "Share",
     "文档设置": "Setting",
     "文档成员": "Members",
+    "仅作者可以修改。": "Only the author may modify it.",
+    "仅作者和文档成员可以修改。": "Only authors and document members can be modified.",
+    "所有会员都可以修改。": "All members can modify it.",
+    "仅作者可以阅读分享地址。": "Only the author can read the Shared address.",
+    "仅作者和文档成员可以阅读分享地址。": "Only authors and document members can read the Shared address.",
+    "所有会员都可以阅读分享地址。": "All members can read the Shared address.",
+    "所有人（含游客）都可以阅读分享地址。": "Everyone (including visitors) can read the Shared address.",
 }

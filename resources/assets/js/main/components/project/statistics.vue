@@ -321,7 +321,7 @@
                 this.loadIng++;
                 let tempType = this.taskType;
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/lists',
                     data: {
                         page: Math.max(this.listPage, 1),

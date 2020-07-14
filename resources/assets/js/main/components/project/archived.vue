@@ -117,7 +117,7 @@
                                     content: this.$L('你确定要取消归档吗？'),
                                     loading: true,
                                     onOk: () => {
-                                        $A.aAjax({
+                                        $A.apiAjax({
                                             url: 'project/task/edit',
                                             data: {
                                                 act: 'unarchived',
@@ -231,7 +231,7 @@
                 }
                 this.loadIng++;
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/lists',
                     data: {
                         page: Math.max(this.listPage, 1),

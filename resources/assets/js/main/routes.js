@@ -38,5 +38,9 @@ export default [
         name: 'team',
         meta: { slide: false, tabActive: 'team' },
         component: resolve => require(['./pages/team.vue'], resolve)
+    }, {
+        path: '*',
+        name: '404',
+        component: resolve => require(['./pages/404.vue'], resolve)
     }
 ]

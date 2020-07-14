@@ -317,7 +317,7 @@
         },
         data () {
             return {
-                actionUrl: $A.aUrl('imgupload'),
+                actionUrl: $A.apiUrl('system/imgupload'),
                 params: {
                     token: $A.getToken(),
                     width: this.width,
@@ -486,8 +486,8 @@
                 this.browseList = [];
                 this.browseListNext = [];
                 this.isLoading = true;
-                $A.aAjax({
-                    url: 'imgview',
+                $A.apiAjax({
+                    url: 'system/imgview',
                     data: { path: path?path:'' },
                     beforeSend: true,
                     complete: true,

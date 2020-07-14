@@ -54,7 +54,7 @@
                         <ul>
                             <li v-for="(item, index) in teamListsS(lists)" :key="index" @click="openDialog(item, true)">
                                 <img :src="item.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
-                                <div class="team-username"><user-view :username="item.username" placement="right" @on-result="userViewResult(item, $event)"/></div>
+                                <div class="team-username">{{item.nickname||item.username}}</div>
                             </li>
                         </ul>
                     </li>
@@ -1016,7 +1016,7 @@
 
         methods: {
             getSetting() {
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'system/setting',
                     error: () => {
                         $A.storage("systemSetting", {});
@@ -1053,7 +1053,7 @@
                 }
                 this.loadIng++;
                 this.dialogNoDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'chat/dialog/lists',
                     complete: () => {
                         this.loadIng--;
@@ -1094,7 +1094,7 @@
                 //
                 this.loadIng++;
                 this.messageNoDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'chat/message/lists',
                     data: {
                         username: username,
@@ -1162,11 +1162,11 @@
                 //
                 this.loadIng++;
                 this.teamNoDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'users/team/lists',
                     data: {
                         sorts: {
-                            key: 'username',
+                            key: 'lists',
                             order: 'asc'
                         },
                         firstchart: 1,
@@ -1257,7 +1257,7 @@
                 if (lists.length > 0) {
                     this.openDialog(lists[0]);
                 } else if (autoPush === true) {
-                    $A.aAjax({
+                    $A.apiAjax({
                         url: 'users/team/lists',
                         data: {
                             username: username,
@@ -1283,7 +1283,7 @@
                             loading: true,
                             onOk: () => {
                                 let username = this.dialogTarget.username;
-                                $A.aAjax({
+                                $A.apiAjax({
                                     url: 'chat/dialog/clear',
                                     data: {
                                         username: username,

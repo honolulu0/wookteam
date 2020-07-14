@@ -24,14 +24,13 @@
 
         <w-content>
             <draggable
-                v-if="projectLabel.length > 0"
                 v-model="projectLabel"
                 class="label-box"
                 draggable=".label-draggable"
                 :animation="150"
                 :disabled="projectSortDisabled"
                 @sort="projectSortUpdate(true)">
-                <div v-for="label in projectLabel" :key="label.id" class="label-item label-draggable">
+                <div v-if="projectLabel.length > 0" v-for="label in projectLabel" :key="label.id" class="label-item label-draggable">
                     <div class="label-body">
                         <div class="title-box">
                             <div v-if="label.loadIng === true" class="title-loading">
@@ -423,7 +422,6 @@
         watch: {
             projectid(val) {
                 if ($A.runNum(val) <= 0) {
-                    this.goBack();
                     return;
                 }
                 this.projectDetail = {};
@@ -435,7 +433,7 @@
         methods: {
             getDetail(successTip) {
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/detail',
                     data: {
                         projectid: this.projectid,
@@ -445,7 +443,7 @@
                         this.loadDetailed = true;
                     },
                     error: () => {
-                        this.goBack();
+                        this.goBack({name:'project'});
                         alert(this.$L('网络繁忙，请稍后再试！'));
                     },
                     success: (res) => {
@@ -459,7 +457,6 @@
                             }
                         } else {
                             this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
-                            this.goBack();
                         }
                     }
                 });
@@ -497,7 +494,7 @@
 
             refreshLabel(item) {
                 this.$set(item, 'loadIng', true);
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/lists',
                     data: {
                         projectid: this.projectid,
@@ -550,7 +547,7 @@
                         if (this.renameValue) {
                             this.$set(item, 'loadIng', true);
                             let title = this.renameValue;
-                            $A.aAjax({
+                            $A.apiAjax({
                                 url: 'project/label/rename',
                                 data: {
                                     projectid: this.projectid,
@@ -590,7 +587,7 @@
                     content: '<div>' + this.$L('你确定要删除此列表吗？') + '</div>' + redTip,
                     loading: true,
                     onOk: () => {
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'project/label/delete',
                             data: {
                                 projectid: this.projectid,
@@ -652,7 +649,7 @@
                     loading: true,
                     onOk: () => {
                         if (this.labelValue) {
-                            $A.aAjax({
+                            $A.apiAjax({
                                 url: 'project/label/add',
                                 data: {
                                     projectid: this.projectid,
@@ -713,7 +710,7 @@
                 this.projectSortData = newSort;
                 this.projectSortDisabled = true;
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/sort',
                     data: {
                         projectid: this.projectid,

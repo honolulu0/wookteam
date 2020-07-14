@@ -218,15 +218,6 @@
         },
 
         /**
-         *
-         * @param str
-         * @returns {*|string}
-         */
-        urlApi: function(str) {
-            return this.serverUrl('api/' + str);
-        },
-
-        /**
          * 获取IP地址详情
          * @param ip
          * @param callback
@@ -245,7 +236,7 @@
                 return;
             }
             $A.ajax({
-                url: $A.serverUrl('get/ipinfo'),
+                url: $A.serverUrl('api/system/get/ipinfo'),
                 data: { ip: ip },
                 timeout: 8000,
                 success: (res) => {

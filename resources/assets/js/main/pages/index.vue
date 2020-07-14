@@ -422,7 +422,7 @@
         },
         methods: {
             getSetting() {
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'system/setting',
                     error: () => {
                         $A.storage("systemSetting", {});
@@ -452,7 +452,7 @@
                     if (valid) {
                         this.loadIng++;
                         $A.ajax({
-                            url: $A.urlApi('users/login?type=' + this.loginType),
+                            url: $A.apiUrl('users/login?type=' + this.loginType),
                             data: this.formLogin,
                             complete: () => {
                                 this.loadIng--;

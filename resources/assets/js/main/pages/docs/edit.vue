@@ -493,7 +493,7 @@
         watch: {
             sid(val) {
                 if (!val) {
-                    this.goBack();
+                    this.goBack({name:'docs'});
                     return;
                 }
                 this.hid = $A.runNum($A.strExists(val, '-') ? $A.getMiddle(val, "-", null) : 0);
@@ -506,7 +506,7 @@
                         if (!this.sectionNoDataText) {
                             this.sectionNoDataText = this.$L("数据加载中.....");
                             let bookid = this.docDetail.bookid;
-                            $A.aAjax({
+                            $A.apiAjax({
                                 url: 'docs/section/lists',
                                 data: {
                                     act: 'edit',
@@ -538,7 +538,7 @@
                         if (!this.historyNoDataText) {
                             this.historyNoDataText = this.$L("数据加载中.....");
                             let sid = this.getSid();
-                            $A.aAjax({
+                            $A.apiAjax({
                                 url: 'docs/section/history',
                                 data: {
                                     id: sid,
@@ -639,7 +639,7 @@
 
             getDetail() {
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'docs/section/content',
                     data: {
                         act: 'edit',
@@ -649,7 +649,7 @@
                         this.loadIng--;
                     },
                     error: () => {
-                        this.goBack();
+                        this.goBack({name:'docs'});
                         alert(this.$L('网络繁忙，请稍后再试！'));
                     },
                     success: (res) => {
@@ -660,7 +660,6 @@
                             this.continueLock(1000);
                         } else {
                             this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
-                            this.goBack();
                         }
                     }
                 });
@@ -687,7 +686,7 @@
                 switch (act) {
                     case "back":
                         if (this.bakContent == $A.jsonStringify(this.docContent) && this.hid == 0) {
-                            this.goBack();
+                            this.goBack({name:'docs'});
                             return;
                         }
                         this.$Modal.confirm({
@@ -696,12 +695,12 @@
                             loading: true,
                             cancelText: this.$L('放弃保存'),
                             onCancel: () => {
-                                this.goBack();
+                                this.goBack({name:'docs'});
                             },
                             okText: this.$L('保存并返回'),
                             onOk: () => {
                                 this.bakContent = $A.jsonStringify(this.docContent);
-                                $A.aAjax({
+                                $A.apiAjax({
                                     url: 'docs/section/save?id=' + this.getSid(),
                                     method: 'post',
                                     data: {
@@ -713,7 +712,7 @@
                                     },
                                     success: (res) => {
                                         this.$Modal.remove();
-                                        this.goBack();
+                                        this.goBack({name:'docs'});
                                         setTimeout(() => {
                                             if (res.ret === 1) {
                                                 this.$Message.success(res.msg);
@@ -730,7 +729,7 @@
 
                     case "save":
                         this.bakContent = $A.jsonStringify(this.docContent);
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'docs/section/save?id=' + this.getSid(),
                             method: 'post',
                             data: {
@@ -781,7 +780,7 @@
 
                     case "lock":
                     case "unlock":
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'docs/section/lock?id=' + this.getSid(),
                             data: {
                                 act: act,
@@ -805,7 +804,7 @@
                         break;
 
                     case "view":
-                        return $A.fillUrl('#/docs/view/' + this.docDetail.id);
+                        return $A.webUrl('docs/view/' + this.docDetail.id);
 
                 }
             },

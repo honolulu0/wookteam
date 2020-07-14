@@ -342,7 +342,7 @@
                 }
                 this.loadIng++;
                 this.bookNoDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'docs/book/lists',
                     data: {
                         page: Math.max(this.bookListPage, 1),
@@ -376,7 +376,7 @@
                 this.$refs.bookAdd.validate((valid) => {
                     if (valid) {
                         this.loadIng++;
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'docs/book/add',
                             data: Object.assign(this.formBookAdd, {id:this.addBookId}),
                             complete: () => {
@@ -415,7 +415,7 @@
                     content: this.$L('你确定要删除此知识库吗？'),
                     loading: true,
                     onOk: () => {
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'docs/book/delete',
                             data: {
                                 id: bookId
@@ -455,7 +455,7 @@
                 let bookid = this.selectBookData.id;
                 this.loadIng++;
                 this.sectionNoDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'docs/section/lists',
                     data: {
                         act: 'edit',
@@ -490,7 +490,7 @@
                     if (valid) {
                         this.loadIng++;
                         let bookid = this.selectBookData.id;
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'docs/section/add',
                             data: Object.assign(this.formSectionAdd, {
                                 id: this.addSectionId,
@@ -524,7 +524,7 @@
                     content: this.$L('你确定要删除此文档吗？'),
                     loading: true,
                     onOk: () => {
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'docs/section/delete',
                             data: {
                                 id: sectionId
@@ -572,7 +572,7 @@
 
                     case 'sort':
                         this.sortDisabled = true;
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'docs/section/sort',
                             data: {
                                 bookid: this.selectBookData.id,
@@ -611,7 +611,7 @@
                             }, this.$L('文档链接')),
                             h('Input', {
                                 props: {
-                                    value: $A.fillUrl('#/docs/view/b' + this.selectBookData.id),
+                                    value: $A.webUrl('docs/view/b' + this.selectBookData.id),
                                     readonly: true,
                                 },
                             })

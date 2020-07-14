@@ -246,7 +246,7 @@
                             where['nobookid'] = this.nobookid;
                         }
                         this.noDataText = this.$L("数据加载中.....");
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: window.location.origin + '/api/users/searchinfo',
                             data: {
                                 where: where,
@@ -385,7 +385,7 @@
                     where['nobookid'] = this.nobookid;
                 }
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: window.location.origin + '/api/users/searchinfo',
                     data: {
                         where: where,

@@ -403,7 +403,7 @@
                     this.listPage = 1;
                 }
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/lists',
                     data: {
                         page: Math.max(this.listPage, 1),
@@ -467,7 +467,7 @@
                 this.$refs.add.validate((valid) => {
                     if (valid) {
                         this.loadIng++;
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'project/add',
                             data: this.formAdd,
                             complete: () => {
@@ -580,7 +580,7 @@
                         if (this.renameValue) {
                             this.$set(item, 'loadIng', true);
                             let title = this.renameValue;
-                            $A.aAjax({
+                            $A.apiAjax({
                                 url: 'project/rename',
                                 data: {
                                     projectid: item.id,
@@ -643,7 +643,7 @@
                         if (this.transferValue) {
                             this.$set(item, 'loadIng', true);
                             let username = this.transferValue;
-                            $A.aAjax({
+                            $A.apiAjax({
                                 url: 'project/transfer',
                                 data: {
                                     projectid: item.id,

@@ -128,7 +128,7 @@
         methods: {
             getData() {
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'report/template?id=' + this.id + '&type=' + this.type,
                     complete: () => {
                         this.loadIng--;
@@ -143,7 +143,7 @@
 
             handleSubmit(send = false) {
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'report/template?act=submit&id=' + this.id + '&type=' + this.type + '&send=' + (send === true ? 1 : 0),
                     method: 'post',
                     data: {

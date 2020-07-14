@@ -6,7 +6,7 @@ export default {
             }
             this.$set(taskDetail, 'loadIng', true);
             this.$set(taskDetail, 'complete', !!complete);
-            $A.aAjax({
+            $A.apiAjax({
                 url: 'project/task/edit',
                 data: {
                     act: complete ? 'complete' : 'unfinished',

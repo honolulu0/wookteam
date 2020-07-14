@@ -98,7 +98,7 @@
             getLists(page) {
                 this.lists = [];
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/task/lists',
                     data: {
                         startdate: this.startdate,

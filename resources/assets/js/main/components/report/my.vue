@@ -224,7 +224,7 @@
                 whereData.sorts = $A.cloneData(this.sorts);
                 this.loadIng++;
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'report/my',
                     data: whereData,
                     complete: () => {
@@ -258,7 +258,7 @@
                     content: this.$L('你确定要发送汇报吗？'),
                     loading: true,
                     onOk: () => {
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'report/template?act=send&id=' + row.id + '&type=' + row.type,
                             error: () => {
                                 this.$Modal.remove();
@@ -305,7 +305,7 @@
                     content: this.$L('你确定要删除汇报吗？'),
                     loading: true,
                     onOk: () => {
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'report/template?act=delete&id=' + row.id + '&type=' + row.type,
                             error: () => {
                                 this.$Modal.remove();

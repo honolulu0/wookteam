@@ -345,6 +345,9 @@ class UsersController extends Controller
                 case 'username':
                     $orderBy = '`' . $sorts['key'] . '` ' . $sorts['order'] . ',`id` DESC';
                     break;
+                case 'lists':
+                    $orderBy = '`nickname` ' . $sorts['order'] . ',`username` ' . $sorts['order'] . ',`id` DESC';
+                    break;
             }
         }
         //
@@ -356,7 +359,7 @@ class UsersController extends Controller
         foreach ($lists['lists'] AS $key => $item) {
             $lists['lists'][$key]['identity'] = is_array($item['identity']) ? $item['identity'] : explode(",", trim($item['identity'], ","));
             $lists['lists'][$key]['userimg'] = Users::userimg($item['userimg']);
-            $lists['lists'][$key]['firstchart'] = Base::getFirstCharter($item['username']);
+            $lists['lists'][$key]['firstchart'] = Base::getFirstCharter($item['nickname'] ?: $item['username']);
         }
         if ($username) {
             return Base::retSuccess('success', $lists['lists'][0]);

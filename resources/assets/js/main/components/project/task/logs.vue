@@ -8,12 +8,13 @@
                         <Timeline>
                             <TimelineItem v-for="(item, index) in items.lists" :key="index">
                                 <div slot="dot" class="logs-dot">
-                                    <img :src="item.userimg"/>
+                                    <img :src="item.userimg" @click="openChat(item.username)"/>
                                 </div>
                                 <div class="log-summary">
-                                    <span class="log-creator"><UserView :username="item.username"/></span>
+                                    <span class="log-creator" @click="openChat(item.username)"><UserView :username="item.username"/></span>
                                     <span class="log-text-secondary">{{item.detail}}</span>
                                     <span v-if="item.other.type=='task' && taskid == 0" class="log-text-link" @click="taskDetail(item.other.id)">{{item.other.title}}</span>
+                                    <span v-if="item.other.type=='username'" class="log-text-link" @click="openChat(item.other.username)"><UserView :username="item.other.username"/></span>
                                     <a v-if="item.other.type=='file'" class="log-text-link" target="_blank" :href="fileDownUrl(item.other.id)">{{item.other.name}}</a>
                                     <span class="log-text-info">{{item.timeData.ymd}} {{item.timeData.segment}} {{item.timeData.hi}}</span></div>
                             </TimelineItem>
@@ -201,7 +202,7 @@
                 if (noLoading !== true) {
                     this.loadIng++;
                 }
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/log/lists',
                     data: {
                         projectid: this.projectid,
@@ -256,8 +257,14 @@
                 this.getLists();
             },
 
+            openChat(username) {
+                if (typeof window.onChatOpenUserName === "function") {
+                    window.onChatOpenUserName(username);
+                }
+            },
+
             fileDownUrl(id) {
-                return $A.aUrl('project/files/download?fileid=' + id);
+                return $A.apiUrl('project/files/download?fileid=' + id);
             }
         }
     }

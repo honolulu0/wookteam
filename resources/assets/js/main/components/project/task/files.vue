@@ -101,7 +101,7 @@
                 noDataText: "",
 
                 uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'],
-                actionUrl: $A.aUrl('project/files/upload'),
+                actionUrl: $A.apiUrl('project/files/upload'),
                 params: {
                     token: $A.getToken(),
                     taskid: this.taskid,
@@ -222,7 +222,7 @@
                             style: { margin: '0 3px', cursor: 'pointer' },
                         }), h('a', {
                             style: { position: 'absolute', top: '0', left: '0', right: '0', bottom: '0', 'zIndex': 1 },
-                            attrs: { href: $A.aUrl('project/files/download?fileid=' + params.row.id), target: '_blank' },
+                            attrs: { href: $A.apiUrl('project/files/download?fileid=' + params.row.id), target: '_blank' },
                             on: {
                                 click: () => {
                                     if (params.row.yetdown) {
@@ -251,7 +251,7 @@
                             style: { margin: '0 3px', cursor: 'pointer', transform: 'rotate(-45deg)' },
                             on: {
                                 click: () => {
-                                    this.$copyText($A.aUrl('project/files/download?fileid=' + params.row.id)).then(() => {
+                                    this.$copyText($A.apiUrl('project/files/download?fileid=' + params.row.id)).then(() => {
                                         this.$Message.success(this.$L('复制成功！'));
                                     }, () => {
                                         this.$Message.error(this.$L('复制失败！'));
@@ -356,7 +356,7 @@
                 whereData.taskid = this.taskid;
                 whereData.sorts = this.sorts;
                 this.noDataText = this.$L("数据加载中.....");
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'project/files/lists',
                     data: whereData,
                     complete: () => {
@@ -416,7 +416,7 @@
                                 newName += '.' + item.ext;
                             }
                             this.$set(item, 'name', newName);
-                            $A.aAjax({
+                            $A.apiAjax({
                                 url: 'project/files/rename',
                                 data: {
                                     fileid: item.id,
@@ -450,7 +450,7 @@
                     content: this.$L('你确定要删除此文件吗？'),
                     loading: true,
                     onOk: () => {
-                        $A.aAjax({
+                        $A.apiAjax({
                             url: 'project/files/delete',
                             data: {
                                 fileid: item.id,

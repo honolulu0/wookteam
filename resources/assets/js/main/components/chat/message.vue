@@ -293,7 +293,7 @@
             },
 
             fileDownUrl(id) {
-                return $A.aUrl('project/files/download?fileid=' + id);
+                return $A.apiUrl('project/files/download?fileid=' + id);
             },
 
             formatSecond(d) {

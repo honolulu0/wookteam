@@ -10,7 +10,7 @@ export default {
                 content: this.$L('你确定要退出此项目吗？'),
                 loading: true,
                 onOk: () => {
-                    $A.aAjax({
+                    $A.apiAjax({
                         url: 'project/out?projectid=' + projectid,
                         error: () => {
                             this.$Modal.remove();
@@ -33,7 +33,7 @@ export default {
         },
 
         favorProject(act, projectid, successCallback) {
-            $A.aAjax({
+            $A.apiAjax({
                 url: 'project/favor',
                 data: {
                     act: act,
@@ -63,7 +63,7 @@ export default {
                 content: this.$L('你确定要删除此项目吗？'),
                 loading: true,
                 onOk: () => {
-                    $A.aAjax({
+                    $A.apiAjax({
                         url: 'project/delete?projectid=' + projectid,
                         error: () => {
                             this.$Modal.remove();

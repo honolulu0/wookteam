@@ -2,6 +2,9 @@
     <drawer-tabs-container>
         <div class="book-setting">
             <Form ref="formSystem" :model="formSystem" :label-width="80">
+                <FormItem :label="$L('文档链接')">
+                    <a class="form-link" target="_blank" :href="$A.webUrl('docs/view/b' + this.id)">{{$A.webUrl('docs/view/b' + this.id)}}</a>
+                </FormItem>
                 <FormItem :label="$L('修改权限')">
                     <div>
                         <RadioGroup v-model="formSystem.role_edit">
@@ -10,7 +13,15 @@
                             <Radio label="reg">{{$L('注册会员')}}</Radio>
                         </RadioGroup>
                     </div>
-                    <div class="form-placeholder">{{$L('管理文库的会员。')}}</div>
+                    <div v-if="formSystem.role_edit=='private'" class="form-placeholder">
+                        {{$L('仅作者可以修改。')}}
+                    </div>
+                    <div v-else-if="formSystem.role_edit=='member'" class="form-placeholder">
+                        {{$L('仅作者和文档成员可以修改。')}}
+                    </div>
+                    <div v-else-if="formSystem.role_edit=='reg'" class="form-placeholder">
+                        {{$L('所有会员都可以修改。')}}
+                    </div>
                 </FormItem>
                 <FormItem :label="$L('阅读权限')">
                     <div>
@@ -21,7 +32,18 @@
                             <Radio label="all">{{$L('完全开放')}}</Radio>
                         </RadioGroup>
                     </div>
-                    <div class="form-placeholder">{{$L('可以打开阅读分享地址的会员。')}}</div>
+                    <div v-if="formSystem.role_view=='private'" class="form-placeholder">
+                        {{$L('仅作者可以阅读分享地址。')}}
+                    </div>
+                    <div v-else-if="formSystem.role_view=='member'" class="form-placeholder">
+                        {{$L('仅作者和文档成员可以阅读分享地址。')}}
+                    </div>
+                    <div v-else-if="formSystem.role_view=='reg'" class="form-placeholder">
+                        {{$L('所有会员都可以阅读分享地址。')}}
+                    </div>
+                    <div v-else-if="formSystem.role_view=='all'" class="form-placeholder">
+                        {{$L('所有人（含游客）都可以阅读分享地址。')}}
+                    </div>
                 </FormItem>
                 <FormItem>
                     <Button :loading="loadIng > 0" type="primary" @click="handleSubmit('formSystem')">{{$L('提交')}}</Button>
@@ -35,8 +57,15 @@
 <style lang="scss" scoped>
     .book-setting {
         padding: 0 12px;
+        .form-link {
+            text-decoration: underline;
+        }
         .form-placeholder {
-            color: #999;
+            font-size: 12px;
+            color: #999999;
+        }
+        .form-placeholder:hover {
+            color: #000000;
         }
     }
 </style>
@@ -87,7 +116,7 @@
         methods: {
             getSetting(save) {
                 this.loadIng++;
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'docs/book/setting?type=' + (save ? 'save' : 'get'),
                     data: Object.assign(this.formSystem, {
                         id: this.id

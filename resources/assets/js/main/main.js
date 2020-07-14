@@ -22,7 +22,11 @@ import '../../sass/main.scss';
             return window.location.origin + '/' + str;
         },
 
-        aUrl(str) {
+        webUrl(str) {
+            return $A.fillUrl(str || '');
+        },
+
+        apiUrl(str) {
             if (str.substring(0, 2) === "//" ||
                 str.substring(0, 7) === "http://" ||
                 str.substring(0, 8) === "https://" ||
@@ -33,10 +37,10 @@ import '../../sass/main.scss';
             return apiUrl + str;
         },
 
-        aAjax(params) {
+        apiAjax(params) {
             if (typeof params !== 'object') return false;
             if (typeof params.success === 'undefined') params.success = () => { };
-            params.url = this.aUrl(params.url);
+            params.url = this.apiUrl(params.url);
             //
             let beforeCall = params.beforeSend;
             params.beforeSend = () => {
@@ -69,7 +73,6 @@ import '../../sass/main.scss';
                             title: '温馨提示',
                             content: data.msg,
                             onOk: () => {
-                                $A.token("");
                                 $A.userLogout();
                             }
                         });
@@ -157,10 +160,10 @@ import '../../sass/main.scss';
                     }
                 }
                 //
-                $A.aAjax({
+                $A.apiAjax({
                     url: 'users/info',
                     error: () => {
-                        this.userLogout();
+                        $A.userLogout();
                     },
                     success: (res) => {
                         if (res.ret === 1) {
@@ -229,7 +232,7 @@ import '../../sass/main.scss';
                 }
             });
             //
-            $A.aAjax({
+            $A.apiAjax({
                 url: 'users/basic',
                 data: {
                     username: $A.jsonStringify(userArray),
@@ -299,9 +302,9 @@ import '../../sass/main.scss';
             $A.storage("userInfo", {});
             $A.triggerUserInfoListener({});
             if (typeof $A.app === "object") {
-                $A.app.goForward({path: '/'}, true);
+                $A.app.goForward({path: '/', query:{from:encodeURIComponent(window.location.href)}}, true);
             } else {
-                window.location.href = window.location.origin;
+                window.location.replace($A.webUrl() + '?from=' + encodeURIComponent(window.location.href));
             }
         },
 
@@ -403,7 +406,7 @@ import '../../sass/main.scss';
          * @param taskid
          */
         triggerTaskInfoChange(taskid) {
-            $A.aAjax({
+            $A.apiAjax({
                 url: 'project/task/pushlog',
                 data: {
                     taskid: taskid,

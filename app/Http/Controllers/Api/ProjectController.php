@@ -798,8 +798,12 @@ class ProjectController extends Controller
                             'type' => '日志',
                             'projectid' => $projectDetail['id'],
                             'username' => $user['username'],
-                            'detail' => '将成员【' . $username . '】移出项目',
-                            'indate' => Base::time()
+                            'detail' => '将成员移出项目',
+                            'indate' => Base::time(),
+                            'other' => Base::array2string([
+                                'type' => 'username',
+                                'username' => $username,
+                            ])
                         ];
                     }
                     break;
@@ -816,9 +820,13 @@ class ProjectController extends Controller
                         $logArray[] = [
                             'type' => '日志',
                             'projectid' => $projectDetail['id'],
-                            'username' => $username,
-                            'detail' => '将成员【' . $username . '】加入项目',
-                            'indate' => Base::time()
+                            'username' => $user['username'],
+                            'detail' => '邀请成员加入项目',
+                            'indate' => Base::time(),
+                            'other' => Base::array2string([
+                                'type' => 'username',
+                                'username' => $username,
+                            ])
                         ];
                     }
                     break;
