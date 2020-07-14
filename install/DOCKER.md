@@ -82,7 +82,7 @@ $ ./cmd mysql "your command"            // 运行 mysql 命令
 
 ## 升级更新
 
-- 进入目录，依次运行一下命令：
+- 进入目录，依次运行以下命令：
 
 ```bash
 $ git fetch --all

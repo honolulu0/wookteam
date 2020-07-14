@@ -82,7 +82,7 @@ $ ./cmd mysql "your command"            // To run a mysql command
 
 ## Upgrade
 
-- Enter the directory and run the following command in turn:
+- Go to the directory and run the following commands in turn:
 
 ```bash
 $ git fetch --all

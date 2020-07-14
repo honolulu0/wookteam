@@ -156,12 +156,10 @@ $ systemctl restart supervisord
 
 ## 升级更新
 
-- 进入服务器，切换至网站目录，然后依次运行一下命令：
+- 将最新的代码上传至站点；
+- 进入服务器，切换至站点目录，然后依次运行以下命令：
 
 ```bash
-$ git fetch --all
-$ git reset --hard origin/master
-$ git pull
 $ composer install
 $ php artisan migrate
 
