@@ -90,7 +90,7 @@ $ ./cmd mysql "your command"            // 运行 mysql 命令
 $ git fetch --all
 $ git reset --hard origin/master
 $ git pull
-$ ./cmd composer install
+$ ./cmd composer update
 $ ./cmd artisan migrate
 
 $ ./cmd npm install

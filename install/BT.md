@@ -162,7 +162,7 @@ $ systemctl restart supervisord
 - 进入服务器，切换至站点目录，然后依次运行以下命令：
 
 ```bash
-$ composer install
+$ composer update
 $ php artisan migrate
 
 $ npm install

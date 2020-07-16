@@ -156,7 +156,7 @@ server {
 $ git fetch --all
 $ git reset --hard origin/master
 $ git pull
-$ composer install
+$ composer update
 $ php artisan migrate
 
 $ npm install

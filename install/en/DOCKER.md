@@ -90,7 +90,7 @@ $ ./cmd mysql "your command"            // To run a mysql command
 $ git fetch --all
 $ git reset --hard origin/master
 $ git pull
-$ ./cmd composer install
+$ ./cmd composer update
 $ ./cmd artisan migrate
 
 $ ./cmd npm install
