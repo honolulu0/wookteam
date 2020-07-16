@@ -14,8 +14,6 @@ use Redirect;
 class IndexController extends Controller
 {
 
-    private $version = '1.4.6';
-
     public function __invoke($method, $action = '', $child = '')
     {
         $app = $method ? $method : 'main';
@@ -31,7 +29,7 @@ class IndexController extends Controller
      */
     public function main()
     {
-        return view('main', ['version' => $this->version]);
+        return view('main', ['version' => Base::version]);
     }
 
     /**

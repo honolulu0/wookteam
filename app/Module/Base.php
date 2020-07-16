@@ -13,6 +13,7 @@ use Storage;
 
 class Base
 {
+    const version = "1.4.6";
 
     /**
      * 获取数组或对象值
