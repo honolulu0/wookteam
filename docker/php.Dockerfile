@@ -22,7 +22,7 @@ RUN apt-get update \
         && curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
         && apt-get -y install nodejs \
         && rm -r /var/lib/apt/lists/* \
-        && docker-php-ext-configure gd \
+        && docker-php-ext-configure gd --with-jpeg \
         && docker-php-ext-install pdo_mysql gd pcntl zip
 
 # Copy application file to /var/www

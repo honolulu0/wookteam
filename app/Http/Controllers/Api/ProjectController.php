@@ -1068,6 +1068,7 @@ class ProjectController extends Controller
             ]);
             DB::table('project_label')->where('id', $labelDetail['id'])->delete();
             DB::table('project_log')->insert($logArray);
+            Project::updateNum($projectid);
             //
             return Base::retSuccess('删除成功！');
         });
