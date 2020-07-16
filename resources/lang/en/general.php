@@ -131,4 +131,5 @@ return [
     "知识库仅对作者开放！" => "Knowledge base for authors only!",
     "操作权限不足！" => "Not permissions!",
     "此操作仅限项目负责人！" => "This operation is only for the project leader!",
+    "开始时间与结束时间一致！" => "Start time and end time are the same!",
 ];

@@ -1620,6 +1620,9 @@ class ProjectController extends Controller
                 if ($startdate == $task['startdate'] && $enddate == $task['enddate']) {
                     return Base::retError('与原计划时间一致！');
                 }
+                if ($startdate == $enddate) {
+                    return Base::retError('开始时间与结束时间一致！');
+                }
                 $upArray['startdate'] = $startdate;
                 $upArray['enddate'] = $enddate;
                 $logArray[] = [

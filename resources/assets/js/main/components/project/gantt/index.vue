@@ -115,13 +115,13 @@
                 this.projectLabel.forEach((item) => {
                     item.taskLists.forEach((taskData) => {
                         let start = taskData.startdate || taskData.indate;
-                        let end = taskData.enddate || taskData.indate;
+                        let end = taskData.enddate || (taskData.indate + 86400);
                         if (end == start) {
                             end = Math.round(new Date($A.formatDate('Y-m-d 23:59:59', end)).getTime()/1000);
                         }
+                        end = Math.max(end, start + 60);
                         start*= 1000;
                         end*= 1000;
-                        if (end == start) end++;
                         //
                         let color = '#058ce4';
                         if (taskData.complete) {
@@ -158,6 +158,16 @@
                         };
                     });
                 });
+                //
+                if (Object.keys(this.rows).length == 0) {
+                    this.$Modal.warning({
+                        title: this.$L("温馨提示"),
+                        content: this.$L('任务列表为空，请先添加任务。'),
+                        onOk: () => {
+                            this.$emit('on-close');
+                        },
+                    });
+                }
                 //
                 this.config = Object.assign({
                     plugins: [ItemMovement({
