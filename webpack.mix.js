@@ -105,4 +105,10 @@ mix.webpackConfig({
             }
         }]
     }
+}).options({
+    uglify: {
+        uglifyOptions: {
+            compress: { inline: false }
+        }
+    }
 });
