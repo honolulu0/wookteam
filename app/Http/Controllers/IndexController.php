@@ -14,7 +14,7 @@ use Redirect;
 class IndexController extends Controller
 {
 
-    private $version = '1.4';
+    private $version = '1.4.1';
 
     public function __invoke($method, $action = '', $child = '')
     {

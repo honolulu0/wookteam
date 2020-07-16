@@ -1059,7 +1059,8 @@ class ProjectController extends Controller
                 'taskid' => 0,
                 'username' => $user['username'],
                 'detail' => '删除任务列表【' . $labelDetail['title'] . '】',
-                'indate' => Base::time()
+                'indate' => Base::time(),
+                'other' => Base::array2string([])
             ];
             DB::table('project_task')->where('labelid', $labelDetail['id'])->update([
                 'delete' => 1,
