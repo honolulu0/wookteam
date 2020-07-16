@@ -117,7 +117,7 @@
                                             url: 'docs/users/join',
                                             data: {
                                                 act: 'delete',
-                                                id: params.row.id,
+                                                id: params.row.bookid,
                                                 username: params.row.username,
                                             },
                                             error: () => {
