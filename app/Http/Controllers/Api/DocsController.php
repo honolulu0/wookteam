@@ -45,6 +45,7 @@ class DocsController extends Controller
         //
         $lists = DB::table('docs_book')
             ->where('username', $user['username'])
+            ->orWhere('role_edit', 'reg')
             ->orWhere(function ($query) use ($user) {
                 $query->where('role_edit', 'private')->where('username', $user['username']);
             })
