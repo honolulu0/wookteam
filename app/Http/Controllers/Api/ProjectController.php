@@ -98,11 +98,16 @@ class ProjectController extends Controller
         if (Base::isError($inRes)) {
             return $inRes;
         }
+        $projectSetting = Base::string2array($projectDetail['setting']);
         //子分类
         $label = Base::DBC2A(DB::table('project_label')->where('projectid', $projectid)->orderBy('inorder')->orderBy('id')->get());
         $simpleLabel = [];
         //任务
-        $task = Base::DBC2A(DB::table('project_task')->where([ 'projectid' => $projectid, 'delete' => 0, 'complete' => 0 ])->orderByDesc('inorder')->orderByDesc('id')->get());
+        $whereArray = [ 'projectid' => $projectid, 'delete' => 0, 'complete' => 0 ];
+        if ($projectSetting['complete_show'] == 'show') {
+            unset($whereArray['complete']);
+        }
+        $task = Base::DBC2A(DB::table('project_task')->where($whereArray)->orderByDesc('inorder')->orderByDesc('id')->get());
         //任务归类
         foreach ($label AS $index => $temp) {
             $taskLists = [];
@@ -223,6 +228,58 @@ class ProjectController extends Controller
         } else {
             return Base::retError('添加失败！');
         }
+    }
+
+
+    /**
+     * 设置项目
+     *
+     * @apiParam {String} act           类型
+     * - save: 保存
+     * - other: 读取
+     * @apiParam {Number} projectid     项目ID
+     * @apiParam {Object} ...           其他保存参数
+     *
+     * @throws \Throwable
+     */
+    public function setting()
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
+        } else {
+            $user = $user['data'];
+        }
+        //
+        $projectid = trim(Request::input('projectid'));
+        $projectDetail = Base::DBC2A(DB::table('project_lists')->where('id', $projectid)->where('delete', 0)->first());
+        if (empty($projectDetail)) {
+            return Base::retError('项目不存在或已被删除！');
+        }
+        //
+        $setting = Base::string2array($projectDetail['setting']);
+        $act = trim(Request::input('act'));
+        if ($act == 'save') {
+            if ($projectDetail['username'] != $user['username']) {
+                return Base::retError('你不是项目负责人！');
+            }
+            foreach (Request::input() AS $key => $value) {
+                if (in_array($key, ['add_role', 'edit_role', 'complete_role', 'archived_role', 'del_role', 'complete_show'])) {
+                    $setting[$key] = $value;
+                }
+            }
+            DB::table('project_lists')->where('id', $projectDetail['id'])->update([
+                'setting' => Base::string2array($setting)
+            ]);
+        }
+        //
+        foreach (['edit_role', 'complete_role', 'archived_role', 'del_role'] AS $key) {
+            $setting[$key] = is_array($setting[$key]) ? $setting[$key] : ['__', 'owner'];
+        }
+        $setting['add_role'] = is_array($setting['add_role']) ? $setting['add_role'] : ['__', 'member'];
+        $setting['complete_show'] = $setting['complete_show'] ?: 'hide';
+        //
+        return Base::retSuccess($act == 'save' ? '修改成功！' : 'success', $setting ?: json_decode('{}'));
     }
 
     /**
@@ -1282,6 +1339,10 @@ class ProjectController extends Controller
             if (Base::isError($inRes)) {
                 return $inRes;
             }
+            $checkRole = Project::role('add_role', $projectid, 0);
+            if (Base::isError($checkRole)) {
+                return $checkRole;
+            }
             //
             $username = trim(Request::input('username'));
             if (empty($username)) {
@@ -1395,10 +1456,33 @@ class ProjectController extends Controller
             if (Base::isError($inRes)) {
                 return $inRes;
             }
-            if (!$inRes['data']['isowner']
-                && $task['username'] != $user['username']
-                && !in_array($act, ['comment', 'attention'])) {
-                return Base::retError('此操作只允许项目管理员或者任务负责人！');
+            if (!in_array($act, ['comment', 'attention'])) {
+                $checkRole = Project::role('edit_role', $task['projectid'], $task['id']);
+                if (Base::isError($checkRole)) {
+                    return $checkRole;
+                }
+                switch ($act) {
+                    case 'complete':
+                    case 'unfinished':
+                        $checkRole = Project::role('complete_role', $task['projectid'], $task['id']);
+                        if (Base::isError($checkRole)) {
+                            return $checkRole;
+                        }
+                        break;
+                    case 'archived':
+                    case 'unarchived':
+                        $checkRole = Project::role('archived_role', $task['projectid'], $task['id']);
+                        if (Base::isError($checkRole)) {
+                            return $checkRole;
+                        }
+                        break;
+                    case 'delete':
+                        $checkRole = Project::role('del_role', $task['projectid'], $task['id']);
+                        if (Base::isError($checkRole)) {
+                            return $checkRole;
+                        }
+                        break;
+                }
             }
         } else {
             if ($task['username'] != $user['username']) {

@@ -129,4 +129,6 @@ return [
     "知识库仅对会员开放，请登录后再试！" => "Knowledge base is open to members only, please login and try again!",
     "知识库仅对成员开放！" => "Knowledge base is open to members only!",
     "知识库仅对作者开放！" => "Knowledge base for authors only!",
+    "操作权限不足！" => "Not permissions!",
+    "此操作仅限项目负责人！" => "This operation is only for the project leader!",
 ];

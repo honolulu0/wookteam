@@ -132,7 +132,7 @@ import '../../sass/main.scss';
         },
 
         /**
-         * 获取会员昵称
+         * 获取会员账号
          * @returns string
          */
         getUserName() {
@@ -141,6 +141,18 @@ import '../../sass/main.scss';
             }
             let userInfo = $A.getUserInfo();
             return $A.ishave(userInfo.username) ? userInfo.username : '';
+        },
+
+        /**
+         * 获取会员昵称
+         * @returns string
+         */
+        getNickName() {
+            if ($A.getToken() === false) {
+                return "";
+            }
+            let userInfo = $A.getUserInfo();
+            return $A.ishave(userInfo.nickname) ? userInfo.nickname : $A.getUserName();
         },
 
         /**
@@ -364,7 +376,7 @@ import '../../sass/main.scss';
          * 监听任务发生变化
          * @param listenerName      监听标识
          * @param callback          监听回调
-         * @param callSpecial       是否监听几种特殊情况
+         * @param callSpecial       是否监听几种特殊事件（非操作任务的）
          */
         setOnTaskInfoListener(listenerName, callback, callSpecial) {
             if (typeof listenerName != "string") {
@@ -383,7 +395,7 @@ import '../../sass/main.scss';
                 if (!$A.__taskInfoListenerObject.hasOwnProperty(key)) continue;
                 item = $A.__taskInfoListenerObject[key];
                 if (typeof item.callback === "function") {
-                    if (['deleteproject', 'deletelabel', 'leveltask'].indexOf(act) === -1 || item.special === true) {
+                    if (['addlabel', 'deleteproject', 'deletelabel', 'labelsort', 'tasksort'].indexOf(act) === -1 || item.special === true) {
                         if (typeof taskDetail.__modifyUsername === "undefined") {
                             taskDetail.__modifyUsername = $A.getUserName();
                         }

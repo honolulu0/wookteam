@@ -383,13 +383,15 @@
                     }
                     return;
                 }
-                //
+                //特殊事件（非操作任务的）
                 switch (act) {
                     case 'deleteproject':   // 删除项目
                     case 'deletelabel':     // 删除分类
                         this.refreshTask();
                         return;
-                    case 'tasklevel':       // 调整级别
+                    case 'addlabel':        // 添加分类
+                    case "labelsort":       // 调整分类排序
+                    case "tasksort":        // 调整任务排序
                         return;
                 }
                 //
@@ -689,7 +691,6 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.$Message.success(res.msg);
-                            $A.triggerTaskInfoListener('tasklevel', res.data.taskLevel);
                         } else {
                             this.refreshTask();
                             this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});

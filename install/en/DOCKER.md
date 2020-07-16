@@ -82,6 +82,8 @@ $ ./cmd mysql "your command"            // To run a mysql command
 
 ## Upgrade
 
+**Note: Please backup your data before upgrading!**
+
 - Go to the directory and run the following commands in turn:
 
 ```bash

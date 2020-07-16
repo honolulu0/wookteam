@@ -450,7 +450,7 @@
                         return;
 
                     case 'plannedtime':
-                        this.timeValue = $A.date2string(this.timeValue);
+                        this.timeValue = $A.date2string(this.timeValue, "Y-m-d H:i");
                         ajaxData.content = this.timeValue[0] + "," + this.timeValue[1];
                         this.$refs.timeRef.handleClose();
                         break;
@@ -560,7 +560,9 @@
                             $A.triggerTaskInfoChange(ajaxData.taskid);
                         } else {
                             ajaxCallback(0);
-                            this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                            setTimeout(() =>  {
+                                this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                            }, 350);
                         }
                     }
                 });

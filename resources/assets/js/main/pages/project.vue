@@ -68,7 +68,7 @@
                 </li>
             </ul>
             <!-- 分页 -->
-            <Page v-if="listTotal > 0" class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[10,20,30,50,100]" placement="top" transfer show-elevator show-sizer show-total></Page>
+            <Page v-if="listTotal > 0" class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" :pageSize="listPageSize" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[20,40,60,100]" placement="top" transfer show-elevator show-sizer show-total></Page>
         </w-content>
 
         <Modal
@@ -311,6 +311,7 @@
                 lists: [],
                 listPage: 1,
                 listTotal: 0,
+                listPageSize: 20,
 
                 projectDrawerShow: false,
                 projectDrawerTab: 'archived',
@@ -392,7 +393,7 @@
             },
 
             setPageSize(size) {
-                if (Math.max($A.runNum(this.listPageSize), 10) != size) {
+                if (Math.max($A.runNum(this.listPageSize), 20) != size) {
                     this.listPageSize = size;
                     this.getLists();
                 }
@@ -407,7 +408,7 @@
                     url: 'project/lists',
                     data: {
                         page: Math.max(this.listPage, 1),
-                        pagesize: Math.max($A.runNum(this.listPageSize), 10),
+                        pagesize: Math.max($A.runNum(this.listPageSize), 20),
                     },
                     complete: () => {
                         this.loadIng--;

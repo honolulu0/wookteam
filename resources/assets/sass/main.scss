@@ -113,6 +113,10 @@
             span {
                 margin: 0 12px 0 0;
                 cursor: pointer;
+                &.active {
+                    color: #0285d7;
+                    font-weight: 500;
+                }
             }
             span + span {
                 padding-left: 12px;

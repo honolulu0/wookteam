@@ -101,4 +101,68 @@ class Project
         //
         return $userArray;
     }
+
+    /**
+     * 项目（任务）权限
+     * @param $type
+     * @param $projectid
+     * @param int $taskid
+     * @return array|mixed
+     */
+    public static function role($type, $projectid, $taskid = 0)
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
+        } else {
+            $user = $user['data'];
+        }
+        //
+        $project = Base::DBC2A(DB::table('project_lists')->select(['username', 'setting'])->where('id', $projectid)->where('delete', 0)->first());
+        if (empty($project)) {
+            return Base::retError('项目不存在或已被删除！');
+        }
+        // 项目负责人最高权限
+        if ($project['username'] == $user['username']) {
+            return Base::retSuccess('success');
+        }
+        //
+        $setting = Base::string2array($project['setting']);
+        foreach (['edit_role', 'complete_role', 'archived_role', 'del_role'] AS $key) {
+            $setting[$key] = is_array($setting[$key]) ? $setting[$key] : ['__', 'owner'];
+        }
+        $setting['add_role'] = is_array($setting['add_role']) ? $setting['add_role'] : ['__', 'member'];
+        //
+        $role = $setting[$type];
+        if (empty($role) || !is_array($role)) {
+            return Base::retError('操作权限不足！');
+        }
+        if (in_array('member', $role)) {
+            $inRes = Project::inThe($projectid, $user['username']);
+            if (Base::isError($inRes)) {
+                return $inRes;
+            }
+        } elseif (in_array('owner', $role)) {
+            if (empty($taskid)) {
+                return Base::retError('任务不存在！');
+            }
+            $task = Base::DBC2A(DB::table('project_task')
+                ->select(['username'])
+                ->where([
+                    ['delete', '=', 0],
+                    ['id', '=', $taskid],
+                ])
+                ->first());
+            if (empty($task)) {
+                return Base::retError('任务不存在！');
+            }
+            if ($task['username'] != $user['username']) {
+                return Base::retError('此操作只允许项目管理员或者任务负责人！');
+            }
+        } else {
+            return Base::retError('此操作仅限项目负责人！');
+        }
+        //
+        return Base::retSuccess('success');
+    }
 }

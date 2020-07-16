@@ -15,9 +15,10 @@
                 <div class="w-nav-flex"></div>
                 <div class="w-nav-right">
                     <span class="ft hover" @click="openProjectDrawer('lists')"><i class="ft icon">&#xE89E;</i> {{$L('任务列表')}}</span>
+                    <span class="ft hover" :class="{active:projectGanttShow}" @click="projectGanttShow=!projectGanttShow"><i class="ft icon">&#59141;</i> {{$L('甘特图')}}</span>
                     <span class="ft hover" @click="openProjectDrawer('files')"><i class="ft icon">&#xE701;</i> {{$L('文件列表')}}</span>
                     <span class="ft hover" @click="openProjectDrawer('logs')"><i class="ft icon">&#xE753;</i> {{$L('项目动态')}}</span>
-                    <span class="ft hover" @click="openProjectSettingDrawer('archived')"><i class="ft icon">&#xE7A7;</i> {{$L('设置')}}</span>
+                    <span class="ft hover" @click="openProjectSettingDrawer('setting')"><i class="ft icon">&#xE7A7;</i> {{$L('设置')}}</span>
                 </div>
             </div>
         </div>
@@ -27,6 +28,7 @@
                 v-model="projectLabel"
                 class="label-box"
                 draggable=".label-draggable"
+                :style="{visibility: projectGanttShow ? 'hidden' : 'visible'}"
                 :animation="150"
                 :disabled="projectSortDisabled"
                 @sort="projectSortUpdate(true)">
@@ -83,6 +85,7 @@
                     </div>
                 </div>
             </draggable>
+            <project-gantt v-if="projectGanttShow" @on-close="projectGanttShow=false" :projectLabel="projectLabel"></project-gantt>
         </w-content>
 
         <WDrawer v-model="projectDrawerShow" maxWidth="1080">
@@ -101,6 +104,9 @@
 
         <WDrawer v-model="projectSettingDrawerShow" maxWidth="1000">
             <Tabs v-if="projectSettingDrawerShow" v-model="projectSettingDrawerTab">
+                <TabPane :label="$L('项目设置')" name="setting">
+                    <project-setting :canload="projectSettingDrawerShow && projectSettingDrawerTab == 'setting'" :projectid="projectid" @on-change="getDetail"></project-setting>
+                </TabPane>
                 <TabPane :label="$L('已归档任务')" name="archived">
                     <project-archived :canload="projectSettingDrawerShow && projectSettingDrawerTab == 'archived'" :projectid="projectid"></project-archived>
                 </TabPane>
@@ -241,6 +247,10 @@
                                     border-left-color: #84A83B;
                                 }
                                 &.complete {
+                                    .task-title {
+                                        color: #666666;
+                                        text-decoration: line-through;
+                                    }
                                     .task-more {
                                         .task-status {
                                             color: #666666;
@@ -315,9 +325,13 @@
     import ProjectUsers from "../../components/project/users";
     import ProjectStatistics from "../../components/project/statistics";
     import WDrawer from "../../components/iview/WDrawer";
+    import ProjectGantt from "../../components/project/gantt/index";
+    import ProjectSetting from "../../components/project/setting";
 
     export default {
         components: {
+            ProjectSetting,
+            ProjectGantt,
             WDrawer,
             ProjectStatistics,
             ProjectUsers,
@@ -340,21 +354,57 @@
                 projectDrawerTab: 'lists',
 
                 projectSettingDrawerShow: false,
-                projectSettingDrawerTab: 'archived',
+                projectSettingDrawerTab: 'setting',
+
+                projectGanttShow: false,
+
+                routeName: '',
             }
         },
         mounted() {
+            this.routeName = this.$route.name;
             $A.setOnTaskInfoListener('pages/project-panel',(act, detail) => {
                 if (detail.projectid != this.projectid) {
                     return;
                 }
                 //
                 switch (act) {
-                    case 'deleteproject':   // 删除项目
-                    case 'deletelabel':     // 删除分类
+                    case 'addlabel':        // 添加分类
+                        let tempLists = this.projectLabel.filter((res) => { return res.id == detail.labelid });
+                        if (tempLists.length == 0) {
+                            this.projectLabel.push(Object.assign(detail, {id: detail.labelid}));
+                            this.projectSortData = this.getProjectSort();
+                        }
                         return;
-                    case 'tasklevel':       // 调整级别
-                        this.getDetail(true);
+
+                    case 'deletelabel':     // 删除分类
+                        this.projectLabel.some((label, index) => {
+                            if (label.id == detail.labelid) {
+                                this.projectLabel.splice(index, 1);
+                                this.projectSortData = this.getProjectSort();
+                                return true;
+                            }
+                        });
+                        return;
+
+                    case 'deleteproject':   // 删除项目
+                        return;
+
+                    case "labelsort":       // 调整分类排序
+                    case "tasksort":        // 调整任务排序
+                        if (detail.__modifyUsername != $A.getUserName()) {
+                            if (this.routeName == this.$route.name) {
+                                this.$Modal.confirm({
+                                    title: this.$L("更新提示"),
+                                    content: this.$L('团队成员（%）调整了%，<br/>更新时间：%。<br/><br/>点击【确定】加载最新数据。', detail.nickname, this.$L(act == 'labelsort' ? '分类排序' : '任务排序'), $A.formatDate("Y-m-d H:i:s", detail.time)),
+                                    onOk: () => {
+                                        this.getDetail(true);
+                                    }
+                                });
+                            } else {
+                                this.getDetail(true);
+                            }
+                        }
                         return;
                 }
                 //
@@ -379,6 +429,22 @@
                             });
                         });
                         this.projectSortData = this.getProjectSort();
+                        break;
+
+                    case "create":          // 创建任务
+                        this.projectLabel.some((label) => {
+                            if (label.id == detail.labelid) {
+                                let tempLists = label.taskLists.filter((res) => { return res.id == detail.id });
+                                if (tempLists.length == 0) {
+                                    detail.isNewtask = true;
+                                    label.taskLists.unshift(detail);
+                                    this.$nextTick(() => {
+                                        this.$set(detail, 'isNewtask', false);
+                                    });
+                                }
+                                return true;
+                            }
+                        });
                         break;
 
                     case "unarchived":      // 取消归档
@@ -416,6 +482,7 @@
             if ($A.getToken() === false) {
                 this.projectid = 0;
             }
+            this.projectGanttShow = false;
             this.projectDrawerShow = false;
             this.projectSettingDrawerShow = false;
         },
@@ -649,12 +716,13 @@
                     loading: true,
                     onOk: () => {
                         if (this.labelValue) {
+                            let data = {
+                                projectid: this.projectid,
+                                title: this.labelValue
+                            };
                             $A.apiAjax({
                                 url: 'project/label/add',
-                                data: {
-                                    projectid: this.projectid,
-                                    title: this.labelValue
-                                },
+                                data: data,
                                 error: () => {
                                     this.$Modal.remove();
                                     alert(this.$L('网络繁忙，请稍后再试！'));
@@ -663,6 +731,7 @@
                                     this.$Modal.remove();
                                     this.projectLabel.push(res.data);
                                     this.projectSortData = this.getProjectSort();
+                                    $A.triggerTaskInfoListener('addlabel', Object.assign(data, {labelid: res.data.id}));
                                     setTimeout(() => {
                                         if (res.ret === 1) {
                                             this.$Message.success(res.msg);
@@ -729,6 +798,7 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.$Message.success(res.msg);
+                            $A.triggerTaskInfoListener(isLabel ? 'labelsort' : 'tasksort', { projectid: this.projectid, nickname: $A.getNickName(), time: Math.round(new Date().getTime()/1000) });
                         } else {
                             this.getDetail();
                             this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});

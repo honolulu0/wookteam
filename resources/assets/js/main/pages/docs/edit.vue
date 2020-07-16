@@ -743,6 +743,7 @@
                             okText: this.$L('保存并返回'),
                             onOk: () => {
                                 this.handleClick('save');
+                                this.goBackDirect();
                             }
                         });
                         break;
