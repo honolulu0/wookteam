@@ -20,7 +20,10 @@ class IndexController extends Controller
         if ($action) {
             $app .= "__" . $action;
         }
-        return (method_exists($this, $app)) ? $this->$app($child) : Base::ajaxError("404 not found (" . str_replace("__", "/", $app) . ").");
+        if (!method_exists($this, $app)) {
+            $app = 'main';
+        }
+        return $this->$app($child);
     }
 
     /**

@@ -658,46 +658,20 @@
         },
 
         /**
-         * hash数组拼接
-         * @param obj
-         * @param filtrate
-         * @returns {*}
-         */
-        hashSplice(obj, filtrate) {
-            if (typeof obj !== 'object') {
-                return obj;
-            }
-            let sObj = Object.keys(obj).sort(),
-                text = "",
-                sFiltrate = "," + filtrate + ",";
-            for (let prop in sObj) {
-                if (sObj.hasOwnProperty(prop)) {
-                    if (!$A.strExists(sFiltrate, "," + sObj[prop] + ",")) {
-                        if (text) text += "&";
-                        text += sObj[prop] + "=" + obj[sObj[prop]];
-                    }
-                }
-            }
-            return text;
-        },
-
-        /**
-         * 指定键获取hash参数
+         * 指定键获取url参数
          * @param key
          * @returns {*}
          */
-        hashParameter(key) {
-            let params = this.hashParameterAll();
-            return params[key];
+        urlParameter(key) {
+            let params = this.urlParameterAll();
+            return typeof key === "undefined" ? params : params[key];
         },
 
-        hashParameterAll() {
-            let hash = location.hash || "";
-            let arr;
-            if (this.strExists(hash, "?")) {
-                arr = this.getMiddle(hash, "?").split("&");
-            }else{
-                arr = this.getMiddle(hash, "#").split("&");
+        urlParameterAll() {
+            let search = window.location.search || "";
+            let arr = [];
+            if (this.strExists(search, "?")) {
+                arr = this.getMiddle(search, "?").split("&");
             }
             let params = {};
             for (let i = 0; i < arr.length; i++) {

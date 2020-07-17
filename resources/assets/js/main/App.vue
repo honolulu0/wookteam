@@ -21,24 +21,22 @@
             }
         },
         mounted() {
-            let token = $A.hashParameter("token");
-            if ($A.count(token) > 10) {
-                $.setToken(token);
-                $A.getUserInfo(true);
-                let path = $A.removeURLParameter(window.location.href,'token');
-                if ($A.strExists(path, "#")) {
-                    this.goForward({path: $A.getMiddle(path, '#')}, true);
-                }
-            }
-            //
-            this.sessionStorage('/', 1);
+            this.checkToken();
             //
             let hash = window.location.hash;
             if (hash.indexOf("#") === 0) {
                 hash = hash.substr(1);
-                if (hash !== '/' && this.sessionStorage(hash) === 0) {
-                    this.sessionStorage(hash, this.sessionStorage('::count') + 1);
+                if (hash) {
+                    this.$nextTick(() => {
+                        hash = $A.removeURLParameter(hash, 'token');
+                        this.goForward({path: hash});
+                    });
                 }
+            }
+            this.sessionStorage('/', 1);
+            let pathname = window.location.pathname;
+            if (pathname && this.sessionStorage(pathname) === 0) {
+                this.sessionStorage(pathname, this.sessionStorage('::count') + 1);
             }
             //
             setInterval(() => {
@@ -57,10 +55,27 @@
                 if (typeof To.name === 'undefined' || typeof From.name === 'undefined') {
                     return;
                 }
-                this.slideType(To, From)
+                this.slideType(To, From);
             }
         },
         methods: {
+            checkToken() {
+                let token = $A.urlParameter("token");
+                if ($A.count(token) > 10) {
+                    $.setToken(decodeURIComponent(token));
+                    $A.getUserInfo(true);
+                    let path = $A.removeURLParameter(window.location.href, 'token');
+                    let uri = document.createElement('a');
+                    uri.href = path;
+                    if (uri.pathname) {
+                        let query = $A.urlParameterAll();
+                        if (typeof query['token'] !== "undefined") delete query['token'];
+                        this.$nextTick(() => {
+                            this.goForward({path: uri.pathname, query}, true);
+                        });
+                    }
+                }
+            },
             slideType(To, From) {
                 let isBack = this.$router.isBack;
                 this.$router.isBack = false;

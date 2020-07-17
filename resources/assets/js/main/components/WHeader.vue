@@ -428,7 +428,7 @@
             //
             this.tabActive = this.$route.meta.tabActive;
             //
-            if ($A.hashParameter("open") === 'chat' && $A.getToken() !== false) {
+            if ($A.urlParameter("open") === 'chat' && $A.getToken() !== false) {
                 this.chatDrawerShow = true;
             }
         },
@@ -437,7 +437,7 @@
                 this.tabActive = this.$route.meta.tabActive;
                 this.systemDrawerShow = false;
                 this.userDrawerShow = false;
-                if ($A.hashParameter("open") === 'chat' && $A.getToken() !== false) {
+                if ($A.urlParameter("open") === 'chat' && $A.getToken() !== false) {
                     this.chatDrawerShow = true;
                 }
             }
