@@ -1,4 +1,6 @@
 {
+    "version": "1.4.7",
+    "name": "wookteam",
     "private": true,
     "scripts": {
         "ide-helper": "php artisan ide-helper:generate",

@@ -76,6 +76,9 @@
                 element: this.$refs.gstc,
                 state: this.state
             });
+            if (this.isMac()) {
+                this.$refs.gstc.addEventListener('mousewheel', this.mouseHandler, { passive: false });
+            }
             //
             this.$watch(
                 "config",
@@ -95,6 +98,12 @@
             this.gstc.app.destroy();
         },
         methods: {
+            isMac() {
+                return /macintosh|mac os x/i.test(navigator.userAgent);
+            },
+            mouseHandler(e) {
+                e.preventDefault();
+            },
             getGstc() {
                 return this.gstc;
             },

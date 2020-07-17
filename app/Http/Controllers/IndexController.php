@@ -29,7 +29,7 @@ class IndexController extends Controller
      */
     public function main()
     {
-        return view('main', ['version' => Base::version]);
+        return view('main', ['version' => Base::getVersion()]);
     }
 
     /**

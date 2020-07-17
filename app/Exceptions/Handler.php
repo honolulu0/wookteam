@@ -53,7 +53,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
             if ($exception->getStatusCode() == 404) {
                 if (!\App\Module\Base::leftExists($request->getRequestUri(), '/api')) {
-                    return response()->view('main', ['version' => \App\Module\Base::version]);
+                    return response()->view('main', ['version' => \App\Module\Base::getVersion()]);
                 }
             }
         }

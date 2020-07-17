@@ -13,7 +13,22 @@ use Storage;
 
 class Base
 {
-    const version = "1.4.6";
+
+    /**
+     * 获取版本号
+     * @return string
+     */
+    public static function getVersion()
+    {
+        return Cache::remember("Base::version", now()->addSeconds(10), function () {
+            $file = base_path('package.json');
+            if (file_exists($file)) {
+                $packageArray = json_decode(file_get_contents($file), true);
+                return isset($packageArray['version']) ? $packageArray['version'] : '1.0.0';
+            }
+            return '1.0.0';
+        });
+    }
 
     /**
      * 获取数组或对象值
