@@ -53,6 +53,10 @@ const getBadgeNum = function () {
                 if (['taskA'].indexOf(body.type) !== -1) {
                     return;
                 }
+                var tempLists = $A.jsonParse($A.getStorage("configLists"), {});
+                if (typeof tempLists[key] == "object" && tempLists[key].disabled === true) {
+                    return;
+                }
                 switch (msgDetail.messageType) {
                     case 'open':
                         instances[key].open = true;
@@ -64,11 +68,11 @@ const getBadgeNum = function () {
                         instances[key].unread++;
                         chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
                             if ($A.getHost(tabs[0].url) != key) {
-                                var url = 'http://' + key + '/#/todo?token=' + encodeURIComponent(instances[key].token) + '&open=chat';
+                                var opurl = 'http://' + key + '/todo?token=' + encodeURIComponent(instances[key].token) + '&open=chat';
                                 $A.showNotify(key, {
                                     body: $A.getMsgDesc(body),
                                     icon: body.userimg
-                                }, url);
+                                }, opurl);
                             }
                         });
                         break;

@@ -28,8 +28,12 @@ function showLists(lists) {
     var html = '';
     var j = 1;
     var length = Object.keys(lists).length;
+    var tempLists = $A.jsonParse($A.getStorage("configLists"), {});
     for (var index in lists) {
         if (!lists.hasOwnProperty(index)) {
+            continue;
+        }
+        if (typeof tempLists[index] == "object" && tempLists[index].disabled === true) {
             continue;
         }
         const item = lists[index];
@@ -55,19 +59,21 @@ function showLists(lists) {
     $("div.message_unread,div.message_host").click(function(){
         const index = $(this).parents("li").attr("data-index");
         const token = encodeURIComponent($(this).parents("li").attr("data-token"));
+        const opurl = 'http://' + index + '/todo?token=' + token + '&open=chat';
         chrome.tabs.query({}, function (tabs) {
             var has = false;
             tabs.some(function (item) {
                 if ($A.getHost(item.url) == index) {
+                    var url = $A.getPathname(item.url) == '/' ? opurl : ($A.urlAddParams($A.removeURLParameter(item.url, ['open', 'rand']), {open: 'chat', rand: Math.round(new Date().getTime())}))
                     chrome.windows.update(item.windowId, {focused: true});
                     chrome.tabs.highlight({tabs: item.index, windowId: item.windowId});
-                    chrome.tabs.update({url: $A.urlAddParams($A.removeURLParameter(item.url, ['open', 'rand']), {open: 'chat', rand: Math.round(new Date().getTime())})});
+                    chrome.tabs.update({url: url});
                     onClick(index);
                     return has = true;
                 }
             });
             if (!has) {
-                chrome.tabs.create({ url: 'http://' + index + '/#/todo?token=' + token + '&open=chat' });
+                chrome.tabs.create({ url: opurl });
                 onClick(index);
             }
         });

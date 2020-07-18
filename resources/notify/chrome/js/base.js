@@ -65,6 +65,25 @@
             return info.host || info.hostname;
         } catch (err) {
             console.log(err);
+            return "";
+        }
+    },
+
+    /**
+     * 地址获取目录
+     * @param url
+     * @returns {string}
+     */
+    getPathname(url) {
+        if (/^chrome:\/\//.test(url)) {
+            return "";
+        }
+        try {
+            var info = new URL(url);
+            return info.pathname;
+        } catch (err) {
+            console.log(err);
+            return "";
         }
     },
 
