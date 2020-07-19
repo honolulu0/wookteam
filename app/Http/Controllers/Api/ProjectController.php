@@ -1934,6 +1934,7 @@ class ProjectController extends Controller
         $task['overdue'] = Project::taskIsOverdue($task);
         $task['subtask'] = Base::string2array($task['subtask']);
         $task['follower'] = Base::string2array($task['follower']);
+        $task['projectTitle'] = $task['projectid'] > 0 ? DB::table('project_lists')->where('id', $task['projectid'])->value('title') : '';
         $task = array_merge($task, Users::username2basic($task['username']));
         return Base::retSuccess($message ?: '修改成功！', $task);
     }

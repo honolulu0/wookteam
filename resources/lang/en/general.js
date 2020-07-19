@@ -474,4 +474,5 @@ export default {
     "项目面板隐藏已完成的任务。": "The project panel hides completed tasks.",
     "确定要修改任务【%】的计划时间吗？<br/>开始时间：%<br/>结束时间：%": "Are you sure you want to change the scheduled time for task [%]? <br/> start time: %<br/> end time: %",
     "任务列表为空，请先添加任务。": "The task list is empty, please add the task first.",
+    "项目名称：": "Project name:",
 }

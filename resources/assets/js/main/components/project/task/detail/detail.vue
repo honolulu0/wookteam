@@ -4,9 +4,9 @@
             <div class="detail-left">
                 <div class="detail-title-box detail-icon">
                     <input v-model="detail.title" :disabled="!!loadData.title" type="text" maxlength="60" @keydown.enter="(e)=>{e.target.blur()}" @blur="handleTask('title')">
-                    <div class="subtitle">
-                        {{$L('项目名称：')}}
-                        <span>{{detail.projectTitle}}</span>
+                    <div v-if="detail.projectTitle && urlProjectid != detail.projectid" class="subtitle">
+                        {{$L('所属项目：')}}
+                        <span class="project-title" @click="openProject(detail.projectid)">{{detail.projectTitle}}</span>
                     </div>
                     <div class="subtitle">
                         <span class="z-nick"><UserView :username="detail.createuser"/></span>
@@ -133,6 +133,8 @@
 
                 visible: false,
 
+                urlProjectid: 0,
+
                 bakData: {},
                 loadData: {},
 
@@ -203,6 +205,9 @@
             };
         },
         mounted() {
+            let match = (window.location.pathname + "").match(/\/project\/panel\/(\d+)$/i);
+            this.urlProjectid = match ? match[1] : 0;
+            //
             this.$nextTick(() => {
                 let dom = this.$el;
                 if (parseInt(this.taskid) === 0) {
@@ -573,6 +578,18 @@
                         }
                     }
                 });
+            },
+
+            openProject(projectid) {
+                try {
+                    this.visible = false;
+                    $A.app.$router.push({
+                        name: 'project-panel',
+                        params: {projectid: projectid, statistics: '', other: {}}
+                    });
+                } catch (e) {
+                    this.visible = true;
+                }
             }
         }
     }
@@ -665,6 +682,13 @@
                         padding-top: 3px;
                         font-size: 12px;
                         color: #606266;
+                        .project-title {
+                            cursor: pointer;
+                            &:hover {
+                                color: #57a3f3;
+                                text-decoration: underline;
+                            }
+                        }
                     }
                     input {
                         margin: -10px 0 0 -8px;
