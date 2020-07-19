@@ -4,7 +4,11 @@
             <div class="detail-left">
                 <div class="detail-title-box detail-icon">
                     <input v-model="detail.title" :disabled="!!loadData.title" type="text" maxlength="60" @keydown.enter="(e)=>{e.target.blur()}" @blur="handleTask('title')">
-                    <div class="time">
+                    <div class="subtitle">
+                        {{$L('项目名称：')}}
+                        <span>{{detail.projectTitle}}</span>
+                    </div>
+                    <div class="subtitle">
                         <span class="z-nick"><UserView :username="detail.createuser"/></span>
                         {{$L('创建于：')}}
                         <span>{{$A.formatDate("Y-m-d H:i:s", detail.indate)}}</span>
@@ -56,7 +60,7 @@
             <div class="detail-right">
                 <div class="cancel"><em @click="visible=false"></em></div>
                 <Dropdown trigger="click" class="block" @on-click="handleTask">
-                    <Button :loading="!!loadData.unfinished || !!loadData.complete" icon="md-checkmark-circle-outline" class="btn">{{$L('标记')}}{{$L(detail.complete?'未完成':'已完成')}}</Button>
+                    <Button :loading="!!loadData.unfinished || !!loadData.complete" :icon="detail.complete?'md-checkmark-circle-outline':'md-radio-button-off'" class="btn">{{$L('标记')}}{{$L(detail.complete?'未完成':'已完成')}}</Button>
                     <DropdownMenu slot="list">
                         <DropdownItem name="unfinished">{{$L('标记未完成')}}<Icon v-if="!detail.complete" type="md-checkmark" class="checkmark"/></DropdownItem>
                         <DropdownItem name="complete">{{$L('标记已完成')}}<Icon v-if="detail.complete" type="md-checkmark" class="checkmark"/></DropdownItem>
@@ -657,7 +661,8 @@
                     &:before {
                         content: "\E740";
                     }
-                    .time {
+                    .subtitle {
+                        padding-top: 3px;
                         font-size: 12px;
                         color: #606266;
                     }
