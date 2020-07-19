@@ -1115,13 +1115,21 @@ class ProjectController extends Controller
         }
         //
         $taskid = intval(Request::input('taskid'));
+        $isowner = false;
         if ($taskid > 0) {
-            $projectid = intval(DB::table('project_task')->where('id', $taskid)->value('projectid'));
+            $taskDetail = Base::DBC2A(DB::table('project_task')->where('id', $taskid)->first());
+            if (empty($taskDetail)) {
+                return Base::retError('任务不存在！');
+            }
+            if ($taskDetail['username'] == $user['username']) {
+                $isowner = true;
+            }
+            $projectid = $taskDetail['projectid'];
         } else {
             $projectid = intval(Request::input('projectid'));
         }
         //
-        if ($projectid > 0) {
+        if ($projectid > 0 && !$isowner) {
             $inRes = Project::inThe($projectid, $user['username']);
             if (Base::isError($inRes)) {
                 return $inRes;
