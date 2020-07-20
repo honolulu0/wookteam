@@ -1,8 +1,8 @@
 <template>
     <div class="project-gstc-gantt">
         <GSTC v-if="loadFinish" ref="gstc" :config="config" @state="emitState"/>
-        <Dropdown class="project-gstc-dropdown" @on-click="tapView">
-            <Icon class="project-gstc-dropdown-icon" type="md-funnel" />
+        <Dropdown class="project-gstc-dropdown-eye" @on-click="tapView">
+            <Icon class="project-gstc-dropdown-icon" type="md-eye" />
             <DropdownMenu slot="list">
                 <DropdownItem name="now">{{$L('现在')}}</DropdownItem>
                 <DropdownItem name="day" :class="{'project-gstc-dropdown-period':period=='day'}">{{$L('天视图')}}</DropdownItem>
@@ -10,7 +10,29 @@
                 <DropdownItem name="month" :class="{'project-gstc-dropdown-period':period=='month'}">{{$L('月视图')}}</DropdownItem>
             </DropdownMenu>
         </Dropdown>
+        <Dropdown class="project-gstc-dropdown-filtr" @on-click="tapProject">
+            <Icon class="project-gstc-dropdown-icon" :class="{filtr:filtrProjectId>0}" type="md-funnel" />
+            <DropdownMenu slot="list">
+                <DropdownItem :name="0" :class="{'project-gstc-dropdown-period':filtrProjectId==0}">{{$L('全部')}}</DropdownItem>
+                <DropdownItem v-for="(item, index) in projectLabel" :key="index" :name="item.id" :class="{'project-gstc-dropdown-period':filtrProjectId==item.id}">{{item.title}}</DropdownItem>
+            </DropdownMenu>
+        </Dropdown>
         <div class="project-gstc-close" @click="$emit('on-close')"><Icon type="md-close" /></div>
+        <div class="project-gstc-edit" :class="{info:editShowInfo, visible:editData.length > 0}">
+            <div class="project-gstc-edit-info">
+                <Table class="tableFill" size="small" max-height="600" :columns="editColumns" :data="editData"></Table>
+                <div class="project-gstc-edit-btns">
+                    <Button :loading="editLoad > 0" size="small" type="text" @click="editSubmit(false)">{{$L('取消')}}</Button>
+                    <Button :loading="editLoad > 0" size="small" type="primary" @click="editSubmit(true)">{{$L('保存')}}</Button>
+                    <Icon type="md-arrow-dropright" class="zoom" @click="editShowInfo=false"/>
+                </div>
+            </div>
+            <div class="project-gstc-edit-small">
+                <div class="project-gstc-edit-text" @click="editShowInfo=true">{{$L('未保存计划时间')}}: {{editData.length}}</div>
+                <Button :loading="editLoad > 0" size="small" type="text" @click="editSubmit(false)">{{$L('取消')}}</Button>
+                <Button :loading="editLoad > 0" size="small" type="primary" @click="editSubmit(true)">{{$L('保存')}}</Button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -30,20 +52,31 @@
             padding: 12px;
         }
         .gantt-schedule-timeline-calendar__list-column-header-resizer-container {
-            line-height: 92px;
+            line-height: 90px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        .project-gstc-dropdown {
+        .project-gstc-dropdown-eye,
+        .project-gstc-dropdown-filtr {
             position: absolute;
-            top: 44px;
+            top: 46px;
             left: 276px;
             .project-gstc-dropdown-icon {
                 cursor: pointer;
                 color: #999;
                 font-size: 20px;
+                &.filtr {
+                    color: #058ce4;
+                }
             }
             .project-gstc-dropdown-period {
                 color: #058ce4;
             }
+        }
+        .project-gstc-dropdown-eye {
+            left: 238px;
         }
         .project-gstc-close {
             position: absolute;
@@ -60,6 +93,84 @@
                 font-size: 28px;
                 transform: scale(0.92);
                 transition: all .2s;
+            }
+        }
+        .project-gstc-edit {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            background: #ffffff;
+            border-radius: 4px;
+            opacity: 0;
+            transform: translate(120%, 0);
+            transition: all 0.2s;
+            &.visible {
+                opacity: 1;
+                transform: translate(0, 0);
+            }
+            &.info {
+                .project-gstc-edit-info {
+                    display: block;
+                }
+                .project-gstc-edit-small {
+                    display: none;
+                }
+            }
+            .project-gstc-edit-info {
+                display: none;
+                border: 1px solid #e4e4e4;
+                background: #ffffff;
+                padding: 6px;
+                border-radius: 4px;
+                width: 500px;
+                .project-gstc-edit-btns {
+                    margin: 12px 6px 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    .ivu-btn {
+                        margin-right: 8px;
+                        font-size: 13px;
+                    }
+                    .zoom {
+                        font-size: 20px;
+                        color: #444444;
+                        cursor: pointer;
+                        &:hover {
+                            color: #57a3f3;
+                        }
+                    }
+                }
+            }
+            .project-gstc-edit-small {
+                border: 1px solid #e4e4e4;
+                background: #ffffff;
+                padding: 6px 12px;
+                display: flex;
+                align-items: center;
+                .project-gstc-edit-text {
+                    cursor: pointer;
+                    text-decoration: underline;
+                    color: #444444;
+                    margin-right: 8px;
+                    &:hover {
+                        color: #57a3f3;
+                    }
+                }
+                .ivu-btn {
+                    margin-left: 4px;
+                    font-size: 13px;
+                }
+            }
+        }
+    }
+    .gantt-notice-box {
+        .ivu-notice-desc-btn {
+            margin-top: 6px;
+            text-align: right;
+            .ivu-btn {
+                margin-left: 4px;
+                font-size: 13px;
             }
         }
     }
@@ -92,36 +203,82 @@
                 items: {},
 
                 config: {},
+
+                editColumns: [],
+                editData: [],
+                editShowInfo: false,
+                editLoad: 0,
+
+                filtrProjectId: 0,
             }
         },
 
         mounted() {
+            this.editColumns = [
+                {
+                    title: this.$L('任务名称'),
+                    key: 'label',
+                    minWidth: 150,
+                    ellipsis: true,
+                }, {
+                    title: this.$L('原计划时间'),
+                    minWidth: 135,
+                    align: 'center',
+                    render: (h, params) => {
+                        if (params.row.notime === true) {
+                            return h('span', '-');
+                        }
+                        return h('div', {
+                            style: {},
+                        }, [
+                            h('div', $A.formatDate('Y-m-d H:i', Math.round(params.row.backTime.start / 1000))),
+                            h('div', $A.formatDate('Y-m-d H:i', Math.round(params.row.backTime.end / 1000)))
+                        ]);
+                    }
+                }, {
+                    title: this.$L('新计划时间'),
+                    minWidth: 135,
+                    align: 'center',
+                    render: (h, params) => {
+                        return h('div', {
+                            style: {},
+                        }, [
+                            h('div', $A.formatDate('Y-m-d H:i', Math.round(params.row.newTime.start / 1000))),
+                            h('div', $A.formatDate('Y-m-d H:i', Math.round(params.row.newTime.end / 1000)))
+                        ]);
+                    }
+                }
+            ];
+            //
             this.initData();
             this.loadFinish = true;
             //
-            this.$watch(
-                "projectLabel",
+            this.$watch("projectLabel",
                 (projectLabel) => {
-                    this.initData(this.loadFinish == true);
+                    this.initData();
                 },
                 {deep: true}
             );
         },
 
         methods: {
-            initData(isUpdate) {
+            initData() {
+                let isUpdate = this.loadFinish == true;
                 this.rows = {};
                 this.items = {};
+                let index = 0;
                 this.projectLabel.forEach((item) => {
-                    item.taskLists.forEach((taskData) => {
-                        let start = taskData.startdate || taskData.indate;
-                        let end = taskData.enddate || (taskData.indate + 86400);
-                        if (end == start) {
-                            end = Math.round(new Date($A.formatDate('Y-m-d 23:59:59', end)).getTime()/1000);
+                    if (this.filtrProjectId > 0) {
+                        if (item.id != this.filtrProjectId) {
+                            return;
                         }
-                        end = Math.max(end, start + 60);
-                        start*= 1000;
-                        end*= 1000;
+                    }
+                    item.taskLists.forEach((taskData) => {
+                        index++;
+                        let notime = taskData.startdate == 0 || taskData.enddate == 0;
+                        let times = this.getTimeObj(taskData);
+                        let start = times.start;
+                        let end = times.end;
                         //
                         let color = '#058ce4';
                         if (taskData.complete) {
@@ -138,28 +295,36 @@
                             }
                         }
                         //
-                        let label = `<div class="gantt-schedule-timeline-calendar-title">${taskData['title']}</div>`;
+                        let label = `<div class="gantt-schedule-timeline-calendar-title${taskData.complete?' complete-title':''}">${taskData['title']}</div>`;
                         if (taskData.overdue) {
                             label = `<div class="gantt-schedule-timeline-calendar-overdue"><em>${this.$L('已超期')}</em></div>${label}`;
                         }
-                        label = `${label}<div class="gantt-schedule-timeline-calendar-goto" data-id="${taskData['id']}"></div>`;
-                        this.rows[taskData['id']] = {
-                            id: taskData['id'],
+                        label = `${label}<div class="gantt-schedule-timeline-calendar-goto"></div>`;
+                        this.rows[index] = {
+                            id: index,
                             label: label,
+                            taskId: taskData['id'],
                             complete: taskData.complete,
                             overdue: taskData.overdue,
                         };
+                        let tempTime = { start, end };
+                        let findData = this.editData.find((t) => { return t.id == taskData['id'] });
+                        if (findData) {
+                            findData.backTime = $A.cloneData(tempTime)
+                            tempTime = $A.cloneData(findData.newTime);
+                        }
                         this.items[taskData['id']] = {
+                            rowId: index,
                             id: taskData['id'],
-                            rowId: taskData['id'],
                             label: taskData['title'],
-                            time: { start, end },
+                            time: tempTime,
+                            notime: notime,
                             style: { background: color },
                         };
                     });
                 });
                 //
-                if (Object.keys(this.rows).length == 0) {
+                if (Object.keys(this.rows).length == 0 && this.filtrProjectId == 0) {
                     this.$Modal.warning({
                         title: this.$L("温馨提示"),
                         content: this.$L('任务列表为空，请先添加任务。'),
@@ -169,7 +334,13 @@
                     });
                 }
                 //
-                this.config = Object.assign({
+                if (isUpdate) {
+                    this.$refs.gstc.getState().update('config.list.rows', this.rows);
+                    this.$refs.gstc.getState().update('config.chart.items', this.items);
+                    return;
+                }
+                //
+                this.config = {
                     plugins: [ItemMovement({
                         moveable: 'x',
                         resizeable: true,
@@ -213,14 +384,11 @@
                         },
                         items: this.items
                     },
-
-                }, isUpdate ? {} : {
                     actions: {
                         "list-column-row": [this.actionRow],
                         'chart-timeline-items-row-item': [this.actionResizing]
-                    }
-                }, this.getLanguage() == 'en' ? {} : {
-                    locale: {
+                    },
+                    locale: this.getLanguage() == 'en' ? {} : {
                         name: "zh-cn",
                         weekdays: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
                         weekdaysShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
@@ -265,17 +433,17 @@
                             yy: "%d 年"
                         },
                     },
-                });
+                };
             },
 
             actionRow(element, data) {
                 let onClick = (event) => {
                     //打开任务
+                    let id = this.rows[data.rowId].taskId;
                     if (event.target.className == 'gantt-schedule-timeline-calendar-goto') {
-                        let rowId = event.target.getAttribute("data-id");
-                        rowId && this.$refs.gstc.getGstc().api.scrollToTime(this.items[rowId].time.start)
+                        id && this.$refs.gstc.getGstc().api.scrollToTime(this.items[id].time.start)
                     } else {
-                        this.taskDetail(data.rowId);
+                        id && this.taskDetail(id);
                     }
                 }
                 element.addEventListener('click', onClick);
@@ -295,56 +463,99 @@
                     update(element, newData) {
                         data = newData;
                         if (data.item.isResizing) {
-                            if (Math.abs(thas.items[data.item['id']].time.end - data.item.time.end) > 60000
-                                || Math.abs(thas.items[data.item['id']].time.start - data.item.time.start) > 60000) {
-                                //修改时间（变化超过1分钟)
-                                let backTime = $A.cloneData(thas.items[data.item['id']].time);
+                            let original = thas.getRawTime(data.item.id);
+                            if (Math.abs(original.end - data.item.time.end) > 1000 || Math.abs(original.start - data.item.time.start) > 1000) {
+                                //修改时间（变化超过1秒钟)
+                                let backTime = $A.cloneData(original);
                                 let newTime = $A.cloneData(data.item.time);
-                                let timeStart = $A.formatDate('Y-m-d H:i', Math.round(newTime.start / 1000));
-                                let timeEnd = $A.formatDate('Y-m-d H:i', Math.round(newTime.end / 1000));
-                                thas.items[data.item['id']].time = newTime;
-                                thas.$refs.gstc.updateTime(data.item['id'], newTime);
-                                thas.$Modal.confirm({
-                                    title: thas.$L("计划时间"),
-                                    content: thas.$L('确定要修改任务【%】的计划时间吗？<br/>开始时间：%<br/>结束时间：%', data.item['label'], timeStart, timeEnd),
-                                    onCancel: () => {
-                                        thas.items[data.item['id']].time = backTime;
-                                        thas.$refs.gstc.updateTime(data.item['id'], backTime);
-                                    },
-                                    onOk: () => {
-                                        let ajaxData = {
-                                            act: 'plannedtime',
-                                            taskid: data.item['id'],
-                                            content: timeStart + "," + timeEnd,
-                                        };
-                                        $A.apiAjax({
-                                            url: 'project/task/edit',
-                                            data: ajaxData,
-                                            error: () => {
-                                                alert(thas.$L('网络繁忙，请稍后再试！'));
-                                                thas.items[data.item['id']].time = backTime;
-                                                thas.$refs.gstc.updateTime(data.item['id'], backTime);
-                                            },
-                                            success: (res) => {
-                                                if (res.ret === 1) {
-                                                    thas.$Message.success(res.msg);
-                                                    $A.triggerTaskInfoListener(ajaxData.act, res.data);
-                                                    $A.triggerTaskInfoChange(ajaxData.taskid);
-                                                } else {
-                                                    setTimeout(() => {
-                                                        thas.$Modal.error({title: thas.$L('温馨提示'), content: res.msg});
-                                                    }, 350)
-                                                    thas.items[data.item['id']].time = backTime;
-                                                    thas.$refs.gstc.updateTime(data.item['id'], backTime);
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
+                                let findData = thas.editData.find((item) => { return item.id == data.item.id });
+                                if (findData) {
+                                    findData.newTime = newTime;
+                                } else {
+                                    thas.editData.push({
+                                        id: data.item.id,
+                                        label: data.item.label,
+                                        notime: data.item.notime,
+                                        backTime,
+                                        newTime,
+                                    })
+                                }
                             }
                         }
                     }
                 };
+            },
+
+            getRawTime(taskId) {
+                let times = null;
+                this.projectLabel.some((item) => {
+                    item.taskLists.some((taskData) => {
+                        if (taskData.id == taskId) {
+                            times = this.getTimeObj(taskData);
+                            return true;
+                        }
+                    });
+                    if (times) {
+                        return true;
+                    }
+                });
+                return times;
+            },
+
+            getTimeObj(taskData) {
+                let start = taskData.startdate || taskData.indate;
+                let end = taskData.enddate || (taskData.indate + 86400);
+                if (end == start) {
+                    end = Math.round(new Date($A.formatDate('Y-m-d 23:59:59', end)).getTime()/1000);
+                }
+                end = Math.max(end, start + 60);
+                start*= 1000;
+                end*= 1000;
+                return {start, end};
+            },
+
+            editSubmit(save) {
+                this.editData.forEach((item) => {
+                    if (!this.items[item.id]) {
+                        return;
+                    }
+                    if (save) {
+                        this.editLoad++;
+                        let timeStart = $A.formatDate('Y-m-d H:i', Math.round(item.newTime.start / 1000));
+                        let timeEnd = $A.formatDate('Y-m-d H:i', Math.round(item.newTime.end / 1000));
+                        let ajaxData = {
+                            act: 'plannedtime',
+                            taskid: item.id,
+                            content: timeStart + "," + timeEnd,
+                        };
+                        $A.apiAjax({
+                            url: 'project/task/edit',
+                            data: ajaxData,
+                            complete: () => {
+                                this.editLoad--;
+                            },
+                            error: () => {
+                                alert(this.$L('网络繁忙，请稍后再试！'));
+                                this.items[item.id].time = item.backTime;
+                                this.$refs.gstc.updateTime(item.id, item.backTime);
+                            },
+                            success: (res) => {
+                                if (res.ret === 1) {
+                                    $A.triggerTaskInfoListener(ajaxData.act, res.data);
+                                    $A.triggerTaskInfoChange(ajaxData.taskid);
+                                } else {
+                                    this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                                    this.items[item.id].time = item.backTime;
+                                    this.$refs.gstc.updateTime(item.id, item.backTime);
+                                }
+                            }
+                        });
+                    } else {
+                        this.items[item.id].time = item.backTime;
+                        this.$refs.gstc.updateTime(item.id, item.backTime);
+                    }
+                });
+                this.editData = [];
             },
 
             emitState(GSTCState) {
@@ -361,6 +572,11 @@
                 }
                 this.period = e;
                 this.$refs.gstc.setPeriod(e);
+            },
+
+            tapProject(e) {
+                this.filtrProjectId = $A.runNum(e);
+                this.initData();
             }
         }
     }
