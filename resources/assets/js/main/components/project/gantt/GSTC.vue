@@ -31,6 +31,9 @@
             .gantt-schedule-timeline-calendar-title {
                 flex: 1;
                 padding-right: 6px;
+                &.complete-title {
+                    text-decoration: line-through;
+                }
             }
             .gantt-schedule-timeline-calendar-goto {
                 font-family: Ionicons;

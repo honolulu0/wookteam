@@ -247,6 +247,7 @@
                                     border-left-color: #84A83B;
                                 }
                                 &.complete {
+                                    border-left-color: #c1c1c1;
                                     .task-title {
                                         color: #666666;
                                         text-decoration: line-through;

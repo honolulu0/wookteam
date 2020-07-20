@@ -429,17 +429,6 @@
                             return;
                         }
                         ajaxData.content = eve.username;
-                        ajaxCallback = (res) => {
-                            if (res === 1) {
-                                this.$Modal.info({
-                                    title: this.$L('温馨提示'),
-                                    content: this.$L('任务负责人已改变，点击确定关闭窗口。'),
-                                    onOk: () => {
-                                        this.visible = false;
-                                    }
-                                });
-                            }
-                        };
                         break;
 
                     case 'inittime':
@@ -527,6 +516,7 @@
                                         this.visible = false;
                                     }
                                 });
+                                return false;
                             }
                         };
                         break;
@@ -550,6 +540,7 @@
                 }
                 //
                 this.$set(this.loadData, ajaxData.act, true);
+                let runTime = Math.round(new Date().getTime());
                 $A.apiAjax({
                     url: 'project/task/edit',
                     data: ajaxData,
@@ -561,20 +552,23 @@
                         alert(this.$L('网络繁忙，请稍后再试！'));
                     },
                     success: (res) => {
+                        runTime = Math.round(new Date().getTime()) - runTime;
                         if (res.ret === 1) {
                             this.detail = res.data;
                             this.bakData = $A.cloneData(this.detail);
-                            if (ajaxCallback(1) !== false) {
-                                this.logType == '日志' && this.$refs.log.getLists(true, true);
-                                this.$Message.success(res.msg);
-                            }
                             $A.triggerTaskInfoListener(ajaxData.act, res.data);
                             $A.triggerTaskInfoChange(ajaxData.taskid);
-                        } else {
-                            ajaxCallback(0);
                             setTimeout(() =>  {
+                                if (ajaxCallback(1) !== false) {
+                                    this.logType == '日志' && this.$refs.log.getLists(true, true);
+                                    this.$Message.success(res.msg);
+                                }
+                            }, Math.max(0, 350 - runTime));
+                        } else {
+                            setTimeout(() =>  {
+                                ajaxCallback(0);
                                 this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
-                            }, 350);
+                            }, Math.max(0, 350 - runTime));
                         }
                     }
                 });

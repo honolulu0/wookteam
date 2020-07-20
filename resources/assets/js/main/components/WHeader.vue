@@ -262,7 +262,7 @@
                     .right-info-num {
                         position: absolute;
                         top: 2px;
-                        left: 12px;
+                        left: 22px;
                         height: auto;
                         line-height: normal;
                         color: #ffffff;
