@@ -14,7 +14,7 @@
             <Icon class="project-gstc-dropdown-icon" :class="{filtr:filtrProjectId>0}" type="md-funnel" />
             <DropdownMenu slot="list">
                 <DropdownItem :name="0" :class="{'project-gstc-dropdown-period':filtrProjectId==0}">{{$L('全部')}}</DropdownItem>
-                <DropdownItem v-for="(item, index) in projectLabel" :key="index" :name="item.id" :class="{'project-gstc-dropdown-period':filtrProjectId==item.id}">{{item.title}}</DropdownItem>
+                <DropdownItem v-for="(item, index) in projectLabel" :key="index" :name="item.id" :class="{'project-gstc-dropdown-period':filtrProjectId==item.id}">{{item.title}} ({{item.taskLists.length}})</DropdownItem>
             </DropdownMenu>
         </Dropdown>
         <div class="project-gstc-close" @click="$emit('on-close')"><Icon type="md-close" /></div>
@@ -515,6 +515,7 @@
             },
 
             editSubmit(save) {
+                let triggerTask = [];
                 this.editData.forEach((item) => {
                     if (!this.items[item.id]) {
                         return;
@@ -531,24 +532,35 @@
                         $A.apiAjax({
                             url: 'project/task/edit',
                             data: ajaxData,
-                            complete: () => {
-                                this.editLoad--;
-                            },
                             error: () => {
-                                alert(this.$L('网络繁忙，请稍后再试！'));
                                 this.items[item.id].time = item.backTime;
                                 this.$refs.gstc.updateTime(item.id, item.backTime);
                             },
                             success: (res) => {
                                 if (res.ret === 1) {
-                                    $A.triggerTaskInfoListener(ajaxData.act, res.data);
-                                    $A.triggerTaskInfoChange(ajaxData.taskid);
+                                    triggerTask.push({
+                                        status: 'await',
+                                        act: ajaxData.act,
+                                        taskid: ajaxData.taskid,
+                                        data: res.data,
+                                    })
                                 } else {
-                                    this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
                                     this.items[item.id].time = item.backTime;
                                     this.$refs.gstc.updateTime(item.id, item.backTime);
                                 }
-                            }
+                            },
+                            afterComplete: () => {
+                                this.editLoad--;
+                                if (this.editLoad <= 0) {
+                                    triggerTask.forEach((info) => {
+                                        if (info.status == 'await') {
+                                            info.status = 'trigger';
+                                            $A.triggerTaskInfoListener(info.act, info.data);
+                                            $A.triggerTaskInfoChange(info.taskid);
+                                        }
+                                    });
+                                }
+                            },
                         });
                     } else {
                         this.items[item.id].time = item.backTime;

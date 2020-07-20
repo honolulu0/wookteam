@@ -40,11 +40,11 @@
                                     <Radio label="reg">{{$L('注册会员')}}</Radio>
                                 </RadioGroup>
                             </div>
-                            <div v-if="formSystem.role_look=='edit'" class="form-placeholder">
-                                {{$L('仅有修改权限的人员。')}}
-                            </div>
-                            <div v-else-if="formSystem.role_look=='reg'" class="form-placeholder">
+                            <div v-if="formSystem.role_look=='reg' || formSystem.role_edit=='reg'" class="form-placeholder">
                                 {{$L('所有会员都可以修改。')}}
+                            </div>
+                            <div v-else-if="formSystem.role_look=='edit'" class="form-placeholder">
+                                {{$L('仅有修改权限的人员。')}}
                             </div>
                         </div>
                     </div>
