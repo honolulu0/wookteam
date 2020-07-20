@@ -5,22 +5,48 @@
                 <FormItem :label="$L('文档链接')">
                     <a class="form-link" target="_blank" :href="$A.webUrl('docs/view/b' + this.id)">{{$A.webUrl('docs/view/b' + this.id)}}</a>
                 </FormItem>
-                <FormItem :label="$L('修改权限')">
+                <FormItem :label="$L('管理权限')">
                     <div>
-                        <RadioGroup v-model="formSystem.role_edit">
-                            <Radio label="private">{{$L('私有文库')}}</Radio>
-                            <Radio label="member">{{$L('成员开放')}}</Radio>
-                            <Radio label="reg">{{$L('注册会员')}}</Radio>
-                        </RadioGroup>
+                        <div class="form-title">{{$L('修改权限')}}</div>
+                        <div>
+                            <div>
+                                <RadioGroup v-model="formSystem.role_edit">
+                                    <Radio label="private">{{$L('私有文库')}}</Radio>
+                                    <Radio label="member">{{$L('成员开放')}}</Radio>
+                                    <Radio label="reg">{{$L('注册会员')}}</Radio>
+                                </RadioGroup>
+                            </div>
+                            <div v-if="formSystem.role_edit=='private'" class="form-placeholder">
+                                {{$L('仅作者可以修改。')}}
+                            </div>
+                            <div v-else-if="formSystem.role_edit=='member'" class="form-placeholder">
+                                {{$L('仅作者和文档成员可以修改。')}}
+                            </div>
+                            <div v-else-if="formSystem.role_edit=='reg'" class="form-placeholder">
+                                {{$L('所有会员都可以修改。')}}
+                            </div>
+                        </div>
                     </div>
-                    <div v-if="formSystem.role_edit=='private'" class="form-placeholder">
-                        {{$L('仅作者可以修改。')}}
-                    </div>
-                    <div v-else-if="formSystem.role_edit=='member'" class="form-placeholder">
-                        {{$L('仅作者和文档成员可以修改。')}}
-                    </div>
-                    <div v-else-if="formSystem.role_edit=='reg'" class="form-placeholder">
-                        {{$L('所有会员都可以修改。')}}
+                    <div>
+                        <div class="form-title">{{$L('查看权限')}}</div>
+                        <div>
+                            <div>
+                                <RadioGroup v-if="formSystem.role_edit=='reg'" value="reg">
+                                    <Radio label="edit" disabled>{{$L('修改权限')}}</Radio>
+                                    <Radio label="reg" disabled>{{$L('注册会员')}}</Radio>
+                                </RadioGroup>
+                                <RadioGroup v-else v-model="formSystem.role_look">
+                                    <Radio label="edit">{{$L('修改权限')}}</Radio>
+                                    <Radio label="reg">{{$L('注册会员')}}</Radio>
+                                </RadioGroup>
+                            </div>
+                            <div v-if="formSystem.role_look=='edit'" class="form-placeholder">
+                                {{$L('仅有修改权限的人员。')}}
+                            </div>
+                            <div v-else-if="formSystem.role_look=='reg'" class="form-placeholder">
+                                {{$L('所有会员都可以修改。')}}
+                            </div>
+                        </div>
                     </div>
                 </FormItem>
                 <FormItem :label="$L('阅读权限')">
@@ -57,6 +83,9 @@
 <style lang="scss" scoped>
     .book-setting {
         padding: 0 12px;
+        .form-title {
+            font-weight: bold;
+        }
         .form-link {
             text-decoration: underline;
         }
@@ -126,9 +155,11 @@
                     },
                     success: (res) => {
                         if (res.ret === 1) {
-                            this.formSystem = res.data;
-                            this.formSystem.role_edit = this.formSystem.role_edit || 'reg';
-                            this.formSystem.role_view = this.formSystem.role_view || 'all';
+                            let data = res.data;
+                            data.role_edit = data.role_edit || 'reg';
+                            data.role_look = data.role_look || 'edit';
+                            data.role_view = data.role_view || 'all';
+                            this.formSystem = data;
                             if (save) {
                                 this.$Message.success(this.$L('修改成功'));
                             }

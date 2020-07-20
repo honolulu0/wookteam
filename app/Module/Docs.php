@@ -23,7 +23,7 @@ class Docs
     {
         $row = Base::DBC2A(DB::table('docs_book')->where('id', $bookid)->first());
         if (empty($row)) {
-            return Base::retError('知识库不存在或已被删除！');
+            return Base::retError('知识库不存在或已被删除！', -1000);
         }
         $userE = Users::authE();
         if (Base::isError($userE)) {
@@ -49,11 +49,11 @@ class Docs
         //
         if ($row['role_' . $checkType] == 'member') {
             if (!DB::table('docs_users')->where('bookid', $bookid)->where('username', $user['username'])->exists()) {
-                return Base::retError('知识库仅对成员开放！', -1002);
+                return Base::retError('知识库仅对成员开放！', $checkType == 'edit' && $row['role_look'] == 'reg' ? 1002 : -1002);
             }
         } elseif ($row['role_' . $checkType] == 'private') {
             if ($row['username'] != $user['username']) {
-                return Base::retError('知识库仅对作者开放！', -1003);
+                return Base::retError('知识库仅对作者开放！', $checkType == 'edit' && $row['role_look'] == 'reg' ? 1003 : -1003);
             }
         }
         //

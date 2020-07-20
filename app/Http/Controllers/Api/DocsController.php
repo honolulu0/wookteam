@@ -46,6 +46,7 @@ class DocsController extends Controller
         $lists = DB::table('docs_book')
             ->where('username', $user['username'])
             ->orWhere('role_edit', 'reg')
+            ->orWhere('role_look', 'reg')
             ->orWhere(function ($query) use ($user) {
                 $query->where('role_edit', 'private')->where('username', $user['username']);
             })
@@ -136,8 +137,9 @@ class DocsController extends Controller
         }
         //
         $id = intval(Request::input('id'));
+        $type = trim(Request::input('type'));
         $role = Docs::checkRole($id, 'edit');
-        if (Base::isError($role)) {
+        if (Base::isError($role) && $role['data'] < 0) {
             return $role;
         }
         $row = Base::DBC2A(DB::table('docs_book')->where('id', $id)->first());
@@ -145,15 +147,18 @@ class DocsController extends Controller
             return Base::retError('知识库不存在或已被删除！');
         }
         $setting = Base::string2array($row['setting']);
-        $type = trim(Request::input('type'));
         if ($type == 'save') {
+            if (Base::isError($role)) {
+                return $role;
+            }
             foreach (Request::input() AS $key => $value) {
-                if (in_array($key, ['role_edit', 'role_view'])) {
+                if (in_array($key, ['role_edit', 'role_look', 'role_view'])) {
                     $setting[$key] = $value;
                 }
             }
             DB::table('docs_book')->where('id', $id)->update([
                 'role_edit' => $setting['role_edit'],
+                'role_look' => $setting['role_look'],
                 'role_view' => $setting['role_view'],
                 'setting' => Base::array2string($setting),
             ]);
@@ -314,7 +319,7 @@ class DocsController extends Controller
     {
         $bookid = intval(Request::input('bookid'));
         $role = Docs::checkRole($bookid, Request::input('act'));
-        if (Base::isError($role)) {
+        if (Base::isError($role) && $role['data'] < 0) {
             return $role;
         }
         $lists = Base::DBC2A(DB::table('docs_section')
@@ -509,7 +514,7 @@ class DocsController extends Controller
             return Base::retError('文档不存在或已被删除！');
         }
         $role = Docs::checkRole($row['bookid'], Request::input('act'));
-        if (Base::isError($role)) {
+        if (Base::isError($role) && $role['data'] < 0) {
             return $role;
         }
         $whereArray = [];
@@ -543,8 +548,8 @@ class DocsController extends Controller
         if (empty($row)) {
             return Base::retError('文档不存在或已被删除！');
         }
-        $role = Docs::checkRole($row['bookid'], 'view');
-        if (Base::isError($role)) {
+        $role = Docs::checkRole($row['bookid'], 'edit');
+        if (Base::isError($role) && $role['data'] < 0) {
             return $role;
         }
         //
@@ -619,7 +624,7 @@ class DocsController extends Controller
     }
 
     /**
-     * 保存章节内容
+     * 锁定章节内容
      *
      * @apiParam {String} act
      * - lock: 锁定

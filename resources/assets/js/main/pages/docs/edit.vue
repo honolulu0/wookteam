@@ -415,7 +415,9 @@
             }, false);
             //
             setInterval(() => {
-                this.timeValue = Math.round(new Date().getTime() / 1000);
+                if (this.routeName === this.$route.name) {
+                    this.timeValue = Math.round(new Date().getTime() / 1000);
+                }
             });
             //
             $(window).bind('beforeunload', () => {
