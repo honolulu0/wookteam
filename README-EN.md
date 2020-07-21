@@ -51,3 +51,9 @@
 
 **5. Online knowledge base: online flowcharts, online documentation, and visual catalogs, document management without worry**
 ![Online knowledge base: online flowcharts, online documentation, and visual catalogs, document management without worry](resources/assets/statics/images/index/wiki.jpg)
+
+**6. Task Gantt chart: Visual task time planning, intuitive and convenient**
+![Task Gantt chart: Visual task time planning, intuitive and convenient](resources/assets/statics/images/index/gantt.jpg)
+
+**7. Instant chat: team internal communication, real-time understanding of project dynamics**
+![Instant chat: team internal communication, real-time understanding of project dynamics](resources/assets/statics/images/index/chat.jpg)

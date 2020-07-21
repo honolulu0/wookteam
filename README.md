@@ -52,3 +52,9 @@
 
 **5. 在线知识库：在线流程图，在线文档，以及可视化的目录编排，文档管理无忧**
 ![在线知识库：在线流程图，在线文档，以及可视化的目录编排，文档管理无忧](resources/assets/statics/images/index/wiki.jpg)
+
+**6. 任务甘特图：可视化任务时间规划，直观方便**
+![即时聊天：团队内部沟通，项目动态实时了解](resources/assets/statics/images/index/gantt.jpg)
+
+**7. 即时聊天：团队内部沟通，项目动态实时了解**
+![即时聊天：团队内部沟通，项目动态实时了解](resources/assets/statics/images/index/chat.jpg)
