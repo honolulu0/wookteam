@@ -2,7 +2,7 @@ FROM phpswoole/swoole:4.5.2-php7.4
 
 # Installation dependencies and PHP core extensions
 RUN apt-get update \
-        && apt-get -y install --no-install-recommends \
+        && apt-get -y install --no-install-recommends --assume-yes \
         libpng-dev \
         libzip-dev \
         libzip4 \
@@ -19,6 +19,7 @@ RUN apt-get update \
         apt-transport-https \
         lsb-release \
         ca-certificates \
+        libjpeg-dev \
         && curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
         && apt-get -y install nodejs \
         && rm -r /var/lib/apt/lists/* \
