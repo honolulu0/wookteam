@@ -1300,10 +1300,10 @@ class ProjectController extends Controller
             'level_3' => 0,
             'level_4' => 0,
         ];
-        if (intval(Request::input('level')) > 0) {
-            $array = [
-                'level_1' => 0,
-            ];
+        $level = intval(Request::input('level'));
+        if ($level > 0) {
+            $array = [];
+            $array['level_' . $level] = 0;
         }
         foreach ($array AS $key => $val) {
             $level = intval(Base::leftDelete($key, 'level_'));
