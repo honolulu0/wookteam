@@ -143,7 +143,9 @@ class ChatController extends Controller
         $lists = Base::getPageList($lists, false);
         //
         foreach ($lists['lists'] AS $key => $item) {
-            $item = array_merge($item, Users::username2basic($item['username']));
+            $basic = Users::username2basic($item['username']);
+            $item['nickname'] = $basic ? $basic['nickname'] : ($item['nickname'] || '');
+            $item['userimg'] = $basic ? $basic['userimg'] : ($item['userimg'] || '');
             $item['message'] = Base::string2array($item['message']);
             $lists['lists'][$key] = $item;
         }

@@ -409,9 +409,7 @@
         mounted() {
             this.routeName = this.$route.name;
             this.userInfo = $A.getUserInfo((res, isLogin) => {
-                if (this.userInfo.id != res.id) {
-                    this.userInfo = res;
-                }
+                this.userInfo = res;
             }, false);
             //
             setInterval(() => {

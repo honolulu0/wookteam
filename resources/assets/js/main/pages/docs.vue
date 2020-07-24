@@ -288,6 +288,8 @@
                 if (this.userInfo.id != res.id) {
                     this.userInfo = res;
                     isLogin && this.getBookLists(true);
+                } else {
+                    this.userInfo = res;
                 }
             }, false);
         },

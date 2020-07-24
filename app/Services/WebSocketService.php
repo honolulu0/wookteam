@@ -243,6 +243,10 @@ class WebSocketService implements WebSocketHandlerInterface
                     $data['body']['id'] = $resData['id'];
                     $data['body']['unread'] = $resData['unread'];
                     //
+                    $basic = Users::username2basic($username);
+                    $data['body']['nickname'] = $basic ? $basic['nickname'] : ($data['body']['nickname'] || '');
+                    $data['body']['userimg'] = $basic ? $basic['userimg'] : ($data['body']['userimg'] || '');
+                    //
                     $pushLists = [];
                     foreach ($this->getUserOfName($data['target']) AS $item) {
                         $pushLists[] = [

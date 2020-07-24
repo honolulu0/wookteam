@@ -521,6 +521,7 @@
                                     success: (res) => {
                                         if (res.ret === 1) {
                                             $A.getUserInfo(true);
+                                            $A.getUserBasic(this.userInfo.username, () => {}, 0);
                                             this.$Message.success(this.$L('修改成功'));
                                         } else {
                                             this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });

@@ -839,6 +839,8 @@
                 if (this.userInfo.id != res.id) {
                     this.userInfo = res;
                     resCall();
+                } else {
+                    this.userInfo = res;
                 }
             }, false);
             resCall();

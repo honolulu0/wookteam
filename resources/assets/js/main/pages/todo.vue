@@ -367,6 +367,8 @@
                 if (this.userInfo.id != res.id) {
                     this.userInfo = res;
                     isLogin && this.refreshTask();
+                } else {
+                    this.userInfo = res;
                 }
             }, false);
             //

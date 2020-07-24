@@ -266,6 +266,8 @@
                 if (this.userInfo.id != res.id) {
                     this.userInfo = res;
                     isLogin && this.getLists(true);
+                } else {
+                    this.userInfo = res;
                 }
             }, false);
         },
