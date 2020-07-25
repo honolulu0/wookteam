@@ -1,6 +1,8 @@
 <?php
 namespace App\Tasks;
 
+@error_reporting(E_ALL & ~E_NOTICE);
+
 use App\Module\Base;
 use App\Module\Chat;
 use DB;

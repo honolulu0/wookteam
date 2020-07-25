@@ -1,6 +1,8 @@
 <?php
 namespace App\Tasks;
 
+@error_reporting(E_ALL & ~E_NOTICE);
+
 use App\Module\Base;
 use App\Module\Chat;
 use App\Module\Umeng;
@@ -36,7 +38,7 @@ class NotificationTask extends Task
         $lists = Base::DBC2A(DB::table('umeng')->where('username', $username)->get());
         foreach ($lists AS $item) {
             Umeng::notification($item['platform'], $item['token'], Users::nickname($username), Chat::messageDesc($message), [
-                'contentId' => $row['contentId'],
+                'contentId' => $this->contentId,
                 'username' => $username,
             ]);
         }
