@@ -795,7 +795,7 @@ class Base
                 unset($array[$k]);
             }
         }
-        return $array;
+        return array_values($array);
     }
 
     /**

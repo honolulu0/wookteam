@@ -209,17 +209,17 @@ class WebSocketService implements WebSocketHandlerInterface
              * 收到信息回执
              */
             case 'roger':
-                if ($data['contentId'] > 0) {
+                $contentIds = Base::explodeInt(',', $data['contentId']);
+                if ($contentIds) {
                     $username = DB::table('ws')->where([
                         'fd' => $frame->fd,
                         'channel' => $data['channel'],
                     ])->value('username');
-                    DB::table('chat_msg')->where([
-                        'id' => $data['contentId'],
-                        'receive' => $username,
-                    ])->update([
-                        'roger' => 1,
-                    ]);
+                    if ($username) {
+                        DB::table('chat_msg')->where('receive', $username)->whereIn('id', $contentIds)->update([
+                            'roger' => 1,
+                        ]);
+                    }
                 }
                 break;
 
