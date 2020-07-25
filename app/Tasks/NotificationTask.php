@@ -38,6 +38,7 @@ class NotificationTask extends Task
         $lists = Base::DBC2A(DB::table('umeng')->where('username', $username)->get());
         foreach ($lists AS $item) {
             Umeng::notification($item['platform'], $item['token'], Users::nickname($username), Chat::messageDesc($message), [
+                'notifyType' => 'userMsg',
                 'contentId' => $this->contentId,
                 'username' => $username,
             ]);
