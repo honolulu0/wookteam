@@ -525,13 +525,6 @@ class UsersController extends Controller
      */
     public function umeng__token()
     {
-        $user = Users::authE();
-        if (Base::isError($user)) {
-            return $user;
-        } else {
-            $user = $user['data'];
-        }
-        //
         $act = trim(Request::input('act'));
         $token = trim(Request::input('token'));
         if (empty($token)) {
@@ -539,7 +532,14 @@ class UsersController extends Controller
         }
         $platform = strtolower(trim(Request::input('platform')));
         DB::table('umeng')->where('token', $token)->delete();
-        if ($act != 'del') {
+        //
+        if ($act == 'set') {
+            $user = Users::authE();
+            if (Base::isError($user)) {
+                return $user;
+            } else {
+                $user = $user['data'];
+            }
             DB::table('umeng')->insert([
                 'token' => $token,
                 'username' => $user['username'],
@@ -547,6 +547,7 @@ class UsersController extends Controller
                 'update' => Base::time(),
             ]);
         }
+        //
         return Base::retSuccess('success');
     }
 }
