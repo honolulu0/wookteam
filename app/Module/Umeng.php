@@ -98,6 +98,13 @@ class Umeng
         if ($array['ret'] == 'SUCCESS') {
             return Base::retSuccess('success', $array['data']);
         } else {
+            $logFile = storage_path('logs/umeng-push-' . date('Y-m') . '.log');
+            file_put_contents($logFile, "[" . date("Y-m-d H:i:s") . "]\n" . Base::array2string_discard([
+                    'platform' => $platform,
+                    'url' => $url,
+                    'method' => $method,
+                    'body' => $body,
+                ]) . "\n");
             return Base::retError('error', $array['data']);
         }
     }
