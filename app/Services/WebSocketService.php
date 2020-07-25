@@ -259,7 +259,7 @@ class WebSocketService implements WebSocketHandlerInterface
                     Task::deliver($pushTask);
                     //
                     $notificationTask = new NotificationTask($resData['id']);
-                    $notificationTask->delay(10);
+                    $notificationTask->delay(8);
                     Task::deliver($notificationTask);
                 }
                 break;

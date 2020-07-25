@@ -31,12 +31,13 @@ class NotificationTask extends Task
             return;
         }
         //
+        $username = $row['receive'];
         $message = Base::string2array($row['message']);
-        $lists = Base::DBC2A(DB::table('umeng')->where('username', $row['username'])->get());
+        $lists = Base::DBC2A(DB::table('umeng')->where('username', $username)->get());
         foreach ($lists AS $item) {
-            Umeng::notification($item['platform'], $item['token'], Users::nickname($row['username']), Chat::messageDesc($message), [
+            Umeng::notification($item['platform'], $item['token'], Users::nickname($username), Chat::messageDesc($message), [
                 'contentId' => $row['contentId'],
-                'username' => $row['username'],
+                'username' => $username,
             ]);
         }
     }
