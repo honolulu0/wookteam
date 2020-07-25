@@ -513,4 +513,40 @@ class UsersController extends Controller
             'identity' => $identity
         ]);
     }
+
+    /**
+     * 设置、删除友盟token
+     *
+     * @apiParam {String} act           操作
+     * - set: 设置token
+     * - del: 删除token
+     * @apiParam {String} token         友盟token
+     * @apiParam {String} platform      ios|android
+     */
+    public function umeng__token()
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
+        } else {
+            $user = $user['data'];
+        }
+        //
+        $act = trim(Request::input('act'));
+        $token = trim(Request::input('token'));
+        if (empty($token)) {
+            return Base::retError('token empty');
+        }
+        $platform = strtolower(trim(Request::input('platform')));
+        DB::table('umeng')->where('token', $token)->delete();
+        if ($act != 'del') {
+            DB::table('umeng')->insert([
+                'token' => $token,
+                'username' => $user['username'],
+                'platform' => $platform,
+                'update' => Base::time(),
+            ]);
+        }
+        return Base::retSuccess('success');
+    }
 }

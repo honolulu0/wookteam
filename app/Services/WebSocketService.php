@@ -9,6 +9,7 @@ use App\Module\Chat;
 use App\Module\Project;
 use App\Module\Users;
 use App\Tasks\ChromeExtendTask;
+use App\Tasks\NotificationTask;
 use App\Tasks\PushTask;
 use Cache;
 use DB;
@@ -256,6 +257,10 @@ class WebSocketService implements WebSocketHandlerInterface
                     }
                     $pushTask = new PushTask($pushLists);
                     Task::deliver($pushTask);
+                    //
+                    $notificationTask = new NotificationTask($resData['id']);
+                    $notificationTask->delay(10);
+                    Task::deliver($notificationTask);
                 }
                 break;
 

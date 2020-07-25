@@ -112,34 +112,12 @@ class Chat
             'indate' => $indate
         ];
         //
-        switch ($message['type']) {
-            case 'text':
-                $lastText = $message['text'];
-                break;
-            case 'image':
-                $lastText = '[图片]';
-                break;
-            case 'taskB':
-                $lastText = $message['text'] . " [来自关注任务]";
-                break;
-            case 'report':
-                $lastText = $message['text'] . " [来自工作报告]";
-                break;
-            case 'video':
-                $lastText = '[视频通话]';
-                break;
-            case 'voice':
-                $lastText = '[语音通话]';
-                break;
-            default:
-                $lastText = '[未知类型]';
-                break;
-        }
         if (mb_strlen($message['text']) > 20000) {
             return Base::retError("发送内容长度已超出最大限制！");
         }
         $field = ($dialog['recField'] == 1 ? 'unread1' : 'unread2');
         $unread = intval(DB::table('chat_dialog')->where('id', $dialog['id'])->value($field));
+        $lastText = self::messageDesc($message);
         if ($lastText) {
             $upArray = [];
             if ($username != $receive) {
@@ -226,5 +204,38 @@ class Chat
         return Base::DBC2A(DB::table('ws')->select(['fd', 'username', 'channel'])->where([
             ['update', '>', time() - 600],
         ])->whereIn('username', array_values(array_unique($tmpLists)))->get());
+    }
+
+    /**
+     * 获取消息简述
+     * @param array $message
+     * @return mixed|string
+     */
+    public static function messageDesc($message)
+    {
+        switch ($message['type']) {
+            case 'text':
+                $lastText = $message['text'];
+                break;
+            case 'image':
+                $lastText = '[图片]';
+                break;
+            case 'taskB':
+                $lastText = $message['text'] . " [来自关注任务]";
+                break;
+            case 'report':
+                $lastText = $message['text'] . " [来自工作报告]";
+                break;
+            case 'video':
+                $lastText = '[视频通话]';
+                break;
+            case 'voice':
+                $lastText = '[语音通话]';
+                break;
+            default:
+                $lastText = '[未知类型]';
+                break;
+        }
+        return $lastText;
     }
 }
