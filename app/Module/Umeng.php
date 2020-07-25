@@ -104,7 +104,7 @@ class Umeng
                     'url' => $url,
                     'method' => $method,
                     'body' => $body,
-                ]) . "\n");
+                ]) . "\n", FILE_APPEND);
             return Base::retError('error', $array['data']);
         }
     }
