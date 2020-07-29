@@ -34,16 +34,17 @@ class NotificationTask extends Task
             return;
         }
         //
-        $username = $row['receive'];
+        $receive = $row['receive'];
+        $username = $row['username'];
         $message = Base::string2array($row['message']);
-        $lists = Base::DBC2A(DB::table('umeng')->where('username', $username)->get());
+        $lists = Base::DBC2A(DB::table('umeng')->where('username', $receive)->get());
         foreach ($lists AS $item) {
             Umeng::notification($item['platform'], $item['token'], Users::nickname($username), Chat::messageDesc($message), [
                 'notifyType' => 'userMsg',
                 'contentId' => $this->contentId,
                 'username' => $username,
             ]);
-            Cache::forever("ws::immediatelyNotify-" . $username, "yes");
+            Cache::forever("ws::immediatelyNotify-" . $receive, "yes");
         }
     }
 }
