@@ -84,7 +84,7 @@ class WebSocketService implements WebSocketHandlerInterface
             return;
         }
         //踢下线
-        /*if ($channel != 'chromeExtend') {
+        if (in_array($channel, ['ios', 'android'])) {
             $userLists = $this->getUser('', $channel, $username);
             foreach ($userLists AS $user) {
                 $server->push($user['fd'], Chat::formatMsgSend([
@@ -98,8 +98,9 @@ class WebSocketService implements WebSocketHandlerInterface
                 ]));
                 $this->deleteUser($user['fd']);
             }
-        }*/
+        }
         //保存用户、发送open事件
+        Cache::forever("ws::appActivity-" . $username, "yes");
         $this->saveUser($fd, $channel, $username);
         $server->push($fd, Chat::formatMsgSend([
             'messageType' => 'open',
@@ -162,6 +163,20 @@ class WebSocketService implements WebSocketHandlerInterface
                     'fd' => $frame->fd,
                     'channel' => $data['channel'],
                 ])->update(['update' => time()]);
+                break;
+
+            /**
+             * APP进入前台
+             */
+            case 'appActivity':
+                Cache::forever("ws::appActivity-" . $data['username'], "yes");
+                break;
+
+            /**
+             * APP进入后台
+             */
+            case 'appDeactive':
+                Cache::forever("ws::appActivity-" . $data['username'], "no");
                 break;
 
             /**
@@ -259,7 +274,7 @@ class WebSocketService implements WebSocketHandlerInterface
                     Task::deliver($pushTask);
                     //
                     $notificationTask = new NotificationTask($resData['id']);
-                    $notificationTask->delay(8);
+                    $notificationTask->delay(Cache::get("ws::appActivity-" . $data['target']) == "no" ? 2 : 8);
                     Task::deliver($notificationTask);
                 }
                 break;
