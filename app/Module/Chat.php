@@ -173,7 +173,7 @@ class Chat
         if (!is_array($array)) {
             $array = [];
         }
-        //messageType来自客户端（前端->后端）：refresh/unread/read/roger/user/info/team/docs/appActivity/appDeactive
+        //messageType来自客户端（前端->后端）：refresh/unread/read/roger/user/info/team/docs/appActivity
         //messageType来自服务端（后端->前端）：error/open/kick/user/back/unread/docs
         if (!isset($array['messageType'])) $array['messageType'] = '';  //消息类型
         if (!isset($array['messageId'])) $array['messageId'] = '';      //消息ID（用于back给客户端）

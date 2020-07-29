@@ -7,6 +7,7 @@ use App\Module\Base;
 use App\Module\Chat;
 use App\Module\Umeng;
 use App\Module\Users;
+use Cache;
 use DB;
 use Hhxsv5\LaravelS\Swoole\Task\Task;
 
@@ -42,6 +43,7 @@ class NotificationTask extends Task
                 'contentId' => $this->contentId,
                 'username' => $username,
             ]);
+            Cache::forever("ws::immediatelyNotify-" . $username, "yes");
         }
     }
 }
