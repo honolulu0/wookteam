@@ -331,7 +331,9 @@ class WebSocketService implements WebSocketHandlerInterface
                 }
                 //
                 Cache::put("docs::" . $sid, Base::array2json($array), 30);
-                ksort($array);
+                if ($array) {
+                    ksort($array);
+                }
                 $back['message'] = array_values($array);
                 //
                 if ($type == 'enter' || $type == 'quit') {
