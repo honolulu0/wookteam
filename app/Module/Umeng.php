@@ -94,17 +94,20 @@ class Umeng
         if (Base::isError($res)) {
             return $res;
         }
-        $array = json_decode($res['data'], true);
-        if ($array['ret'] == 'SUCCESS') {
-            return Base::retSuccess('success', $array['data']);
-        } else {
+        if (env('UMENG_PUSH_DEBUG')) {
             $logFile = storage_path('logs/umeng-push-' . date('Y-m') . '.log');
             file_put_contents($logFile, "[" . date("Y-m-d H:i:s") . "]\n" . Base::array2string_discard([
                     'platform' => $platform,
                     'url' => $url,
                     'method' => $method,
                     'body' => $body,
+                    'request' => $res['data'],
                 ]) . "\n", FILE_APPEND);
+        }
+        $array = json_decode($res['data'], true);
+        if ($array['ret'] == 'SUCCESS') {
+            return Base::retSuccess('success', $array['data']);
+        } else {
             return Base::retError('error', $array['data']);
         }
     }
