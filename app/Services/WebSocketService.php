@@ -122,6 +122,12 @@ class WebSocketService implements WebSocketHandlerInterface
                 $body['username'] = $lastMsg['username'];
                 $body['userimg'] = Users::userimg($lastMsg['username']);
                 $body['indate'] = $lastMsg['indate'];
+                //
+                $basic = Users::username2basic($lastMsg['username']);
+                $body['userid'] = $basic ? $basic['id'] : 0;
+                $body['nickname'] = $basic ? $basic['nickname'] : ($body['nickname'] || '');
+                $body['userimg'] = $basic ? $basic['userimg'] : ($body['userimg'] || '');
+                //
                 $server->push($fd, Chat::formatMsgSend([
                     'messageType' => 'user',
                     'contentId' => $lastMsg['id'],
@@ -252,6 +258,7 @@ class WebSocketService implements WebSocketHandlerInterface
                     $data['body']['unread'] = $resData['unread'];
                     //
                     $basic = Users::username2basic($username);
+                    $data['body']['userid'] = $basic ? $basic['id'] : 0;
                     $data['body']['nickname'] = $basic ? $basic['nickname'] : ($data['body']['nickname'] || '');
                     $data['body']['userimg'] = $basic ? $basic['userimg'] : ($data['body']['userimg'] || '');
                     //
