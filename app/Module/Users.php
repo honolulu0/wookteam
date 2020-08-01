@@ -257,7 +257,7 @@ class Users
         if (empty($userid)) {
             return [];
         }
-        $fields = ['username', 'nickname', 'userimg', 'profession'];
+        $fields = ['id AS userid', 'username', 'nickname', 'userimg', 'profession'];
         $userInfo = DBCache::table('users')->where('id', $userid)->select($fields)->cacheMinutes(1)->first();
         if ($userInfo) {
             $userInfo['userimg'] = Users::userimg($userInfo['userimg']);
@@ -276,7 +276,7 @@ class Users
         if (empty($username)) {
             return [];
         }
-        $fields = ['username', 'nickname', 'userimg', 'profession'];
+        $fields = ['id AS userid', 'username', 'nickname', 'userimg', 'profession'];
         $builder = DBCache::table('users')->where('username', $username)->select($fields)->cacheMinutes(1);
         if ($clearCache) {
             $builder->removeCache()->first();
