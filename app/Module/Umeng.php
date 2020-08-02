@@ -94,7 +94,9 @@ class Umeng
         if (Base::isError($res)) {
             return $res;
         }
-        if (env('UMENG_PUSH_DEBUG')) {
+        $array = json_decode($res['data'], true);
+        $debug = env('UMENG_PUSH_DEBUG');
+        if ($debug === true || $debug === 'info' || ($debug === 'error' && $array['ret'] !== 'SUCCESS')) {
             $logFile = storage_path('logs/umeng-push-' . date('Y-m') . '.log');
             file_put_contents($logFile, "[" . date("Y-m-d H:i:s") . "]\n" . Base::array2string_discard([
                     'platform' => $platform,
@@ -104,7 +106,6 @@ class Umeng
                     'request' => $res['data'],
                 ]) . "\n", FILE_APPEND);
         }
-        $array = json_decode($res['data'], true);
         if ($array['ret'] == 'SUCCESS') {
             return Base::retSuccess('success', $array['data']);
         } else {
