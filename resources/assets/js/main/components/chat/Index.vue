@@ -1368,7 +1368,9 @@
                             username: this.userInfo.username,
                             userimg: this.userInfo.userimg,
                             indate: Math.round(new Date().getTime() / 1000),
-                            url: item.url
+                            url: item.url,
+                            width: $A.getObject(item, 'response.data.width'),
+                            height: $A.getObject(item, 'response.data.height'),
                         };
                         $A.WSOB.sendTo('user', this.dialogTarget.username, data, (res) => {
                             this.$set(data, res.status === 1 ? 'id' : 'error', res.message)
