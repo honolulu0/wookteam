@@ -521,16 +521,17 @@
                 });
             },
 
-            onSectionDelete(sectionId) {
+            onSectionDelete(detail) {
+                let sectionType = this.sectionTypeLists.find((item) => { return item.value == detail.type });
                 this.$Modal.confirm({
                     title: this.$L('删除文档'),
-                    content: this.$L('你确定要删除此文档吗？'),
+                    content: this.$L('你确定要删除%【%】吗？', sectionType ? sectionType.text : '', detail.title),
                     loading: true,
                     onOk: () => {
                         $A.apiAjax({
                             url: 'docs/section/delete',
                             data: {
-                                id: sectionId
+                                id: detail.id
                             },
                             error: () => {
                                 this.$Modal.remove();
@@ -570,11 +571,19 @@
                         break;
 
                     case 'delete':
-                        this.onSectionDelete(detail.id);
+                        if (this.sortDisabled) {
+                            this.$Modal.warning({
+                                title: this.$L('温馨提示'),
+                                content: this.$L('正在进行其他操作，请稍后重试...')
+                            });
+                            return;
+                        }
+                        this.onSectionDelete(detail);
                         break;
 
                     case 'sort':
                         this.sortDisabled = true;
+                        this.loadIng++;
                         $A.apiAjax({
                             url: 'docs/section/sort',
                             data: {
@@ -583,6 +592,7 @@
                             },
                             complete: () => {
                                 this.sortDisabled = false;
+                                this.loadIng--;
                             },
                             error: () => {
                                 this.getSectionLists();

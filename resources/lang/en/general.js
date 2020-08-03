@@ -481,4 +481,7 @@ export default {
     "未保存计划时间": "Unsaved planned time",
     "原计划时间": "Original time",
     "新计划时间": "New time",
+    "你确定要删除%【%】吗？": "Are you sure you want to delete % [%]?",
+    "正在进行其他操作，请稍后重试...": "Other operations in progress, please try again later...",
+    "浏览器阻止不是https的网站访问音视频，所以请尝试安装SSL！": "Browsers prevent sites that are not HTTPS from accessing audio and video, so try installing SSL!",
 }

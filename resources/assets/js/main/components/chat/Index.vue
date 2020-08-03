@@ -1465,6 +1465,10 @@
             },
 
             videoConnect(username, videoChat) {
+                if (!$A.leftExists(window.location.protocol, "https")) {
+                    this.$Modal.warning({title: this.$L('温馨提示'), content: this.$L('浏览器阻止音视频访问不是https的网站，所以尝试安装SSL！')});
+                    return;
+                }
                 this.videoChat = videoChat;
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
                 try {
