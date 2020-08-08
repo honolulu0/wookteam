@@ -64,6 +64,7 @@
                                         task.overdue ? 'overdue' : '',
                                         task.isNewtask === true ? 'newtask' : ''
                                     ]" @click="openTaskModal(task)">
+                                    <div v-if="task.subtask.length > 0" class="subtask-progress"><em :style="{width: subtaskProgress(task.subtask) + '%'}"></em></div>
                                     <div class="task-title">{{task.title}}</div>
                                     <div class="task-more">
                                         <div v-if="task.overdue" class="task-status">{{$L('已超期')}}</div>
@@ -221,10 +222,10 @@
                             width: 100%;
                             .task-shadow {
                                 margin: 5px 0 4px;
-                                padding: 8px;
+                                padding: 8px 10px 8px 8px;
                                 background-color: #ffffff;
                                 border-left: 2px solid #BF9F03;
-                                border-right: 2px solid #ffffff;
+                                border-right: 0;
                                 color: #091e42;
                                 border-radius: 3px;
                                 cursor: pointer;
@@ -294,6 +295,22 @@
                                             height: 100%;
                                             border-radius: 50%;
                                         }
+                                    }
+                                }
+                                .subtask-progress {
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    width: 100%;
+                                    height: 100%;
+                                    z-index: -1;
+                                    border-radius: 0 3px 3px 0;
+                                    overflow: hidden;
+                                    pointer-events: none;
+                                    em {
+                                        display: block;
+                                        height: 100%;
+                                        background-color: rgba(3, 150, 242, 0.07);
                                     }
                                 }
                             }
@@ -806,6 +823,14 @@
                         }
                     }
                 });
+            },
+
+            subtaskProgress(subtask) {
+                if (subtask.length === 0) {
+                    return 0;
+                }
+                const completeLists = subtask.filter((item) => { return item.status == 'complete'});
+                return parseFloat(((completeLists.length / subtask.length) * 100).toFixed(2));
             },
 
             openTaskModal(taskDetail) {

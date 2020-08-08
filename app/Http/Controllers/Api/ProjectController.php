@@ -1437,6 +1437,7 @@ class ProjectController extends Controller
      * - delete: 删除任务
      * - comment: 评论
      * - attention: 添加关注
+     * - subtask: 修改子任务
      * @apiParam {String} [content]         内容数据
      *
      * @throws \Throwable
@@ -1500,7 +1501,7 @@ class ProjectController extends Controller
             }
         }
         //
-        $content = trim(Request::input('content'));
+        $content = Base::newTrim(Request::input('content'));
         $message = "";
         $upArray = [];
         $logArray = [];
@@ -1910,6 +1911,35 @@ class ProjectController extends Controller
                 $tempRow = Base::DBC2A(DB::table('project_users')->select(['username'])->where([ 'type' => '关注', 'taskid' => $task['id'] ])->get()->pluck('username'));
                 $upArray['follower'] = Base::array2string($tempRow);
                 $message = "保存成功！";
+                break;
+            }
+
+            /**
+             * 修改子任务
+             */
+            case 'subtask': {
+                if (!is_array($content)) {
+                    return Base::retError('参数错误！');
+                }
+                $content = Base::array2string($content);
+                if ($content == $task['subtask']) {
+                    return Base::retError('子任务未做改变！');
+                }
+                $upArray['subtask'] = $content;
+                $logArray[] = [
+                    'type' => '日志',
+                    'projectid' => $task['projectid'],
+                    'taskid' => $task['id'],
+                    'username' => $user['username'],
+                    'detail' => '修改子任务',
+                    'indate' => Base::time(),
+                    'other' => Base::array2string([
+                        'type' => 'task',
+                        'id' => $task['id'],
+                        'subtask' => $content,
+                        'old_subtask' => $task['subtask'],
+                    ])
+                ];
                 break;
             }
 

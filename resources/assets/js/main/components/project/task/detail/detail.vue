@@ -44,9 +44,48 @@
                         <em v-else class="unfinished">{{$L('未完成')}}</em>
                     </li>
                 </ul>
+                <div class="detail-h2 detail-subtask-icon detail-icon">
+                    <strong class="active">{{$L('子任务')}}</strong>
+                    <Button class="detail-button" size="small" @click="handleTask('subtaskAdd')">{{$L('添加子任务')}}</Button>
+                </div>
+                <div class="detail-subtask-box">
+                    <div v-if="detail.subtask.length == 0" class="detail-subtask-none" @click="handleTask('subtaskAdd')">{{$L('暂无子任务')}}</div>
+                    <div v-else>
+                        <Progress class="detail-subtask-progress" :percent="subtaskProgress" :stroke-width="5" status="active" />
+                        <div v-for="(subitem, subindex) in detail.subtask" :key="subindex" class="detail-subtask-item">
+                            <Checkbox v-model="subitem.status"
+                                      true-value="complete"
+                                      false-value="unfinished"
+                                      @on-change="handleTask('subtaskBlur')"></Checkbox>
+                            <input v-model="subitem.detail"
+                                   :ref="`subtaskInput_${subindex}`"
+                                   :placeholder="$L('子任务描述...')"
+                                   class="detail-subtask-input"
+                                   :class="{'subtask-complete':subitem.status=='complete'}"
+                                   @keydown.enter="handleTask('subtaskEnter', subindex)"
+                                   @blur="handleTask('subtaskBlur')"/>
+                            <div v-if="subitem.detail==''" class="detail-subtask-delete">
+                                <Icon type="md-trash" @click="handleTask('subtaskDelete', subindex)"/>
+                            </div>
+                            <Poptip
+                                v-else
+                                class="detail-subtask-delete"
+                                transfer
+                                confirm
+                                :title="$L('你确定你要删除这个子任务吗?')"
+                                :style="subitem.showPoptip===true?{opacity:1}:{}"
+                                @on-ok="handleTask('subtaskDelete', subindex)"
+                                @on-popper-show="$set(subitem, 'showPoptip', true)"
+                                @on-popper-hide="$set(subitem, 'showPoptip', false)"><Icon type="md-trash" /></Poptip>
+                        </div>
+                    </div>
+                </div>
                 <div :style="`${detail.filenum>0?'':'display:none'}`">
-                    <div class="detail-h2 detail-file-box detail-icon"><strong class="active">{{$L('附件')}}</strong></div>
-                    <project-task-files ref="upload" :taskid="taskid" :simple="true" @change="handleTask('filechange', $event)"></project-task-files>
+                    <div class="detail-h2 detail-file-box detail-icon">
+                        <strong class="active">{{$L('附件')}}</strong>
+                        <Button class="detail-button" size="small" @click="handleTask('fileupload')">{{$L('添加附件')}}</Button>
+                    </div>
+                    <project-task-files ref="upload" :taskid="taskid" :projectid="detail.projectid" :simple="true" @change="handleTask('filechange', $event)"></project-task-files>
                 </div>
                 <div class="detail-h2 detail-comment-box detail-icon"><strong class="link" :class="{active:logType=='评论'}" @click="logType='评论'">{{$L('评论')}}</strong><em></em><strong class="link" :class="{active:logType=='日志'}" @click="logType='日志'">{{$L('操作记录')}}</strong></div>
                 <div class="detail-log-box">
@@ -124,6 +163,8 @@
 <script>
     import ProjectTaskLogs from "../logs";
     import ProjectTaskFiles from "../files";
+    import cloneDeep from "lodash/cloneDeep";
+
     export default {
         components: {ProjectTaskFiles, ProjectTaskLogs},
         data() {
@@ -225,7 +266,7 @@
                     this.visible = true;
                 }, 0)
             });
-            this.bakData = $A.cloneData(this.detail);
+            this.bakData = cloneDeep(this.detail);
             this.myUsername = $A.getUserName();
             this.getTaskDetail();
             //
@@ -244,8 +285,18 @@
         },
         watch: {
             taskid() {
-                this.bakData = $A.cloneData(this.detail);
+                this.bakData = cloneDeep(this.detail);
                 this.getTaskDetail();
+            }
+        },
+        computed: {
+            subtaskProgress() {
+                const countLists = this.detail.subtask;
+                if (countLists.length === 0) {
+                    return 0;
+                }
+                const completeLists = countLists.filter((item) => { return item.status == 'complete'});
+                return parseFloat(((completeLists.length / countLists.length) * 100).toFixed(2));
             }
         },
         methods: {
@@ -322,7 +373,7 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.detail = res.data;
-                            this.bakData = $A.cloneData(this.detail);
+                            this.bakData = cloneDeep(this.detail);
                         } else {
                             this.$Modal.error({
                                 title: this.$L('温馨提示'),
@@ -354,11 +405,60 @@
                         if (this.detail[act] == this.bakData[act]) {
                             return;
                         }
-                        if (!this.detail[act]) {
+                        if (act == 'title' && !this.detail[act]) {
                             this.$set(this.detail, act, this.bakData[act]);
                             return;
                         }
                         ajaxData.content = this.detail[act];
+                        ajaxCallback = (res) => {
+                            if (res !== 1) {
+                                this.$set(this.detail, act, this.bakData[act]);
+                            }
+                        };
+                        break;
+
+                    case 'subtaskAdd':
+                        if (!$A.isArray(this.detail.subtask)) {
+                            this.detail.subtask = [];
+                        }
+                        this.detail.subtask.push({
+                            status: 'unfinished',
+                            detail: '',
+                        });
+                        this.$nextTick(() => {
+                            this.$refs['subtaskInput_' + (this.detail.subtask.length  - 1)][0].focus();
+                        });
+                        return;
+
+                    case 'subtaskDelete':
+                        this.detail.subtask.splice(eve, 1);
+                        this.handleTask('subtaskBlur');
+                        return;
+
+                    case 'subtaskEnter':
+                        if (!$A.isArray(this.detail.subtask)) {
+                            this.detail.subtask = [];
+                        }
+                        if (eve + 1 >= this.detail.subtask.length) {
+                            this.handleTask('subtaskAdd');
+                            return;
+                        }
+                        this.handleTask('subtaskBlur')
+                        return;
+
+                    case 'subtaskBlur':
+                        this.handleTask('subtask');
+                        return;
+
+                    case 'subtask':
+                        let newArray = cloneDeep(this.detail[act]);
+                        while (newArray.length > 0 && newArray[newArray.length - 1].detail == '') {
+                            newArray.splice(newArray.length - 1, 1);
+                        }
+                        if ($A.jsonStringify(newArray) === $A.jsonStringify(this.bakData[act])) {
+                            return;
+                        }
+                        ajaxData.content = newArray;
                         ajaxCallback = (res) => {
                             if (res !== 1) {
                                 this.$set(this.detail, act, this.bakData[act]);
@@ -486,7 +586,7 @@
                     case 'unattention':
                         ajaxData.content = eve.username;
                         if (eve.uisynch === true) {
-                            let bakFollower = $A.cloneData(this.detail.follower);
+                            let bakFollower = cloneDeep(this.detail.follower);
                             this.$set(this.detail, 'follower', this.detail.follower.filter((uname) => { return uname != eve }));
                             ajaxCallback = (res) => {
                                 if (res !== 1) {
@@ -555,7 +655,7 @@
                         runTime = Math.round(new Date().getTime()) - runTime;
                         if (res.ret === 1) {
                             this.detail = res.data;
-                            this.bakData = $A.cloneData(this.detail);
+                            this.bakData = cloneDeep(this.detail);
                             $A.triggerTaskInfoListener(ajaxData.act, res.data);
                             $A.triggerTaskInfoChange(ajaxData.taskid);
                             setTimeout(() =>  {
@@ -648,6 +748,14 @@
                         width: 1px;
                         height: 10px;
                         background: #cccccc;
+                    }
+                    .detail-button {
+                        position: absolute;
+                        right: 12px;
+                        top: 50%;
+                        font-size: 12px;
+                        transform: translate(0, -50%);
+                        opacity: 0.8;
                     }
                 }
                 .detail-icon {
@@ -804,6 +912,65 @@
                         content: "\E8B9";
                         font-size: 16px;
                         padding-left: 2px;
+                    }
+                }
+                .detail-subtask-icon {
+                    &:before {
+                        content: "\E819";
+                        font-size: 16px;
+                        padding-left: 2px;
+                    }
+                }
+                .detail-subtask-box {
+                    padding: 12px;
+                    .detail-subtask-progress {
+                        margin: 2px 0 6px;
+                    }
+                    .detail-subtask-item {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        margin: 4px 2px;
+                        position: relative;
+                        &:hover {
+                            .detail-subtask-delete {
+                                opacity: 1;
+                            }
+                        }
+                        .detail-subtask-input {
+                            flex: 1;
+                            border: 0;
+                            background: #ffffff;
+                            margin-left: 2px;
+                            height: 30px;
+                            line-height: 30px;
+                            cursor: pointer;
+                            color: #172b4d;
+                            outline: none;
+                            border-bottom: 1px solid #f6f6f6;
+                            &.subtask-complete {
+                                text-decoration: line-through;
+                                color: #999;
+                            }
+                        }
+                        .detail-subtask-delete {
+                            opacity: 0;
+                            position: absolute;
+                            top: 50%;
+                            right: 0;
+                            transform: translate(0, -50%);
+                            width: 26px;
+                            height: 24px;
+                            font-size: 16px;
+                            line-height: 24px;
+                            text-align: center;
+                            cursor: pointer;
+                            background: #ffffff;
+                        }
+                    }
+                    .detail-subtask-none {
+                        color: #666666;
+                        cursor: pointer;
                     }
                 }
                 .detail-comment-box {

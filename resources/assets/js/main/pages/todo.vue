@@ -52,6 +52,7 @@
                                     @sort="taskSortUpdate"
                                     @remove="taskSortUpdate">
                                     <div v-for="task in taskDatas[index].lists" class="content-li task-draggable" :key="task.id" :class="{complete:task.complete}" @click="openTaskModal(task)">
+                                        <div v-if="task.subtask.length > 0" class="subtask-progress"><em :style="{width: subtaskProgress(task.subtask) + '%'}"></em></div>
                                         <Icon v-if="task.complete" class="task-check" type="md-checkbox-outline" @click.stop="taskComplete(task, false)"/>
                                         <Icon v-else class="task-check" type="md-square-outline" @click.stop="taskComplete(task, true)"/>
                                         <div v-if="!!task.loadIng" class="task-loading"><w-loading></w-loading></div>
@@ -267,6 +268,21 @@
                                         word-break: break-all;
                                         &:hover {
                                             color: #000000;
+                                        }
+                                    }
+                                    .subtask-progress {
+                                        position: absolute;
+                                        top: 0;
+                                        left: 0;
+                                        width: 100%;
+                                        height: 100%;
+                                        z-index: -1;
+                                        overflow: hidden;
+                                        pointer-events: none;
+                                        em {
+                                            display: block;
+                                            height: 100%;
+                                            background-color: rgba(3, 150, 242, 0.07);
                                         }
                                     }
                                 }
@@ -699,6 +715,14 @@
                         }
                     }
                 });
+            },
+
+            subtaskProgress(subtask) {
+                if (subtask.length === 0) {
+                    return 0;
+                }
+                const completeLists = subtask.filter((item) => { return item.status == 'complete'});
+                return parseFloat(((completeLists.length / subtask.length) * 100).toFixed(2));
             },
 
             openTaskModal(taskDetail) {
