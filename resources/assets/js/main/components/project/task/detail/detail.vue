@@ -31,6 +31,7 @@
                            ref="descInput"
                            :rows="2"
                            :autosize="{minRows:2,maxRows:8}"
+                           maxlength="500"
                            :placeholder="$L('添加详细描述...')"
                            @on-keydown="descKeydown"
                            @on-blur="handleTask('desc')"/>
@@ -81,6 +82,7 @@
                                    :class="{'subtask-complete':subitem.status=='complete'}"
                                    :rows="1"
                                    :autosize="{minRows:1,maxRows:5}"
+                                   maxlength="255"
                                    :placeholder="$L('子任务描述...')"
                                    @on-keydown="subtaskKeydown(subindex, $event)"
                                    @on-blur="handleTask('subtaskBlur')"/>
@@ -780,6 +782,8 @@
                 outline: none;
                 resize: none;
                 min-height: auto;
+                padding-left: 0;
+                padding-right: 0;
                 &:focus {
                     color: #333333;
                 }
