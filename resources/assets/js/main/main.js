@@ -145,14 +145,15 @@ import '../../sass/main.scss';
 
         /**
          * 获取会员昵称
-         * @returns string
+         * @param nullName
+         * @returns {string|*}
          */
-        getNickName() {
+        getNickName(nullName = true) {
             if ($A.getToken() === false) {
                 return "";
             }
             let userInfo = $A.getUserInfo();
-            return $A.ishave(userInfo.nickname) ? userInfo.nickname : $A.getUserName();
+            return $A.ishave(userInfo.nickname) ? userInfo.nickname : (nullName ? $A.getUserName() : '');
         },
 
         /**

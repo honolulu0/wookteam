@@ -106,6 +106,7 @@ const WTWS = function (config) {
             config = {};
         }
         config.username = config.username || '';
+        config.key = config.key || '';
         config.url = config.url || '';
         config.token = config.token || '';
         config.channel = config.channel || '';
@@ -132,6 +133,15 @@ const WTWS = function (config) {
         if (this.__instance !== null && force !== true) {
             this.__log("[WS] Connection exists");
             return this;
+        }
+
+        var configLists = $A.jsonParse($A.getStorage("configLists"), {});
+        var keyConfig = configLists[this.__config.key];
+        if (keyConfig !== null && typeof keyConfig == "object") {
+            if (keyConfig['disabled'] === true) {
+                this.__log("[WS] " + this.__config.key + " is disabled");
+                return this;
+            }
         }
 
         var thas = this;

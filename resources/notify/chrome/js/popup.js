@@ -33,12 +33,21 @@ function showLists(lists) {
         if (!lists.hasOwnProperty(index)) {
             continue;
         }
-        if (typeof tempLists[index] == "object" && tempLists[index].disabled === true) {
+        if (tempLists[index] === null || typeof tempLists[index] !== "object") {
             continue;
         }
-        const item = lists[index];
+        if (tempLists[index].disabled === true) {
+            continue;
+        }
+        const item = Object.assign(lists[index], {
+            nickname: tempLists[index].nickname
+        });
         html+= '<li class="message_box' + (j == length ? ' last' : '') + '" data-index="' + index + '" data-token="' + item.token + '">';
-        html+= '<div class="message_username">' + item.username + '</div>';
+        if (item.nickname) {
+            html+= `<div class="message_username">${item.nickname} (${item.username})</div>`;
+        } else {
+            html+= '<div class="message_username">' + item.username + '</div>';
+        }
         html+= '<div class="message_host">' + index + '</div>';
         html+= '<div class="message_unread' + (item.unread == 0 ? ' zero' : '') + '">未读: ' + item.unread + '</div>';
         html+= '<div class="message_delete">删除</div>';

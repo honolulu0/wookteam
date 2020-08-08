@@ -47,6 +47,7 @@ const getBadgeNum = function () {
                 username: config.username,
                 token: config.token,
                 url: config.url,
+                key: key,
                 channel: 'chromeExtend'
             }).setOnMsgListener('notify', ['open', 'unread', 'user'], function (msgDetail) {
                 let body = msgDetail.body;
@@ -102,45 +103,53 @@ getBadgeNum();
  */
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     var configLists;
-    if (request.act === "config") {
-        if (sender.tab) {
-            var hostname = $A.getHost(sender.tab.url);
-            if (hostname) {
-                configLists = $A.jsonParse($A.getStorage("configLists"), {});
-                if (typeof configLists[hostname] !== "object") {
-                    configLists[hostname] = {};
+    switch (request.act) {
+        case "config":
+            if (sender.tab) {
+                var hostname = $A.getHost(sender.tab.url);
+                if (hostname) {
+                    configLists = $A.jsonParse($A.getStorage("configLists"), {});
+                    if (typeof configLists[hostname] !== "object" || configLists[hostname] === null) {
+                        configLists[hostname] = {};
+                    }
+                    configLists[hostname] = Object.assign(configLists[hostname], request.config, {
+                        hostname: hostname,
+                    });
+                    $A.setStorage("configLists", $A.jsonStringify(configLists));
+                    sendResponse(configLists);
                 }
-                configLists[hostname] = Object.assign(request.config, {
-                    hostname: hostname,
-                });
+            }
+            break;
+
+        case "getInstances":
+            sendResponse(instances);
+            break;
+
+        case "clickInstances":
+            if (typeof instances[request.index] === "object") {
+                instances[request.index].ws.sendTo('unread', function (res) {
+                    if (res.status === 1) {
+                        instances[request.index].unread = $A.runNum(res.message);
+                        updateBadgeNum();
+                    }
+                    sendResponse(res);
+                })
+            }
+            break;
+
+        case "delInstances":
+            configLists = $A.jsonParse($A.getStorage("configLists"), {});
+            if (typeof configLists[request.index] === "object") {
+                delete configLists[request.index];
                 $A.setStorage("configLists", $A.jsonStringify(configLists));
-                sendResponse(configLists);
             }
-        }
-    } else if (request.act === "getInstances") {
-        sendResponse(instances);
-    } else if (request.act === "clickInstances") {
-        if (typeof instances[request.index] === "object") {
-            instances[request.index].ws.sendTo('unread', function (res) {
-                if (res.status === 1) {
-                    instances[request.index].unread = $A.runNum(res.message);
-                    updateBadgeNum();
+            if (typeof instances[request.index] === "object") {
+                if (typeof instances[request.index].ws !== "undefined") {
+                    instances[request.index].ws.config(null).close();
                 }
-                sendResponse(res);
-            })
-        }
-    } else if (request.act === "delInstances") {
-        configLists = $A.jsonParse($A.getStorage("configLists"), {});
-        if (typeof configLists[request.index] === "object") {
-            delete configLists[request.index];
-            $A.setStorage("configLists", $A.jsonStringify(configLists));
-        }
-        if (typeof instances[request.index] === "object") {
-            if (typeof  instances[request.index].ws !== "undefined") {
-                 instances[request.index].ws.config(null).close();
+                delete instances[request.index];
             }
-            delete instances[request.index];
-        }
-        updateBadgeNum();
+            updateBadgeNum();
+            break;
     }
 });

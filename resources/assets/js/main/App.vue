@@ -184,7 +184,9 @@
                         }
                         switch (msgDetail.messageType) {
                             case 'open':
-                                window.localStorage.setItem("__::WookTeam:config", $A.jsonStringify(msgDetail.config));
+                                window.localStorage.setItem("__::WookTeam:config", $A.jsonStringify(Object.assign(msgDetail.config, {
+                                    nickname: $A.getNickName(false)
+                                })));
                                 break;
                             case 'close':
                                 window.localStorage.setItem("__::WookTeam:config", $A.jsonStringify({}));
