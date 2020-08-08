@@ -3,7 +3,16 @@
         <div class="task-detail-main">
             <div class="detail-left">
                 <div class="detail-title-box detail-icon">
-                    <input v-model="detail.title" :disabled="!!loadData.title" type="text" maxlength="60" @keydown.enter="(e)=>{e.target.blur()}" @blur="handleTask('title')">
+                    <Input v-model="detail.title"
+                           :disabled="!!loadData.title"
+                           type="textarea"
+                           class="detail-title-input"
+                           ref="titleInput"
+                           :rows="1"
+                           :autosize="{minRows:1,maxRows:5}"
+                           maxlength="60"
+                           @on-keydown="titleKeydown"
+                           @on-blur="handleTask('title')"/>
                     <div v-if="detail.projectTitle && urlProjectid != detail.projectid" class="subtitle">
                         {{$L('所属项目：')}}
                         <span class="project-title" @click="openProject(detail.projectid)">{{detail.projectTitle}}</span>
@@ -16,7 +25,15 @@
                 </div>
                 <div class="detail-desc-box detail-icon">
                     <div class="detail-h2"><strong class="active">{{$L('描述')}}</strong></div>
-                    <textarea v-model="detail.desc" :placeholder="$L('添加详细描述...')"  @keydown="descKeydown" @blur="handleTask('desc')"></textarea>
+                    <Input v-model="detail.desc"
+                           type="textarea"
+                           class="detail-desc-input"
+                           ref="descInput"
+                           :rows="2"
+                           :autosize="{minRows:2,maxRows:8}"
+                           :placeholder="$L('添加详细描述...')"
+                           @on-keydown="descKeydown"
+                           @on-blur="handleTask('desc')"/>
                 </div>
                 <ul class="detail-text-box">
                     <li v-if="detail.startdate > 0 && detail.enddate > 0" class="text-time detail-icon">
@@ -316,6 +333,14 @@
                 }
             },
 
+            titleKeydown(e) {
+                e = e || event;
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    e.target.blur();
+                }
+            },
+
             descKeydown(e) {
                 e = e || event;
                 if (e.keyCode == 13) {
@@ -388,6 +413,13 @@
                         if (res.ret === 1) {
                             this.detail = res.data;
                             this.bakData = cloneDeep(this.detail);
+                            this.$nextTick(() => {
+                                this.$refs.titleInput.resizeTextarea();
+                                this.$refs.descInput.resizeTextarea();
+                                this.detail.subtask.forEach((temp, index) => {
+                                    this.$refs['subtaskInput_' + (index)][0].resizeTextarea();
+                                })
+                            });
                         } else {
                             this.$Modal.error({
                                 title: this.$L('温馨提示'),
@@ -707,6 +739,35 @@
 
 <style lang="scss">
     .project-task-detail-window {
+        .detail-title-box {
+            .detail-title-input {
+                textarea {
+                    margin: -10px 0 0 -2px;
+                    font-size: 20px;
+                    font-weight: 600;
+                    border: 2px solid #ffffff;
+                    padding: 5px 2px;
+                    cursor: pointer;
+                    color: #172b4d;
+                    background: #ffffff;
+                    width: 100%;
+                    border-radius: 3px;
+                    resize: none;
+                }
+            }
+        }
+        .detail-desc-box {
+            .detail-desc-input {
+                margin: 10px 0 6px;
+                textarea {
+                    border: 2px solid #F4F5F7;
+                    padding: 5px 8px;
+                    color: #172b4d;
+                    background: rgba(9, 30, 66, 0.04);
+                    resize: none;
+                }
+            }
+        }
         .detail-subtask-input {
             flex: 1;
             border: 0;
@@ -719,6 +780,9 @@
                 outline: none;
                 resize: none;
                 min-height: auto;
+                &:focus {
+                    color: #333333;
+                }
             }
             &.subtask-complete {
                 textarea {
@@ -832,43 +896,10 @@
                             }
                         }
                     }
-                    input {
-                        margin: -10px 0 0 -8px;
-                        font-size: 20px;
-                        font-weight: 600;
-                        border: 2px solid #ffffff;
-                        padding: 5px 8px;
-                        cursor: pointer;
-                        color: #172b4d;
-                        background: #ffffff;
-                        width: 100%;
-                        border-radius: 3px;
-                    }
-                    input:focus {
-                        outline: 0;
-                        background: #fff;
-                        border-color: #0396f2;
-                    }
                 }
                 .detail-desc-box {
                     &:before {
                         content: "\E75E";
-                    }
-                    textarea {
-                        border: 2px solid #F4F5F7;
-                        padding: 5px 8px;
-                        cursor: pointer;
-                        color: #172b4d;
-                        background: rgba(9, 30, 66, 0.04);
-                        width: 100%;
-                        border-radius: 3px;
-                        resize: none;
-                        margin-top: 10px;
-                        &:focus {
-                            outline: 0;
-                            background: #fff;
-                            border-color: #0396f2;
-                        }
                     }
                 }
                 .detail-text-box {
@@ -983,13 +1014,15 @@
                             top: 50%;
                             right: 0;
                             transform: translate(0, -50%);
-                            width: 26px;
-                            height: 24px;
+                            width: 28px;
+                            height: 28px;
+                            line-height: 28px;
                             font-size: 16px;
-                            line-height: 24px;
                             text-align: center;
                             cursor: pointer;
                             background: #ffffff;
+                            border-radius: 2px 0 0 2px;
+                            transition: all 0.3s;
                         }
                     }
                     .detail-subtask-none {
