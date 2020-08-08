@@ -57,7 +57,7 @@
                                         <Icon v-else class="task-check" type="md-square-outline" @click.stop="taskComplete(task, true)"/>
                                         <div v-if="!!task.loadIng" class="task-loading"><w-loading></w-loading></div>
                                         <div v-if="task.overdue" class="task-overdue">[{{$L('超期')}}]</div>
-                                        <div class="task-title">{{task.title}}</div>
+                                        <div class="task-title">{{task.title}}<Icon v-if="task.desc" type="ios-list-box-outline" /></div>
                                     </div>
                                     <div v-if="taskDatas[index].hasMorePages === true" class="content-li more" @click="getTaskLists(index, true)">{{$L('加载更多')}}</div>
                                 </draggable>
@@ -268,6 +268,13 @@
                                         word-break: break-all;
                                         &:hover {
                                             color: #000000;
+                                        }
+                                        .ivu-icon {
+                                            font-size: 16px;
+                                            color: #afafaf;
+                                            vertical-align: top;
+                                            padding: 2px 6px;
+                                            transform: scale(0.98);
                                         }
                                     }
                                     .subtask-progress {

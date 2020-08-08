@@ -65,7 +65,7 @@
                                         task.isNewtask === true ? 'newtask' : ''
                                     ]" @click="openTaskModal(task)">
                                     <div v-if="task.subtask.length > 0" class="subtask-progress"><em :style="{width: subtaskProgress(task.subtask) + '%'}"></em></div>
-                                    <div class="task-title">{{task.title}}</div>
+                                    <div class="task-title">{{task.title}}<Icon v-if="task.desc" type="ios-list-box-outline" /></div>
                                     <div class="task-more">
                                         <div v-if="task.overdue" class="task-status">{{$L('已超期')}}</div>
                                         <div v-else-if="task.complete" class="task-status">{{$L('已完成')}}</div>
@@ -276,6 +276,13 @@
                                     font-size: 12px;
                                     color: #091e42;
                                     word-break: break-all;
+                                    .ivu-icon {
+                                        font-size: 14px;
+                                        color: #afafaf;
+                                        vertical-align: top;
+                                        padding: 2px 4px;
+                                        transform: scale(0.94);
+                                    }
                                 }
                                 .task-more {
                                     min-height: 30px;

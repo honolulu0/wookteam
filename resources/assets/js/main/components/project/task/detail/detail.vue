@@ -1,6 +1,6 @@
 <template>
-    <div class="project-task-detail-window" :class="{'task-detail-show': visible}">
-        <div class="task-detail-main">
+    <div class="project-task-detail-window" :class="{'task-detail-show': visible}" @click="$nextTick(()=>{visible=false})">
+        <div class="task-detail-main" @click.stop="">
             <div class="detail-left">
                 <div class="detail-title-box detail-icon">
                     <Input v-model="detail.title"
@@ -744,11 +744,11 @@
         .detail-title-box {
             .detail-title-input {
                 textarea {
-                    margin: -10px 0 0 -2px;
+                    margin: -7px 0 3px -2px;
                     font-size: 20px;
                     font-weight: 600;
                     border: 2px solid #ffffff;
-                    padding: 5px 2px;
+                    padding: 2px;
                     cursor: pointer;
                     color: #172b4d;
                     background: #ffffff;
@@ -863,7 +863,11 @@
                         top: 50%;
                         font-size: 12px;
                         transform: translate(0, -50%);
-                        opacity: 0.8;
+                        opacity: 0.5;
+                        transition: all 0.3s;
+                        &:hover {
+                            opacity: 1;
+                        }
                     }
                 }
                 .detail-icon {
@@ -1032,6 +1036,7 @@
                     .detail-subtask-none {
                         color: #666666;
                         cursor: pointer;
+                        padding: 0 12px;
                     }
                 }
                 .detail-comment-box {
