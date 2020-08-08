@@ -57,13 +57,16 @@
                                       true-value="complete"
                                       false-value="unfinished"
                                       @on-change="handleTask('subtaskBlur')"></Checkbox>
-                            <input v-model="subitem.detail"
-                                   :ref="`subtaskInput_${subindex}`"
-                                   :placeholder="$L('子任务描述...')"
+                            <Input v-model="subitem.detail"
+                                   type="textarea"
                                    class="detail-subtask-input"
+                                   :ref="`subtaskInput_${subindex}`"
                                    :class="{'subtask-complete':subitem.status=='complete'}"
-                                   @keydown.enter="handleTask('subtaskEnter', subindex)"
-                                   @blur="handleTask('subtaskBlur')"/>
+                                   :rows="1"
+                                   :autosize="{minRows:1,maxRows:5}"
+                                   :placeholder="$L('子任务描述...')"
+                                   @on-keydown="subtaskKeydown(subindex, $event)"
+                                   @on-blur="handleTask('subtaskBlur')"/>
                             <div v-if="subitem.detail==''" class="detail-subtask-delete">
                                 <Icon type="md-trash" @click="handleTask('subtaskDelete', subindex)"/>
                             </div>
@@ -335,6 +338,17 @@
                 }
             },
 
+            subtaskKeydown(subindex, e) {
+                e = e || event;
+                if (e.keyCode == 13) {
+                    if (e.shiftKey) {
+                        return;
+                    }
+                    e.preventDefault();
+                    this.handleTask('subtaskEnter', subindex);
+                }
+            },
+
             followerLength(follower) {
                 if (follower instanceof Array) {
                     return follower.length;
@@ -421,10 +435,7 @@
                         if (!$A.isArray(this.detail.subtask)) {
                             this.detail.subtask = [];
                         }
-                        this.detail.subtask.push({
-                            status: 'unfinished',
-                            detail: '',
-                        });
+                        this.detail.subtask.push({status: 'unfinished', detail: '' });
                         this.$nextTick(() => {
                             this.$refs['subtaskInput_' + (this.detail.subtask.length  - 1)][0].focus();
                         });
@@ -443,7 +454,7 @@
                             this.handleTask('subtaskAdd');
                             return;
                         }
-                        this.handleTask('subtaskBlur')
+                        this.$refs['subtaskInput_' + (eve + 1)][0].focus();
                         return;
 
                     case 'subtaskBlur':
@@ -451,14 +462,14 @@
                         return;
 
                     case 'subtask':
-                        let newArray = cloneDeep(this.detail[act]);
-                        while (newArray.length > 0 && newArray[newArray.length - 1].detail == '') {
-                            newArray.splice(newArray.length - 1, 1);
+                        let tempArray = cloneDeep(this.detail[act]);
+                        while (tempArray.length > 0 && tempArray[tempArray.length - 1].detail == '') {
+                            tempArray.splice(tempArray.length - 1, 1);
                         }
-                        if ($A.jsonStringify(newArray) === $A.jsonStringify(this.bakData[act])) {
+                        if ($A.jsonStringify(tempArray) === $A.jsonStringify(this.bakData[act])) {
                             return;
                         }
-                        ajaxData.content = newArray;
+                        ajaxData.content = tempArray;
                         ajaxCallback = (res) => {
                             if (res !== 1) {
                                 this.$set(this.detail, act, this.bakData[act]);
@@ -654,8 +665,13 @@
                     success: (res) => {
                         runTime = Math.round(new Date().getTime()) - runTime;
                         if (res.ret === 1) {
+                            let tempArray = cloneDeep(this.detail.subtask);
                             this.detail = res.data;
                             this.bakData = cloneDeep(this.detail);
+                            while (tempArray.length > 0 && tempArray[tempArray.length - 1].detail == '') {
+                                tempArray.splice(tempArray.length - 1, 1);
+                                this.detail.subtask.push({status: 'unfinished', detail: '' })
+                            }
                             $A.triggerTaskInfoListener(ajaxData.act, res.data);
                             $A.triggerTaskInfoChange(ajaxData.taskid);
                             setTimeout(() =>  {
@@ -689,6 +705,30 @@
     }
 </script>
 
+<style lang="scss">
+    .project-task-detail-window {
+        .detail-subtask-input {
+            flex: 1;
+            border: 0;
+            background: #ffffff;
+            margin-left: 2px;
+            border-bottom: 1px solid #f6f6f6;
+            textarea {
+                border: 0;
+                box-shadow: none;
+                outline: none;
+                resize: none;
+                min-height: auto;
+            }
+            &.subtask-complete {
+                textarea {
+                    text-decoration: line-through;
+                    color: #999;
+                }
+            }
+        }
+    }
+</style>
 <style lang="scss" scoped>
     .project-task-detail-window {
         position: fixed;
@@ -935,22 +975,6 @@
                         &:hover {
                             .detail-subtask-delete {
                                 opacity: 1;
-                            }
-                        }
-                        .detail-subtask-input {
-                            flex: 1;
-                            border: 0;
-                            background: #ffffff;
-                            margin-left: 2px;
-                            height: 30px;
-                            line-height: 30px;
-                            cursor: pointer;
-                            color: #172b4d;
-                            outline: none;
-                            border-bottom: 1px solid #f6f6f6;
-                            &.subtask-complete {
-                                text-decoration: line-through;
-                                color: #999;
                             }
                         }
                         .detail-subtask-delete {

@@ -1926,15 +1926,29 @@ class ProjectController extends Controller
                     return Base::retError('子任务未做改变！');
                 }
                 $upArray['subtask'] = $content;
+                //
+                $detail = '修改子任务';
+                $subtype = 'modify';
+                $new_count = count(Base::string2array($content));
+                $old_count = count(Base::string2array($task['subtask']));
+                if ($new_count > $old_count) {
+                    $detail = '添加子任务';
+                    $subtype = 'add';
+                } elseif ($new_count < $old_count) {
+                    $detail = '删除子任务';
+                    $subtype = 'del';
+                }
+                //
                 $logArray[] = [
                     'type' => '日志',
                     'projectid' => $task['projectid'],
                     'taskid' => $task['id'],
                     'username' => $user['username'],
-                    'detail' => '修改子任务',
+                    'detail' => $detail,
                     'indate' => Base::time(),
                     'other' => Base::array2string([
                         'type' => 'task',
+                        'subtype' => $subtype,
                         'id' => $task['id'],
                         'subtask' => $content,
                         'old_subtask' => $task['subtask'],
