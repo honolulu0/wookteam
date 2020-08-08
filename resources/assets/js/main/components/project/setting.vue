@@ -2,6 +2,10 @@
     <drawer-tabs-container>
         <div class="project-setting">
             <Form ref="formSystem" :model="formSystem" :label-width="110">
+                <div class="project-setting-title">{{$L('项目信息')}}:</div>
+                <FormItem :label="$L('项目简介')">
+                    <Input v-model="formSystem.project_desc" type="textarea" :autosize="{minRows:3,maxRows:20}" style="max-width:450px"/>
+                </FormItem>
                 <div class="project-setting-title">{{$L('权限设置')}}:</div>
                 <FormItem :label="$L('添加任务')">
                     <Checkbox :value="true" disabled>{{$L('项目负责人')}}</Checkbox>

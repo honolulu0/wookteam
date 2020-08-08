@@ -264,7 +264,7 @@ class ProjectController extends Controller
                 return Base::retError('你不是项目负责人！');
             }
             foreach (Request::input() AS $key => $value) {
-                if (in_array($key, ['add_role', 'edit_role', 'complete_role', 'archived_role', 'del_role', 'complete_show'])) {
+                if (in_array($key, ['project_desc', 'add_role', 'edit_role', 'complete_role', 'archived_role', 'del_role', 'complete_show'])) {
                     $setting[$key] = $value;
                 }
             }

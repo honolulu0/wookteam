@@ -484,4 +484,10 @@ export default {
     "你确定要删除%【%】吗？": "Are you sure you want to delete % [%]?",
     "正在进行其他操作，请稍后重试...": "Other operations in progress, please try again later...",
     "浏览器阻止不是https的网站访问音视频，所以请尝试安装SSL！": "Browsers prevent sites that are not HTTPS from accessing audio and video, so try installing SSL!",
+    "你确定你要删除这个子任务吗?": "Are you sure you want to delete this subtask?",
+    "子任务": "Subtasks",
+    "子任务描述...": "Subtask description...",
+    "添加子任务": "Add subtasks",
+    "项目信息": "Project information",
+    "项目简介": "Project introduction"
 }
