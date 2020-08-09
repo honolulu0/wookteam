@@ -14,6 +14,9 @@ const detailElement = (taskid, detail = {}) => {
             return myNewObj;
         }
     };
+    let isArray = (myObj) => {
+        return Object.prototype.toString.call(myObj) == '[object Array]';
+    }
     return new Promise(() => {
         let custom = Vue.extend(component);
 
@@ -31,6 +34,10 @@ const detailElement = (taskid, detail = {}) => {
 
         if (typeof taskid === "number") {
             detail.taskid = taskid;
+        }
+
+        if (!isArray(detail.subtask)) {
+            detail.subtask = [];
         }
 
         let data = {
