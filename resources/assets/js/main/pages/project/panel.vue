@@ -462,7 +462,11 @@
                                 let tempLists = label.taskLists.filter((res) => { return res.id == detail.id });
                                 if (tempLists.length == 0) {
                                     detail.isNewtask = true;
-                                    label.taskLists.unshift(detail);
+                                    if (detail.insertbottom) {
+                                        label.taskLists.push(detail);
+                                    } else {
+                                        label.taskLists.unshift(detail);
+                                    }
                                     this.$nextTick(() => {
                                         this.$set(detail, 'isNewtask', false);
                                     });
@@ -776,7 +780,11 @@
             addTaskSuccess(taskDetail, label) {
                 if (label.taskLists instanceof Array) {
                     taskDetail.isNewtask = true;
-                    label.taskLists.unshift(taskDetail);
+                    if (taskDetail.insertbottom) {
+                        label.taskLists.push(taskDetail);
+                    } else {
+                        label.taskLists.unshift(taskDetail);
+                    }
                     this.$nextTick(() => {
                         this.$set(taskDetail, 'isNewtask', false);
                     });

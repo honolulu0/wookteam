@@ -70,7 +70,7 @@
                     <div v-if="detail.subtask.length == 0" class="detail-subtask-none" @click="handleTask('subtaskAdd')">{{$L('暂无子任务')}}</div>
                     <div v-else>
                         <Progress class="detail-subtask-progress" :percent="subtaskProgress" :stroke-width="5" status="active" />
-                        <div v-for="(subitem, subindex) in detail.subtask" :key="subindex" class="detail-subtask-item">
+                        <div v-for="(subitem, subindex) in detail.subtask" :key="subindex" :data-id="subitem.id" class="detail-subtask-item">
                             <Checkbox v-model="subitem.status"
                                       true-value="complete"
                                       false-value="unfinished"
@@ -78,6 +78,7 @@
                             <Input v-model="subitem.detail"
                                    type="textarea"
                                    class="detail-subtask-input"
+                                   :readonly="subitem.status=='complete'"
                                    :ref="`subtaskInput_${subindex}`"
                                    :class="{'subtask-complete':subitem.status=='complete'}"
                                    :rows="1"
@@ -469,7 +470,13 @@
                         if (!$A.isArray(this.detail.subtask)) {
                             this.detail.subtask = [];
                         }
-                        this.detail.subtask.push({status: 'unfinished', detail: '' });
+                        this.detail.subtask.push({
+                            id: $A.randomString(6),
+                            uname: $A.getUserName(),
+                            time: Math.round(new Date().getTime()/1000),
+                            status: 'unfinished',
+                            detail: ''
+                        });
                         this.$nextTick(() => {
                             this.$refs['subtaskInput_' + (this.detail.subtask.length  - 1)][0].focus();
                         });
@@ -506,7 +513,7 @@
                         ajaxData.content = tempArray;
                         ajaxCallback = (res) => {
                             if (res !== 1) {
-                                this.$set(this.detail, act, this.bakData[act]);
+                                this.$set(this.detail, act, cloneDeep(this.bakData[act]));
                             }
                         };
                         break;
@@ -704,7 +711,13 @@
                             this.bakData = cloneDeep(this.detail);
                             while (tempArray.length > 0 && tempArray[tempArray.length - 1].detail == '') {
                                 tempArray.splice(tempArray.length - 1, 1);
-                                this.detail.subtask.push({status: 'unfinished', detail: '' })
+                                this.detail.subtask.push({
+                                    id: $A.randomString(6),
+                                    uname: $A.getUserName(),
+                                    time: Math.round(new Date().getTime()/1000),
+                                    status: 'unfinished',
+                                    detail: ''
+                                });
                             }
                             $A.triggerTaskInfoListener(ajaxData.act, res.data);
                             $A.triggerTaskInfoChange(ajaxData.taskid);

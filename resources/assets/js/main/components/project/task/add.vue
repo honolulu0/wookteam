@@ -35,7 +35,15 @@
                         </div>
                     </div>
                 </Poptip>
-                <Button class="enter-module-btn" type="info" size="small" @click="clickAdd">{{$L('添加任务')}}</Button>
+                <div class="enter-module-btn">
+                    <Button class="enter-module-btn-1" type="info" size="small" @click="clickAdd">{{$L('添加任务')}}</Button>
+                    <Dropdown class="enter-module-btn-drop" @on-click="dropAdd" placement="bottom-end" transfer>
+                        <Button class="enter-module-btn-2" type="info" size="small"><Icon type="ios-arrow-down"></Icon></Button>
+                        <DropdownMenu slot="list" class="enter-module-btn-drop-list">
+                            <DropdownItem name="insertbottom">{{$L('添加至列表结尾')}}</DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
             </div>
         </div>
         <div v-if="loadIng > 0" class="load-box" @click.stop="">
@@ -44,6 +52,14 @@
     </div>
 </template>
 
+<style lang="scss">
+    .enter-module-btn-drop-list {
+        .ivu-dropdown-item {
+            padding: 5px 16px;
+            font-size: 12px !important;
+        }
+    }
+</style>
 <style lang="scss" scoped>
     .task-input-box {
         position: relative;
@@ -137,7 +153,22 @@
                     flex: 1;
                 }
                 .enter-module-btn {
-                    font-size: 12px;
+                    button {
+                        font-size: 12px;
+                    }
+                    .enter-module-btn-1 {
+                        border-top-right-radius: 0;
+                        border-bottom-right-radius: 0;
+                    }
+                    .enter-module-btn-2 {
+                        padding: 0 2px;
+                        border-top-left-radius: 0;
+                        border-bottom-left-radius: 0;
+                    }
+                    .enter-module-btn-drop {
+                        margin-left: -4px;
+                        border-left: 1px solid #c0daff;
+                    }
                 }
             }
         }
@@ -193,7 +224,12 @@
             changeUser(user) {
                 this.addUserimg = user.userimg;
             },
-            clickAdd() {
+            dropAdd(name) {
+                if (name == 'insertbottom') {
+                    this.clickAdd(true);
+                }
+            },
+            clickAdd(insertbottom = false) {
                 let addText = this.addText.trim();
                 if ($A.count(addText) == 0 || this.loadIng > 0) {
                     return;
@@ -207,6 +243,7 @@
                         title: addText,
                         level: this.addLevel,
                         username: this.addUsername,
+                        insertbottom: insertbottom ? 1 : 0,
                     },
                     complete: () => {
                         this.loadIng--;
@@ -219,6 +256,7 @@
                             this.addText = '';
                             this.addFocus = false;
                             this.$Message.success(res.msg);
+                            res.data.insertbottom = insertbottom;
                             this.$emit('on-add-success', res.data);
                             $A.triggerTaskInfoListener('create', res.data);
                             $A.triggerTaskInfoChange(res.data.id);

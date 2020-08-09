@@ -1320,6 +1320,7 @@ class ProjectController extends Controller
      * @apiParam {Number} [labelid]             项目子分类ID
      * @apiParam {Number} [level]               任务紧急级别（1~4，默认:2）
      * @apiParam {String} [username]            任务负责人用户名（如果项目ID为空时此参数无效，负责人为自己）
+     * @apiParam {Number} [insertbottom]        是否添加至列表结尾（1：是，默认：0，仅适用于项目分类列表）
      *
      * @throws \Throwable
      */
@@ -1334,6 +1335,7 @@ class ProjectController extends Controller
         //
         $projectid = intval(Request::input('projectid'));
         $labelid = intval(Request::input('labelid'));
+        $insertbottom = intval(Request::input('insertbottom'));
         if ($projectid > 0) {
             $projectDetail = Base::DBC2A(DB::table('project_lists')->where('id', $projectid)->where('delete', 0)->first());
             if (empty($projectDetail)) {
@@ -1376,6 +1378,13 @@ class ProjectController extends Controller
         }
         //
         $level = max(1, min(4, intval(Request::input('level'))));
+        if (empty($projectid)) {
+            $inorder = 0;
+        } else {
+            $inorder = intval(DB::table('project_task')->where('projectid', $projectid)->orderBy('inorder', $insertbottom ? 'asc' : 'desc')->value('inorder')) + ($insertbottom ? -1 : 1);
+        }
+        $userorder = intval(DB::table('project_task')->where('username', $user['username'])->where('level', $level)->orderByDesc('userorder')->value('userorder')) + 1;
+        //
         $inArray = [
             'projectid' => $projectid,
             'labelid' => $labelid,
@@ -1383,8 +1392,8 @@ class ProjectController extends Controller
             'username' => $username,
             'title' => $title,
             'level' => $level,
-            'inorder' => empty($projectid) ? 0 : intval(DB::table('project_task')->where('projectid', $projectid)->orderByDesc('inorder')->value('inorder')) + 1,
-            'userorder' => intval(DB::table('project_task')->where('username', $user['username'])->where('level', $level)->orderByDesc('userorder')->value('userorder')) + 1,
+            'inorder' => $inorder,
+            'userorder' => $userorder,
             'indate' => Base::time(),
             'startdate' => Base::time(),
             'subtask' => Base::array2string([]),
