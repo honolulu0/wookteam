@@ -64,10 +64,10 @@
                 </ul>
                 <div class="detail-h2 detail-subtask-icon detail-icon">
                     <strong class="active">{{$L('子任务')}}</strong>
-                    <Tooltip class="detail-button" theme="light" :delay="300" placement="top" transfer>
-                        <div slot="content" class="project-task-detail-button-batch" @click="subtaskBatchAdd">{{$L('批量添加子任务')}}</div>
+                    <div class="detail-button">
+                        <Button class="detail-button-batch" size="small" @click="subtaskBatchAdd">{{$L('批量添加子任务')}}</Button>
                         <Button class="detail-button-btn" size="small" @click="handleTask('subtaskAdd')">{{$L('添加子任务')}}</Button>
-                    </Tooltip>
+                    </div>
                 </div>
                 <div class="detail-subtask-box">
                     <div v-if="detail.subtask.length == 0" class="detail-subtask-none" @click="handleTask('subtaskAdd')">{{$L('暂无子任务')}}</div>
@@ -471,7 +471,7 @@
                     loading: true,
                     onOk: () => {
                         if (this.inputValue) {
-                            let tempArray = this.inputValue.split(/[\s\n]/);
+                            let tempArray = this.inputValue.split(/\n/);
                             tempArray.forEach((detail) => {
                                 detail = detail.trim();
                                 detail && this.detail.subtask.push({
@@ -752,6 +752,7 @@
                 let runTime = Math.round(new Date().getTime());
                 $A.apiAjax({
                     url: 'project/task/edit',
+                    method: 'post',
                     data: ajaxData,
                     complete: () => {
                         this.$set(this.loadData, ajaxData.act, false);
@@ -866,10 +867,6 @@
             }
         }
     }
-    .project-task-detail-button-batch {
-        font-size: 12px;
-        cursor: pointer;
-    }
 </style>
 <style lang="scss" scoped>
     .project-task-detail-window {
@@ -936,13 +933,23 @@
                         right: 12px;
                         top: 50%;
                         transform: translate(0, -50%);
-                        .detail-button-btn {
+                        &:hover {
+                            .detail-button-batch {
+                                display: inline-block;
+                            }
+                        }
+                        .detail-button-btn,
+                        .detail-button-batch {
                             font-size: 12px;
                             opacity: 0.5;
                             transition: all 0.3s;
+                            margin-left: 3px;
                             &:hover {
                                 opacity: 1;
                             }
+                        }
+                        .detail-button-batch {
+                            display: none;
                         }
                     }
                 }

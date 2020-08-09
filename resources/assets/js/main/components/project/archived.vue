@@ -119,6 +119,7 @@
                                     onOk: () => {
                                         $A.apiAjax({
                                             url: 'project/task/edit',
+                                            method: 'post',
                                             data: {
                                                 act: 'unarchived',
                                                 taskid: params.row.id,

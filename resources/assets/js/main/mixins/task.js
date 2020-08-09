@@ -8,6 +8,7 @@ export default {
             this.$set(taskDetail, 'complete', !!complete);
             $A.apiAjax({
                 url: 'project/task/edit',
+                method: 'post',
                 data: {
                     act: complete ? 'complete' : 'unfinished',
                     taskid: taskDetail.id,

@@ -129,7 +129,12 @@
             getData() {
                 this.loadIng++;
                 $A.apiAjax({
-                    url: 'report/template?id=' + this.id + '&type=' + this.type,
+                    url: 'report/template',
+                    method: 'post',
+                    data: {
+                        id: this.id,
+                        type: this.type,
+                    },
                     complete: () => {
                         this.loadIng--;
                     },
@@ -144,11 +149,14 @@
             handleSubmit(send = false) {
                 this.loadIng++;
                 $A.apiAjax({
-                    url: 'report/template?act=submit&id=' + this.id + '&type=' + this.type + '&send=' + (send === true ? 1 : 0),
+                    url: 'report/template',
                     method: 'post',
-                    data: {
-                        D: this.dataDetail
-                    },
+                    data: Object.assign(this.dataDetail, {
+                        act: 'submit',
+                        id: this.id,
+                        type: this.type,
+                        send: (send === true ? 1 : 0),
+                    }),
                     complete: () => {
                         this.loadIng--;
                     },

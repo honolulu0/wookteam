@@ -751,11 +751,12 @@
                     case "save":
                         this.bakContent = $A.jsonStringify(this.docContent);
                         $A.apiAjax({
-                            url: 'docs/section/save?id=' + this.getSid(),
+                            url: 'docs/section/save',
                             method: 'post',
-                            data: {
-                                D: Object.assign(this.docDetail, {content: this.bakContent})
-                            },
+                            data: Object.assign(this.docDetail, {
+                                id: this.getSid(),
+                                content: this.bakContent
+                            }),
                             error: () => {
                                 this.bakContent = '';
                                 alert(this.$L('网络繁忙，保存失败！'));

@@ -1429,7 +1429,7 @@ class ProjectController extends Controller
     }
 
     /**
-     * 项目任务-修改
+     * {post} 项目任务-修改
      *
      * @apiParam {Number} taskid            任务ID
      * @apiParam {String} act               修改字段|操作类型
@@ -1460,8 +1460,8 @@ class ProjectController extends Controller
             $user = $user['data'];
         }
         //
-        $act = trim(Request::input('act'));
-        $taskid = intval(Request::input('taskid'));
+        $act = trim(Base::getPostValue('act'));
+        $taskid = intval(Base::getPostValue('taskid'));
         $task = Base::DBC2A(DB::table('project_task')
             ->where([
                 ['delete', '=', 0],
@@ -1512,7 +1512,7 @@ class ProjectController extends Controller
             }
         }
         //
-        $content = Base::newTrim(Request::input('content'));
+        $content = Base::newTrim(Base::getPostValue('content'));
         $message = "";
         $upArray = [];
         $logArray = [];
@@ -1930,7 +1930,7 @@ class ProjectController extends Controller
              */
             case 'subtask': {
                 if (!is_array($content)) {
-                    return Base::retError('参数错误！');
+                    $content = [];
                 }
                 $content = Base::array2string($content);
                 if ($content == $task['subtask']) {

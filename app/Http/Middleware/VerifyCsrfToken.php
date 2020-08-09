@@ -18,6 +18,9 @@ class VerifyCsrfToken extends Middleware
         //上传项目文件
         'api/project/files/upload/',
 
+        //修改项目任务
+        'api/project/task/edit/',
+
         //汇报提交
         'api/report/template/',
 

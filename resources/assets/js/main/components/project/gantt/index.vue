@@ -531,6 +531,7 @@
                         };
                         $A.apiAjax({
                             url: 'project/task/edit',
+                            method: 'post',
                             data: ajaxData,
                             error: () => {
                                 this.items[item.id].time = item.backTime;

@@ -39,7 +39,7 @@ class ReportController extends Controller
     }
 
     /**
-     * 获取模板、保存、发送、删除
+     * {post} 获取模板、保存、发送、删除
      *
      * @apiParam {String} type           类型
      * - 日报
@@ -65,9 +65,9 @@ class ReportController extends Controller
             $user = $user['data'];
         }
         //
-        $id = intval(Request::input('id'));
-        $act = trim(Request::input('act'));
-        $type = trim(Request::input('type'));
+        $id = intval(Base::getPostValue('id'));
+        $act = trim(Base::getPostValue('act'));
+        $type = trim(Base::getPostValue('type'));
         if (!in_array($type, ['日报', '周报'])) {
             return Base::retError('参数错误！');
         }
@@ -130,14 +130,13 @@ class ReportController extends Controller
             DB::table('report_content')->where('rid', $reportDetail['id'])->delete();
             return Base::retSuccess('删除成功！');
         } elseif ($act == 'submit') {
-            $D = Base::getContentsParse('D');
-            if (mb_strlen($D['title']) < 2 || mb_strlen($D['title']) > 100) {
+            if (mb_strlen(Base::getPostValue('title')) < 2 || mb_strlen(Base::getPostValue('title')) > 100) {
                 return Base::retError('标题限制2-100个字！');
             }
             if (empty($reportDetail)) {
                 DB::table('report_lists')->insert([
                     'username' => $user['username'],
-                    'title' => $D['title'],
+                    'title' => Base::getPostValue('title'),
                     'type' => $type,
                     'status' => '未发送',
                     'date' => $type=='日报'?date("Ymd"):date("W"),
@@ -149,14 +148,14 @@ class ReportController extends Controller
                 return Base::retError('系统繁忙，请稍后再试！');
             }
             //
-            $D['ccuser'] = explode(",", $D['ccuser']);
-            $send = $reportDetail['status'] == '已发送' ? 1 : intval(Request::input('send'));
+            $ccuserArr = explode(",", Base::getPostValue('ccuser'));
+            $send = $reportDetail['status'] == '已发送' ? 1 : intval(Base::getPostValue('send'));
             $ccuserAgain = $reportDetail['status'] == '已发送';
             if ($send) {
                 DB::table('report_ccuser')->where(['rid' => $reportDetail['id']])->update(['cc' => 0]);
-                foreach ($D['ccuser'] AS $ck => $cuser) {
+                foreach ($ccuserArr AS $ck => $cuser) {
                     if (!$cuser) {
-                        unset($D['ccuser'][$ck]);
+                        unset($ccuserArr[$ck]);
                         continue;
                     }
                     DB::table('report_ccuser')->updateOrInsert(['rid' => $reportDetail['id'], 'username' => $cuser], ['cc' => 1]);
@@ -165,17 +164,17 @@ class ReportController extends Controller
             }
             //
             DB::table('report_lists')->where('id', $reportDetail['id'])->update([
-                'title' => $D['title'],
+                'title' => Base::getPostValue('title'),
                 'status' => $send ? '已发送' : '未发送',
-                'ccuser' => Base::array2string($D['ccuser'])
+                'ccuser' => Base::array2string($ccuserArr)
             ]);
-            DB::table('report_content')->updateOrInsert(['rid' => $reportDetail['id']], ['content' => $D['content']]);
+            DB::table('report_content')->updateOrInsert(['rid' => $reportDetail['id']], ['content' => Base::getPostValue('content')]);
             //
             $reportDetail = array_merge($reportDetail, [
                 'ccuserAgain' => $ccuserAgain,
-                'ccuser' => $D['ccuser'],
-                'title' => $D['title'],
-                'content' => $D['content'],
+                'ccuser' => $ccuserArr,
+                'title' => Base::getPostValue('title'),
+                'content' => Base::getPostValue('content'),
             ]);
         }
         if (empty($reportDetail)) {

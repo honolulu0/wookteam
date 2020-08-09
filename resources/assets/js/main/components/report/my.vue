@@ -259,7 +259,13 @@
                     loading: true,
                     onOk: () => {
                         $A.apiAjax({
-                            url: 'report/template?act=send&id=' + row.id + '&type=' + row.type,
+                            url: 'report/template',
+                            method: 'post',
+                            data: {
+                                act: 'send',
+                                id: row.id,
+                                type: row.type,
+                            },
                             error: () => {
                                 this.$Modal.remove();
                                 alert(this.$L('网络繁忙，请稍后再试！'));
@@ -306,7 +312,13 @@
                     loading: true,
                     onOk: () => {
                         $A.apiAjax({
-                            url: 'report/template?act=delete&id=' + row.id + '&type=' + row.type,
+                            url: 'report/template',
+                            method: 'post',
+                            data: {
+                                act: 'delete',
+                                id: row.id,
+                                type: row.type,
+                            },
                             error: () => {
                                 this.$Modal.remove();
                                 alert(this.$L('网络繁忙，请稍后再试！'));

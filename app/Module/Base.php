@@ -1781,9 +1781,30 @@ class Base
     {
         parse_str(Request::getContent(), $input);
         if ($key) {
-            $input = isset($input[$key])?$input[$key]:array();
+            $input = isset($input[$key]) ? $input[$key] : array();
         }
-        return is_array($input)?$input:array($input);
+        return is_array($input) ? $input : array($input);
+    }
+
+    /**
+     * php://input 字符串解析到变量并获取指定值
+     * @param $key
+     * @param null $default
+     * @return mixed|null
+     */
+    public static function getContentValue($key, $default = null)
+    {
+        global $_A;
+        if (!isset($_A["__static_input_content"])) {
+            parse_str(Request::getContent(), $input);
+            $_A["__static_input_content"] = $input;
+        }
+        return isset($_A["__static_input_content"][$key]) ? $_A["__static_input_content"][$key] : $default;
+    }
+
+    public static function getPostValue($key, $default = null)
+    {
+        return self::getContentValue($key, $default);
     }
 
     /**

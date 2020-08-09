@@ -565,7 +565,7 @@ class DocsController extends Controller
     }
 
     /**
-     * 保存章节内容
+     * {post} 保存章节内容
      *
      * @apiParam {Number} id                章节数据ID
      * @apiParam {Object} [D]               Request Payload 提交
@@ -580,7 +580,7 @@ class DocsController extends Controller
             $user = $user['data'];
         }
         //
-        $id = intval(Request::input('id'));
+        $id = intval(Base::getPostValue('id'));
         $row = Base::DBC2A(DB::table('docs_section')->where('id', $id)->first());
         if (empty($row)) {
             return Base::retError('文档不存在或已被删除！');
@@ -592,9 +592,9 @@ class DocsController extends Controller
         if ($row['lockdate'] + 60 > Base::time() && $row['lockname'] != $user['username']) {
             return Base::retError(['已被会员【%】锁定！', Users::nickname($row['lockname'])]);
         }
-        $D = Base::getContentsParse('D');
+        $content = Base::getPostValue('content');
         if ($row['type'] == 'document') {
-            $data = Base::json2array($D['content']);
+            $data = Base::json2array($content);
             $isRep = false;
             preg_match_all("/<img\s*src=\"data:image\/(png|jpg|jpeg);base64,(.*?)\"/s", $data['content'], $matchs);
             foreach ($matchs[2] as $key => $text) {
@@ -608,13 +608,13 @@ class DocsController extends Controller
                 }
             }
             if ($isRep == true) {
-                $D['content'] = Base::array2json($data);
+                $content = Base::array2json($data);
             }
         }
         DB::table('docs_content')->insert([
             'bookid' => $row['bookid'],
             'sid' => $id,
-            'content' => $D['content'],
+            'content' => $content,
             'username' => $user['username'],
             'indate' => Base::time()
         ]);
