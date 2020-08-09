@@ -489,5 +489,8 @@ export default {
     "子任务描述...": "Subtask description...",
     "添加子任务": "Add subtasks",
     "项目信息": "Project information",
-    "项目简介": "Project introduction"
+    "项目简介": "Project introduction",
+    "使用换行添加多个子任务": "Add multiple subtasks using line feeds",
+    "批量添加子任务": "Batch add subtasks",
+    "添加至列表结尾": "Add to the end of the list",
 }

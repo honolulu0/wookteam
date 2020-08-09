@@ -64,7 +64,10 @@
                 </ul>
                 <div class="detail-h2 detail-subtask-icon detail-icon">
                     <strong class="active">{{$L('子任务')}}</strong>
-                    <Button class="detail-button" size="small" @click="handleTask('subtaskAdd')">{{$L('添加子任务')}}</Button>
+                    <Tooltip class="detail-button" theme="light" :delay="300" placement="top" transfer>
+                        <div slot="content" class="project-task-detail-button-batch" @click="subtaskBatchAdd">{{$L('批量添加子任务')}}</div>
+                        <Button class="detail-button-btn" size="small" @click="handleTask('subtaskAdd')">{{$L('添加子任务')}}</Button>
+                    </Tooltip>
                 </div>
                 <div class="detail-subtask-box">
                     <div v-if="detail.subtask.length == 0" class="detail-subtask-none" @click="handleTask('subtaskAdd')">{{$L('暂无子任务')}}</div>
@@ -436,6 +439,59 @@
                 });
             },
 
+            subtaskBatchAdd() {
+                this.inputValue = "";
+                this.$Modal.confirm({
+                    width: 560,
+                    render: (h) => {
+                        return h('div', [
+                            h('div', {
+                                style: {
+                                    fontSize: '16px',
+                                    fontWeight: '500',
+                                    marginBottom: '20px',
+                                }
+                            }, this.$L('批量添加子任务')),
+                            h('Input', {
+                                props: {
+                                    type: 'textarea',
+                                    rows: 4,
+                                    autosize: {minRows: 4, maxRows: 30},
+                                    value: this.inputValue,
+                                    placeholder: this.$L('使用换行添加多个子任务')
+                                },
+                                on: {
+                                    input: (val) => {
+                                        this.inputValue = val;
+                                    }
+                                }
+                            })
+                        ])
+                    },
+                    loading: true,
+                    onOk: () => {
+                        if (this.inputValue) {
+                            let tempArray = this.inputValue.split(/[\s\n]/);
+                            tempArray.forEach((detail) => {
+                                detail = detail.trim();
+                                detail && this.detail.subtask.push({
+                                    id: $A.randomString(6),
+                                    uname: $A.getUserName(),
+                                    time: Math.round(new Date().getTime()/1000),
+                                    status: 'unfinished',
+                                    detail: detail
+                                });
+                            });
+                            this.handleTask('subtask', () => {
+                                this.$Modal.remove();
+                            });
+                        } else {
+                            this.$Modal.remove();
+                        }
+                    },
+                });
+            },
+
             handleTask(act, eve) {
                 if (!!this.loadData[act]) {
                     this.$Message.info(this.$L('请稍候...'));
@@ -515,6 +571,7 @@
                             if (res !== 1) {
                                 this.$set(this.detail, act, cloneDeep(this.bakData[act]));
                             }
+                            typeof eve === "function" && eve(res);
                         };
                         break;
 
@@ -809,6 +866,10 @@
             }
         }
     }
+    .project-task-detail-button-batch {
+        font-size: 12px;
+        cursor: pointer;
+    }
 </style>
 <style lang="scss" scoped>
     .project-task-detail-window {
@@ -874,12 +935,14 @@
                         position: absolute;
                         right: 12px;
                         top: 50%;
-                        font-size: 12px;
                         transform: translate(0, -50%);
-                        opacity: 0.5;
-                        transition: all 0.3s;
-                        &:hover {
-                            opacity: 1;
+                        .detail-button-btn {
+                            font-size: 12px;
+                            opacity: 0.5;
+                            transition: all 0.3s;
+                            &:hover {
+                                opacity: 1;
+                            }
                         }
                     }
                 }
