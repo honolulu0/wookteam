@@ -437,9 +437,7 @@
                 this.tabActive = this.$route.meta.tabActive;
                 this.systemDrawerShow = false;
                 this.userDrawerShow = false;
-                if ($A.urlParameter("open") === 'chat' && $A.getToken() !== false) {
-                    this.chatDrawerShow = true;
-                }
+                this.chatDrawerShow = $A.urlParameter("open") === 'chat' && $A.getToken() !== false;
             }
         },
         methods: {
