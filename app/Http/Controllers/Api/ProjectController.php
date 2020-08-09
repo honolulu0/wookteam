@@ -1115,21 +1115,21 @@ class ProjectController extends Controller
         }
         //
         $taskid = intval(Request::input('taskid'));
-        $isowner = false;
+        $isOwner = false;
         if ($taskid > 0) {
             $taskDetail = Base::DBC2A(DB::table('project_task')->where('id', $taskid)->first());
             if (empty($taskDetail)) {
                 return Base::retError('任务不存在！');
             }
             if ($taskDetail['username'] == $user['username']) {
-                $isowner = true;
+                $isOwner = true;
             }
             $projectid = $taskDetail['projectid'];
         } else {
             $projectid = intval(Request::input('projectid'));
         }
         //
-        if ($projectid > 0 && !$isowner) {
+        if ($projectid > 0 && !$isOwner) {
             $inRes = Project::inThe($projectid, $user['username']);
             if (Base::isError($inRes)) {
                 return $inRes;
@@ -1463,9 +1463,11 @@ class ProjectController extends Controller
             return Base::retError('任务不存在！');
         }
         if ($task['projectid'] > 0) {
-            $inRes = Project::inThe($task['projectid'], $user['username']);
-            if (Base::isError($inRes)) {
-                return $inRes;
+            if ($task['username'] != $user['username']) {
+                $inRes = Project::inThe($task['projectid'], $user['username']);
+                if (Base::isError($inRes)) {
+                    return $inRes;
+                }
             }
             if (!in_array($act, ['comment', 'attention'])) {
                 $checkRole = Project::role('edit_role', $task['projectid'], $task['id']);
