@@ -73,37 +73,46 @@
                     <div v-if="detail.subtask.length == 0" class="detail-subtask-none" @click="handleTask('subtaskAdd')">{{$L('暂无子任务')}}</div>
                     <div v-else>
                         <Progress class="detail-subtask-progress" :percent="subtaskProgress" :stroke-width="5" status="active" />
-                        <div v-for="(subitem, subindex) in detail.subtask" :key="subindex" :data-id="subitem.id" class="detail-subtask-item">
-                            <Checkbox v-model="subitem.status"
-                                      true-value="complete"
-                                      false-value="unfinished"
-                                      @on-change="handleTask('subtaskBlur')"></Checkbox>
-                            <Input v-model="subitem.detail"
-                                   type="textarea"
-                                   class="detail-subtask-input"
-                                   :readonly="subitem.status=='complete'"
-                                   :ref="`subtaskInput_${subindex}`"
-                                   :class="{'subtask-complete':subitem.status=='complete'}"
-                                   :rows="1"
-                                   :autosize="{minRows:1,maxRows:5}"
-                                   maxlength="255"
-                                   :placeholder="$L('子任务描述...')"
-                                   @on-keydown="subtaskKeydown(subindex, $event)"
-                                   @on-blur="handleTask('subtaskBlur')"/>
-                            <div v-if="subitem.detail==''" class="detail-subtask-delete">
-                                <Icon type="md-trash" @click="handleTask('subtaskDelete', subindex)"/>
+                        <draggable
+                            v-model="detail.subtask"
+                            draggable=".detail-subtask-item"
+                            handle=".detail-subtask-rmenu"
+                            :animation="150"
+                            @sort="handleTask('subtaskBlur')">
+                            <div v-for="(subitem, subindex) in detail.subtask" :key="subindex" :data-id="subitem.id" class="detail-subtask-item">
+                                <Checkbox v-model="subitem.status"
+                                          true-value="complete"
+                                          false-value="unfinished"
+                                          @on-change="handleTask('subtaskBlur')"></Checkbox>
+                                <Input v-model="subitem.detail"
+                                       type="textarea"
+                                       class="detail-subtask-input"
+                                       :readonly="subitem.status=='complete'"
+                                       :ref="`subtaskInput_${subindex}`"
+                                       :class="{'subtask-complete':subitem.status=='complete'}"
+                                       :rows="1"
+                                       :autosize="{minRows:1,maxRows:5}"
+                                       maxlength="255"
+                                       :placeholder="$L('子任务描述...')"
+                                       @on-keydown="subtaskKeydown(subindex, $event)"
+                                       @on-blur="handleTask('subtaskBlur')"/>
+                                <div class="detail-subtask-right" :style="subitem.showPoptip===true?{opacity:1}:{}">
+                                    <Icon type="md-menu" class="detail-subtask-ricon detail-subtask-rmenu"/>
+                                    <div v-if="subitem.detail==''" class="detail-subtask-ricon">
+                                        <Icon type="md-trash" @click="handleTask('subtaskDelete', subindex)"/>
+                                    </div>
+                                    <Poptip
+                                        v-else
+                                        class="detail-subtask-ricon"
+                                        transfer
+                                        confirm
+                                        :title="$L('你确定你要删除这个子任务吗?')"
+                                        @on-ok="handleTask('subtaskDelete', subindex)"
+                                        @on-popper-show="$set(subitem, 'showPoptip', true)"
+                                        @on-popper-hide="$set(subitem, 'showPoptip', false)"><Icon type="md-trash" /></Poptip>
+                                </div>
                             </div>
-                            <Poptip
-                                v-else
-                                class="detail-subtask-delete"
-                                transfer
-                                confirm
-                                :title="$L('你确定你要删除这个子任务吗?')"
-                                :style="subitem.showPoptip===true?{opacity:1}:{}"
-                                @on-ok="handleTask('subtaskDelete', subindex)"
-                                @on-popper-show="$set(subitem, 'showPoptip', true)"
-                                @on-popper-hide="$set(subitem, 'showPoptip', false)"><Icon type="md-trash" /></Poptip>
-                        </div>
+                        </draggable>
                     </div>
                 </div>
                 <div :style="`${detail.filenum>0?'':'display:none'}`">
@@ -189,10 +198,11 @@
 <script>
     import ProjectTaskLogs from "../logs";
     import ProjectTaskFiles from "../files";
+    import draggable from 'vuedraggable'
     import cloneDeep from "lodash/cloneDeep";
 
     export default {
-        components: {ProjectTaskFiles, ProjectTaskLogs},
+        components: {ProjectTaskFiles, ProjectTaskLogs, draggable},
         data() {
             return {
                 taskid: 0,
@@ -1085,6 +1095,7 @@
                 }
                 .detail-subtask-box {
                     padding: 12px;
+                    margin-bottom: 4px;
                     .detail-subtask-progress {
                         margin: 2px 0 6px;
                     }
@@ -1092,28 +1103,39 @@
                         display: flex;
                         flex-direction: row;
                         align-items: center;
-                        margin: 4px 2px;
+                        margin: 0 2px 0 -6px;
+                        padding-top: 4px;
+                        padding-left: 8px;
                         position: relative;
+                        background-color: #ffffff;
                         &:hover {
-                            .detail-subtask-delete {
+                            .detail-subtask-right {
                                 opacity: 1;
                             }
                         }
-                        .detail-subtask-delete {
+                        .detail-subtask-right {
                             opacity: 0;
                             position: absolute;
                             top: 50%;
                             right: 0;
+                            padding: 0 6px;
                             transform: translate(0, -50%);
-                            width: 28px;
-                            height: 28px;
-                            line-height: 28px;
-                            font-size: 16px;
-                            text-align: center;
-                            cursor: pointer;
                             background: #ffffff;
-                            border-radius: 2px 0 0 2px;
+                            border-radius: 3px 0 0 3px;
                             transition: all 0.3s;
+                            cursor: pointer;
+                            box-shadow: -3px 0px 3px 0px rgba(45, 45, 45, 0.1);
+                            .detail-subtask-ricon {
+                                &:hover {
+                                    opacity: 1;
+                                }
+                                opacity: 0.9;
+                                width: 18px;
+                                height: 26px;
+                                line-height: 26px;
+                                font-size: 16px;
+                                text-align: center;
+                            }
                         }
                     }
                     .detail-subtask-none {
