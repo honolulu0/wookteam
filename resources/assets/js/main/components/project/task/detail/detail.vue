@@ -101,8 +101,7 @@
                                     <div v-if="subitem.detail==''" class="detail-subtask-ricon">
                                         <Icon type="md-trash" @click="handleTask('subtaskDelete', subindex)"/>
                                     </div>
-                                    <Poptip
-                                        v-else
+                                    <Poptip v-else
                                         class="detail-subtask-ricon"
                                         transfer
                                         confirm
@@ -1129,6 +1128,7 @@
                                 &:hover {
                                     opacity: 1;
                                 }
+                                display: inline-block;
                                 opacity: 0.9;
                                 width: 18px;
                                 height: 26px;
