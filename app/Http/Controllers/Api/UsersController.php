@@ -351,7 +351,7 @@ class UsersController extends Controller
             }
         }
         //
-        $lists = DB::table('users')->where($whereArray)->select(['id', 'identity', 'username', 'nickname', 'userimg', 'profession', 'regdate'])->orderByRaw($orderBy)->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+        $lists = DB::table('users')->where($whereArray)->select(['id', 'identity', 'username', 'nickname', 'userimg', 'profession', 'regdate'])->orderByRaw($orderBy)->paginate(Base::getPaginate(100, 10));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的团队成员');

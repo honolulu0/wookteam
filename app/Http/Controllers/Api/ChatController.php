@@ -114,6 +114,8 @@ class ChatController extends Controller
      * 消息列表
      *
      * @apiParam {String} username             用户名
+     * @apiParam {Number} [page]               当前页，默认:1
+     * @apiParam {Number} [pagesize]           每页显示数量，默认:20，最大:100
      */
     public function message__lists()
     {
@@ -139,7 +141,7 @@ class ChatController extends Controller
             ->where($whereArray)
             ->orderByDesc('indate')
             ->orderByDesc('id')
-            ->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+            ->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists, false);
         //
         foreach ($lists['lists'] AS $key => $item) {

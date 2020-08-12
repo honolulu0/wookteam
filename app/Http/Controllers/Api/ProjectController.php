@@ -67,7 +67,7 @@ class ProjectController extends Controller
             ->join('project_users', 'project_lists.id', '=', 'project_users.projectid')
             ->select(['project_lists.*', 'project_users.isowner', 'project_users.indate as uindate'])
             ->where($whereArray)
-            ->orderByDesc('project_lists.id')->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+            ->orderByDesc('project_lists.id')->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的项目');
@@ -791,7 +791,7 @@ class ProjectController extends Controller
                 ['project_lists.delete', 0],
                 ['project_users.type', '成员'],
             ])
-            ->orderByDesc('project_users.isowner')->orderByDesc('project_users.id')->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+            ->orderByDesc('project_users.isowner')->orderByDesc('project_users.id')->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的成员');
@@ -1248,7 +1248,7 @@ class ProjectController extends Controller
         $lists = $builder->select($selectArray)
             ->where($whereArray)
             ->orderByRaw($orderBy)
-            ->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+            ->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists, $taskid > 0 ? false : true);
         if (intval(Request::input('statistics')) == 1) {
             $lists['statistics_unfinished'] = $type === '未完成' ? $lists['total'] : DB::table('project_task')->where('projectid', $projectid)->where('delete', 0)->where('archived', 0)->where('complete', 0)->count();
@@ -2035,7 +2035,7 @@ class ProjectController extends Controller
                     ['taskid', '=', $taskid],
                     ['indate', '>', Base::time() - 60]
                 ])
-                ->orderBy('id')->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+                ->orderBy('id')->paginate(Base::getPaginate(100, 20));
             $lists = Base::getPageList($lists, false);
             if (count($lists['lists']) == 0) {
                 return Base::retError('no lists');
@@ -2137,7 +2137,7 @@ class ProjectController extends Controller
         //
         $lists = DB::table('project_files')
             ->where($whereArray)
-            ->orderByRaw($orderBy)->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+            ->orderByRaw($orderBy)->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的文件', $lists);
@@ -2453,7 +2453,7 @@ class ProjectController extends Controller
         $lists = DB::table('project_log')
             ->where($whereArray)
             ->where($whereFunc)
-            ->orderByDesc('indate')->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+            ->orderByDesc('indate')->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的记录', $lists);

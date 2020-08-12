@@ -59,7 +59,7 @@ class DocsController extends Controller
                 });
             })
             ->orderByDesc('id')
-            ->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+            ->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('暂无知识库', $lists);
@@ -226,7 +226,7 @@ class DocsController extends Controller
             ->where([
                 ['docs_book.id', $id],
             ])
-            ->orderByDesc('docs_users.id')->paginate(Min(Max(Base::nullShow(Request::input('pagesize'), 10), 1), 100));
+            ->orderByDesc('docs_users.id')->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的成员');

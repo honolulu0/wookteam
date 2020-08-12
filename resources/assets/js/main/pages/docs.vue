@@ -26,7 +26,9 @@
                                 <div class="docs-title">{{book.title}}</div>
                                 <div class="docs-time">{{$A.formatDate("Y-m-d H:i:s", book.indate)}}</div>
                             </li>
-                            <li v-if="bookLists.length == 0" class="none">{{bookNoDataText}}</li>
+                            <li v-if="bookHasMorePages" class="more" @click="getBookLists">{{$L('加载下一页...')}}</li>
+                            <li v-else-if="bookLoading" class="load"><WLoading/></li>
+                            <li v-else-if="bookLists.length == 0" class="none">{{bookNoDataText}}</li>
                         </ul>
                     </div>
                     <div class="docs-container">
@@ -137,6 +139,19 @@
                         li {
                             padding: 12px;
                             cursor: pointer;
+                            &.more {
+                                text-align: center;
+                                color: #555555;
+                                margin-bottom: 6px;
+                                &:hover {
+                                    color: #333333;
+                                }
+                            }
+                            &.load {
+                                text-align: center;
+                                height: 42px;
+                                margin-bottom: 9px;
+                            }
                             &.none {
                                 background-color: transparent;
                                 text-align: center;
@@ -226,6 +241,8 @@
                 bookLists: [],
                 bookListPage: 1,
                 bookListTotal: 0,
+                bookLoading: false,
+                bookHasMorePages: false,
                 bookNoDataText: "",
 
                 addBookId: 0,
@@ -342,9 +359,15 @@
             getBookLists(resetLoad) {
                 if (resetLoad === true) {
                     this.bookListPage = 1;
+                } else {
+                    if (this.bookHasMorePages === false) {
+                        return;
+                    }
+                    this.bookListPage++;
                 }
-                this.loadIng++;
+                this.bookLoading = true;
                 this.bookNoDataText = this.$L("数据加载中.....");
+                this.bookHasMorePages = false;
                 $A.apiAjax({
                     url: 'docs/book/lists',
                     data: {
@@ -352,21 +375,27 @@
                         pagesize: 20,
                     },
                     complete: () => {
-                        this.loadIng--;
+                        this.bookLoading = false;
                     },
                     error: () => {
                         this.bookNoDataText = this.$L("数据加载失败！");
                     },
                     success: (res) => {
                         if (res.ret === 1) {
-                            this.bookLists = res.data.lists;
+                            res.data.lists.forEach((item) => {
+                                let find = this.bookLists.find((t)=>{return t.id==item.id});
+                                if (!find) {
+                                    this.bookLists.push(item);
+                                }
+                            });
                             this.bookListTotal = res.data.total;
                             this.bookNoDataText = this.$L("没有相关的数据");
+                            this.bookHasMorePages = res.data.hasMorePages;
                             if (typeof this.selectBookData.id === "undefined") {
                                 this.selectBookData = this.bookLists[0];
                                 this.getSectionLists();
                             }
-                        }else{
+                        } else {
                             this.bookLists = [];
                             this.bookListTotal = 0;
                             this.bookNoDataText = res.msg;
