@@ -26,6 +26,7 @@
                 <div class="detail-desc-box detail-icon">
                     <div class="detail-h2"><strong class="active">{{$L('描述')}}</strong></div>
                     <Input v-model="detail.desc"
+                           :disabled="!!loadData.desc"
                            type="textarea"
                            class="detail-desc-input"
                            ref="descInput"
@@ -213,6 +214,7 @@
 
                 bakData: {},
                 loadData: {},
+                loadRand: {},
 
                 commentText: '',
                 logType: '评论',
@@ -502,11 +504,6 @@
             },
 
             handleTask(act, eve) {
-                if (!!this.loadData[act]) {
-                    this.$Message.info(this.$L('请稍候...'));
-                    return;
-                }
-                //
                 let ajaxData = {
                     act: act,
                     taskid: this.taskid,
@@ -757,6 +754,8 @@
                     }
                 }
                 //
+                let loadRand = $A.randomString(6);
+                this.$set(this.loadRand, ajaxData.act, loadRand);
                 this.$set(this.loadData, ajaxData.act, true);
                 let runTime = Math.round(new Date().getTime());
                 $A.apiAjax({
@@ -764,13 +763,22 @@
                     method: 'post',
                     data: ajaxData,
                     complete: () => {
+                        if (this.loadRand[ajaxData.act] !== loadRand) {
+                            return;
+                        }
                         this.$set(this.loadData, ajaxData.act, false);
                     },
                     error: () => {
+                        if (this.loadRand[ajaxData.act] !== loadRand) {
+                            return;
+                        }
                         ajaxCallback(-1);
                         alert(this.$L('网络繁忙，请稍后再试！'));
                     },
                     success: (res) => {
+                        if (this.loadRand[ajaxData.act] !== loadRand) {
+                            return;
+                        }
                         runTime = Math.round(new Date().getTime()) - runTime;
                         if (res.ret === 1) {
                             let tempArray = cloneDeep(this.detail.subtask);
