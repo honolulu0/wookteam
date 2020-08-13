@@ -2460,6 +2460,9 @@ class ProjectController extends Controller
         }
         foreach ($lists['lists'] AS $key => $item) {
             $item = array_merge($item, Users::username2basic($item['username']));
+            if (empty($item['userimg'])) {
+                $item['userimg'] = Users::userimg($item['userimg']);
+            }
             $item['timeData'] = [
                 'ymd' => date(date("Y", $item['indate']) == date("Y", Base::time()) ? "m-d" : "Y-m-d", $item['indate']),
                 'hi' => date("h:i", $item['indate']) ,
