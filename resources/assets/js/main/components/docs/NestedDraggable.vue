@@ -82,7 +82,9 @@
                 border-bottom: dashed 1px #eee;
             }
             .header {
-                display: inline-block;
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
                 position: relative;
                 background: #fff;
                 padding: 0 8px;
@@ -102,8 +104,9 @@
                     display: inline-block;
                     border-bottom: 1px solid transparent;
                     cursor: pointer;
-                    padding: 0 3px;
+                    padding: 0 3px 0 7px;
                     color: #555555;
+                    word-break: break-all;
                     &.active {
                         color: #0396f2;
                     }
