@@ -352,33 +352,40 @@
             }, false);
             //
             $A.setOnTaskInfoListener('pages/project',(act, detail) => {
+                let item = this.lists.find((item) => { return item.id == detail.projectid });
+                if (!item) {
+                    return;
+                }
                 switch (act) {
                     case 'deleteproject':   // 删除项目
                     case 'deletelabel':     // 删除分类
-                        this.lists.some((item) => {
-                            if (item.id == detail.projectid) {
-                                this.getLists(true);
-                                return true;
-                            }
-                        });
+                        this.getLists(true);
+                        break;
+                    case "create":          // 创建任务
+                        item.unfinished++;
+                        break;
+                    case "delete":          // 删除任务
+                    case "archived":        // 归档
+                        if (detail.complete) {
+                            item.complete--;
+                        } else {
+                            item.unfinished--;
+                        }
+                        break;
+                    case "unarchived":      // 取消归档
+                        if (detail.complete) {
+                            item.complete++;
+                        } else {
+                            item.unfinished++;
+                        }
                         break;
                     case "complete":        // 标记完成
-                        this.lists.some((item) => {
-                            if (item.id == detail.projectid) {
-                                item.complete++;
-                                item.unfinished--;
-                                return true;
-                            }
-                        });
+                        item.complete++;
+                        item.unfinished--;
                         break;
                     case "unfinished":      // 标记未完成
-                        this.lists.some((item) => {
-                            if (item.id == detail.projectid) {
-                                item.complete--;
-                                item.unfinished++;
-                                return true;
-                            }
-                        });
+                        item.complete--;
+                        item.unfinished++;
                         break;
                 }
             }, true);
