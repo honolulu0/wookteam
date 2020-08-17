@@ -5,17 +5,17 @@
             <li class="self">
                 <img :src="userInfo.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
             </li>
-            <li :class="{active:chatTap=='dialog'}" @click="chatTap='dialog'">
+            <li :class="{active:chatTap=='dialog'}" @click="[chatTap='dialog',chatTam='dialog']">
                 <Icon type="md-text" />
                 <em v-if="unreadTotal > 0" class="chat-num">{{unreadTotal > 99 ? '99+' : unreadTotal}}</em>
             </li>
-            <li :class="{active:chatTap=='team'}" @click="chatTap='team'">
+            <li :class="{active:chatTap=='team'}" @click="[chatTap='team',chatTam='team']">
                 <Icon type="md-person" />
             </li>
         </ul>
 
         <!--对话列表-->
-        <ul class="chat-user" :style="{display:chatTap=='dialog'?'flex':'none'}">
+        <ul class="chat-user" :class="{'chat-flex':chatTap=='dialog','chat-tam':chatTam=='dialog'}">
             <li class="sreach">
                 <Input :placeholder="$L('搜索')" prefix="ios-search" v-model="dialogSearch"/>
             </li>
@@ -43,7 +43,7 @@
         </ul>
 
         <!--联系人列表-->
-        <ul class="chat-team" :style="{display:chatTap=='team'?'flex':'none'}">
+        <ul class="chat-team" :class="{'chat-flex':chatTap=='team','chat-tam':chatTam=='team'}">
             <li class="sreach">
                 <Input :placeholder="$L('搜索')" prefix="ios-search" v-model="teamSearch"/>
             </li>
@@ -263,7 +263,7 @@
             }
         }
         .chat-user {
-            display: flex;
+            display: none;
             flex-direction: column;
             width: 248px;
             height: 100%;
@@ -380,7 +380,7 @@
             }
         }
         .chat-team {
-            display: flex;
+            display: none;
             flex-direction: column;
             width: 248px;
             height: 100%;
@@ -743,6 +743,56 @@
             height: 0;
             display: none;
         }
+        .chat-flex {
+            display: flex;
+        }
+        @media (max-width: 768px) {
+            .chat-menu {
+                width: 50px;
+                li {
+                    padding: 6px 0;
+                    margin: 6px 0;
+                    font-size: 24px;
+                    &.self {
+                        img {
+                            width: 32px;
+                            height: 32px;
+                        }
+                    }
+                }
+            }
+            .chat-user,
+            .chat-team {
+                display: none;
+                position: absolute;
+                left: 50px;
+                right: 0;
+                z-index: 2;
+                width: auto;
+                > li {
+                    &.sreach {
+                        height: 54px;
+                    }
+                }
+                &.chat-tam {
+                    display: flex;
+                }
+            }
+            .chat-message {
+                .manage-title {
+                    height: 54px;
+                    line-height: 54px;
+                    .manage-title-right {
+                        width: 54px;
+                        height: 54px;
+                        line-height: 54px;
+                    }
+                }
+                .manage-lists {
+                    top: 54px;
+                }
+            }
+        }
     }
 </style>
 
@@ -774,6 +824,7 @@
                 userInfo: {},
 
                 chatTap: 'dialog',
+                chatTam: 'dialog',
 
                 messageAudio: window.location.origin + '/audio/',
 
@@ -1231,6 +1282,7 @@
                     }
                 }
                 this.chatTap = 'dialog';
+                this.chatTam = '';
                 this.dialogTarget = user;
                 if (typeof user.unread === "number" && user.unread > 0) {
                     this.unreadTotal -= user.unread;

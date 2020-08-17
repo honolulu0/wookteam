@@ -174,6 +174,11 @@
             line-height: 58px;
             text-align: center;
             cursor: pointer;
+            @media (max-width: 768px) {
+                width: 50px;
+                height: 50px;
+                line-height: 50px;
+            }
             > i {
                 transition: all 0.2s;
             }
