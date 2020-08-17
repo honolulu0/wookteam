@@ -171,7 +171,6 @@
                     "end": $A.formatDate('Y-m-d H:i:s', enddate),
                     "title": title,
                     "color": color,
-                    "avatar": taskData.userimg,
                     "name": taskData.nickname || taskData.username
                 };
                 if (this.isShowImg(taskData.userimg)) {
