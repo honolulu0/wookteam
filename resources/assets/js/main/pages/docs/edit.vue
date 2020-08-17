@@ -25,8 +25,8 @@
                     <ul class="synch-lists" slot="content">
                         <li class="title">{{$L('正在协作会员')}}:</li>
                         <li v-for="(item, key) in synchUsersS" :key="key" @click="handleSynch(item.username)">
-                            <img class="synch-userimg" :src="item.userimg"/>
-                            <user-view class="synch-username" placement="right" :username="item.username"/>
+                            <UserImg :info="item" class="synch-userimg"/>
+                            <UserView class="synch-username" placement="right" :username="item.username"/>
                             <span v-if="item.username==userInfo.username" class="synch-self">{{$L('自己')}}</span>
                         </li>
                     </ul>
@@ -241,7 +241,9 @@
                             .synch-userimg {
                                 width: 24px;
                                 height: 24px;
-                                border-radius: 50%;
+                                font-size: 14px;
+                                line-height: 24px;
+                                border-radius: 12px;
                             }
                             .synch-self {
                                 padding: 1px 3px;
@@ -591,7 +593,7 @@
             },
             synchUsersS() {
                 return this.synchUsers.filter(item => {
-                    return item.indate + 10 > this.timeValue;
+                    return item.indate + 20 > this.timeValue;
                 });
             },
             isLock() {
@@ -624,6 +626,7 @@
                         $A.WSOB.sendTo('docs', null, {
                             type: enter === true ? 'enter' : 'refresh',
                             sid: this.sid,
+                            nickname: this.userInfo.nickname,
                             username: this.userInfo.username,
                             userimg: this.userInfo.userimg,
                             indate: Math.round(new Date().getTime() / 1000),

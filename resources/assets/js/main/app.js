@@ -16,12 +16,14 @@ import Title from '../_components/Title.vue'
 import sreachTitle from '../_components/sreachTitle.vue'
 import UserInput from './components/UserInput'
 import UserView from './components/UserView'
+import UserImg from './components/UserImg'
 import WLoading from './components/WLoading'
 
 Vue.component('VTitle', Title);
 Vue.component('sreachTitle', sreachTitle);
 Vue.component('UserInput', UserInput);
 Vue.component('UserView', UserView);
+Vue.component('UserImg', UserImg);
 Vue.component('WLoading', WLoading);
 
 import TaskDetail from './components/project/task/detail'

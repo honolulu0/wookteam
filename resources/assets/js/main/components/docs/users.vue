@@ -54,16 +54,16 @@
                 "minWidth": 60,
                 "maxWidth": 100,
                 render: (h, params) => {
-                    return h('img', {
-                        style: {
-                            width: "32px",
-                            height: "32px",
-                            verticalAlign: "middle",
-                            objectFit: "cover",
-                            borderRadius: "50%"
+                    return h('UserImg', {
+                        props: {
+                            info: params.row,
                         },
-                        attrs: {
-                            src: params.row.userimg
+                        style: {
+                            width: "30px",
+                            height: "30px",
+                            fontSize: "16px",
+                            lineHeight: "30px",
+                            borderRadius: "15px",
                         },
                     });
                 }

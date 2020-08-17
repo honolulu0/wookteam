@@ -9,10 +9,10 @@
                 </div>
                 <div class="item-right">
                     <div class="item-username" @click="clickUser">
-                        <em class="item-name"><user-view :username="info.username" placement="left"/></em>
+                        <em class="item-name"><user-view :username="userName" :info="info" placement="left"/></em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
-                    <div class="item-text" :class="{'text-error':info.error}">
+                    <div class="item-text" :class="{'text-emoji':textIsEmoji(info.text), 'text-error':info.error}">
                         <div class="item-text-view">{{textMsg(info.text)}}</div>
                     </div>
                     <template v-if="info.type==='taskB'">
@@ -26,17 +26,17 @@
                         <span>{{$L('通话时长：%', formatSecond(info.other.second))}}</span>
                     </div>
                 </div>
-                <img class="item-userimg" @click="clickUser" :src="info.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'"/>
+                <UserImg :info="info" @click="clickUser" class="item-userimg"/>
             </div>
             <div v-else-if="info.self===false" class="list-item">
-                <img class="item-userimg" @click="clickUser" :src="info.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'"/>
+                <UserImg :info="info" @click="clickUser" class="item-userimg"/>
                 <div class="item-left">
                     <div class="item-username" @click="clickUser">
-                        <em class="item-name"><user-view :username="info.username" placement="right"/></em>
+                        <em class="item-name"><user-view :username="userName" :info="info" placement="right"/></em>
                         <em v-if="info.__usertag" class="item-tag">{{info.__usertag}}</em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
-                    <div class="item-text" :class="{'text-error':info.error}">
+                    <div class="item-text" :class="{'text-emoji':textIsEmoji(info.text), 'text-error':info.error}">
                         <div class="item-text-view">{{textMsg(info.text)}}</div>
                     </div>
                     <template v-if="info.type==='taskB'">
@@ -61,20 +61,20 @@
                 </div>
                 <div class="item-right">
                     <div class="item-username" @click="clickUser">
-                        <em class="item-name"><user-view :username="info.username" placement="left"/></em>
+                        <em class="item-name"><user-view :username="userName" :info="info" placement="left"/></em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
                     <a class="item-image" :href="info.url" target="_blank">
                         <img class="item-image-view" :src="info.url"/>
                     </a>
                 </div>
-                <img class="item-userimg" @click="clickUser" :src="info.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'"/>
+                <UserImg :info="info" @click="clickUser" class="item-userimg"/>
             </div>
             <div v-else-if="info.self===false" class="list-item">
-                <img class="item-userimg" @click="clickUser" :src="info.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'"/>
+                <UserImg :info="info" @click="clickUser" class="item-userimg"/>
                 <div class="item-left">
                     <div class="item-username" @click="clickUser">
-                        <em class="item-name"><user-view :username="info.username" placement="right"/></em>
+                        <em class="item-name"><user-view :username="userName" :info="info" placement="right"/></em>
                         <em v-if="info.__usertag" class="item-tag">{{info.__usertag}}</em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
@@ -154,6 +154,7 @@
             margin-left: 8px;
             margin-right: 8px;
             border-radius: 3px;
+            font-size: 20px;
         }
         .item-error {
             cursor: pointer;
@@ -182,6 +183,13 @@
         background-color: #ffffff;
         max-height: 580px;
         overflow: auto;
+        &.text-emoji {
+            background-color: transparent;
+            .item-text-view {
+                font-size: 52px;
+                line-height: normal;
+            }
+        }
         &.text-error {
             box-shadow: 0 0 4px 0 #ffa1a1;
         }
@@ -262,9 +270,23 @@
 
         },
 
+        computed: {
+            userName() {
+                return this.info.send_username || this.info.username;
+            },
+
+            userImg() {
+                return this.info.send_userimg || this.info.userimg;
+            },
+        },
+
         methods: {
             textMsg(text) {
                 return (text + "").replace(/\n/, '<br/>');
+            },
+
+            textIsEmoji(text) {
+                return text.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "_") === "_";
             },
 
             formatCDate(v) {

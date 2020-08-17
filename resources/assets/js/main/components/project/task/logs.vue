@@ -8,7 +8,7 @@
                         <Timeline>
                             <TimelineItem v-for="(item, index) in items.lists" :key="index">
                                 <div slot="dot" class="logs-dot">
-                                    <img :src="item.userimg" @click="openChat(item.username)"/>
+                                    <UserImg :info="item" class="avatar"/>
                                 </div>
                                 <div class="log-summary">
                                     <span class="log-creator" @click="openChat(item.username)"><UserView :username="item.username"/></span>
@@ -80,10 +80,12 @@
                     width: 18px;
                     height: 18px;
                     margin-left: 10px;
-                    img {
-                        width: 100%;
-                        height: 100%;
-                        border-radius: 50%;
+                    .avatar {
+                        width: 18px;
+                        height: 18px;
+                        font-size: 12px;
+                        line-height: 18px;
+                        border-radius: 14px;
                         overflow: hidden;
                     }
                 }

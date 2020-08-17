@@ -15,11 +15,11 @@
 
         <transition name="fade">
             <div
-                    v-show="!disabled && visible"
-                    ref="popper"
-                    class="user-id-input-body"
-                    :data-transfer="transfer"
-                    v-transfer-dom>
+                v-show="!disabled && visible"
+                ref="popper"
+                class="user-id-input-body"
+                :data-transfer="transfer"
+                v-transfer-dom>
                 <Table highlight-row
                        v-if="searchShow"
                        size="small"
@@ -263,7 +263,7 @@
                                 this.noDataText = this.$L("数据加载失败！");
                             },
                             success: (res) => {
-                                if (res.ret === 1 && res.data.total > 0) {
+                                if (res.ret === 1 && $A.count(res.data) > 0) {
                                     let tmpData = res.data[0];
                                     if (this.multiple) {
                                         this.addMultipleLists(tmpData);
@@ -495,7 +495,7 @@
         mounted() {
             this.updatePopper();
             //
-            if ($A.runNum(this.value) > 0) {
+            if ($A.count(this.value) > 0) {
                 this.userName = this.value;
             }
             if (this.multiple) {

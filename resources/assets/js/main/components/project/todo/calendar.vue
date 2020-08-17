@@ -165,7 +165,7 @@
                 }else if (taskData.level === 4) {
                     color = 'rgba(121, 170, 28, 0.7)';
                 }
-                return {
+                let data = {
                     "id": taskData.id,
                     "start": $A.formatDate('Y-m-d H:i:s', startdate),
                     "end": $A.formatDate('Y-m-d H:i:s', enddate),
@@ -174,7 +174,15 @@
                     "avatar": taskData.userimg,
                     "name": taskData.nickname || taskData.username
                 };
-            }
+                if (this.isShowImg(taskData.userimg)) {
+                    data.avatar = taskData.userimg;
+                }
+                return data;
+            },
+
+            isShowImg(url) {
+                return !!(url && !$A.rightExists(url, 'images/other/avatar.png'));
+            },
         }
     }
 </script>

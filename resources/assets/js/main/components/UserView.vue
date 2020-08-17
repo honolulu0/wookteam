@@ -34,6 +34,9 @@
             placement: {
                 default: 'bottom'
             },
+            info: {
+                default: null
+            },
         },
         data() {
             return {
@@ -52,6 +55,10 @@
             },
         },
         methods: {
+            isJson(obj) {
+                return typeof (obj) == "object" && Object.prototype.toString.call(obj).toLowerCase() == "[object object]" && typeof obj.length == "undefined";
+            },
+
             popperShow() {
                 this.getUserData(30)
             },
@@ -67,6 +74,10 @@
                     }
                     this.loadIng = false;
                     this.$emit("on-result", data);
+                    //
+                    if (this.isJson(this.info)) {
+                        this.$set(this.info, 'nickname', this.nickname);
+                    }
                 }, cacheTime);
             }
         }

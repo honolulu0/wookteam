@@ -127,16 +127,37 @@
                             },
                         });
                     }
-                    return h('img', {
+                    let imgRender = h('img', {
                         style: {
                             width: "28px",
                             height: "28px",
-                            verticalAlign: "middle",
+                            display: "table"
                         },
                         attrs: {
                             src: params.row.thumb
                         },
                     });
+                    if (['jpg', 'jpeg', 'png', 'gif'].indexOf(params.row.ext) !== -1) {
+                        return h('Tooltip', {
+                            props: {
+                                transfer: true,
+                                delay: 600,
+                                maxWidth: 600
+                            },
+                        }, [imgRender, h('div', {slot: 'content'}, [h('img', {
+                            style: {
+                                maxWidth: "360px",
+                                maxHeight: "360px",
+                                display: "table",
+                                margin: "3px 0"
+                            },
+                            attrs: {
+                                src: params.row.path
+                            },
+                        })])]);
+                    } else {
+                        return imgRender;
+                    }
                 }
             });
             columns.push({

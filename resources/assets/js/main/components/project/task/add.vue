@@ -22,16 +22,18 @@
                 <Tooltip :content="$L('不重要不紧急')" placement="bottom" transfer><div @click="addLevel=4" class="enter-module-icon p4"><Icon v-if="addLevel=='4'" type="md-checkmark" /></div></Tooltip>
                 <div class="enter-module-flex"></div>
                 <Poptip placement="bottom" @on-popper-show="nameTipDisabled=true" @on-popper-hide="nameTipDisabled=false" transfer>
-                    <Tooltip :content="`${$L('负责人')}: ${addUsername||$L('自己')}`" placement="bottom" :disabled="nameTipDisabled">
+                    <Tooltip placement="bottom" :disabled="nameTipDisabled">
                         <div class="enter-module-icon user">
-                            <img v-if="addUserimg" @error="addUserimg=''" :src="addUserimg"/>
-                            <Icon v-else type="md-person" />
+                            <UserImg :info="addUserInfo" class="avatar"/>
+                        </div>
+                        <div slot="content">
+                            {{$L('负责人')}}: <UserView :username="addUserInfo.username"/>
                         </div>
                     </Tooltip>
                     <div slot="content">
                         <div style="width:240px">
                             {{$L('选择负责人')}}
-                            <UserInput v-model="addUsername" :projectid="projectid" @change="changeUser" :placeholder="$L('留空默认: 自己')" style="margin:5px 0 3px"></UserInput>
+                            <UserInput v-model="addUserInfo.username" :projectid="projectid" @change="changeUser" :placeholder="$L('留空默认: 自己')" style="margin:5px 0 3px"></UserInput>
                         </div>
                     </div>
                 </Poptip>
@@ -123,16 +125,16 @@
                         background-color: #84A83B;
                     }
                     &.user {
-                        background-color: #98CD75;
-                        border-radius: 50%;
                         width: 24px;
                         height: 24px;
                         margin-left: 10px;
                         margin-right: 10px;
-                        img {
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 50%;
+                        .avatar {
+                            width: 24px;
+                            height: 24px;
+                            font-size: 14px;
+                            line-height: 24px;
+                            border-radius: 12px;
                         }
                         i {
                             line-height: 24px;
@@ -212,17 +214,27 @@
 
                 addText: '',
                 addLevel: 2,
-                addUsername: '',
-
-                addUserimg: '',
+                addUserInfo: {},
                 addFocus: false,
 
                 nameTipDisabled: false,
+
+                userInfo: {},
             }
+        },
+        mounted() {
+            this.userInfo = $A.getUserInfo((res, isLogin) => {
+                this.userInfo = res;
+            }, false);
+            this.addUserInfo = $A.cloneData(this.userInfo);
         },
         methods: {
             changeUser(user) {
-                this.addUserimg = user.userimg;
+                if (typeof user.username === "undefined") {
+                    this.addUserInfo = $A.cloneData(this.userInfo);
+                } else {
+                    this.addUserInfo = user;
+                }
             },
             dropAdd(name) {
                 if (name == 'insertbottom') {
@@ -242,7 +254,7 @@
                         labelid: this.labelid,
                         title: addText,
                         level: this.addLevel,
-                        username: this.addUsername,
+                        username: this.addUserInfo.username,
                         insertbottom: insertbottom ? 1 : 0,
                     },
                     complete: () => {

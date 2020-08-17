@@ -3,7 +3,7 @@
         <!--左边选项-->
         <ul class="chat-menu">
             <li class="self">
-                <img :src="userInfo.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
+                <UserImg :info="userInfo" class="avatar"/>
             </li>
             <li :class="{active:chatTap=='dialog'}" @click="[chatTap='dialog',chatTam='dialog']">
                 <Icon type="md-text" />
@@ -26,7 +26,7 @@
                         :class="{active:dialog.username==dialogTarget.username}"
                         :data-id="dialog.id"
                         @click="openDialog(dialog)">
-                        <img :src="dialog.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
+                        <UserImg :info="dialog" class="avatar"/>
                         <div class="user-msg-box">
                             <div class="user-msg-title">
                                 <span><user-view :username="dialog.username" placement="right" @on-result="userViewResult(dialog, $event)"/></span>
@@ -53,7 +53,7 @@
                         <div class="team-label">{{key}}</div>
                         <ul>
                             <li v-for="(item, index) in teamListsS(lists)" :key="index" @click="openDialog(item, true)">
-                                <img :src="item.userimg" onerror="this.src=window.location.origin+'/images/other/avatar.png'">
+                                <UserImg :info="item" class="avatar"/>
                                 <div class="team-username">{{item.nickname||item.username}}</div>
                             </li>
                         </ul>
@@ -155,6 +155,8 @@
         .chat-notice-userimg {
             width: 42px;
             height: 42px;
+            font-size: 20px;
+            line-height: 42px;
             border-radius: 4px;
         }
         .ivu-notice-with-desc {
@@ -228,9 +230,10 @@
                 cursor: pointer;
                 &.self {
                     cursor: default;
-                    img {
+                    .avatar {
                         width: 36px;
                         height: 36px;
+                        font-size: 20px;
                         border-radius: 3px;
                     }
                 }
@@ -319,9 +322,10 @@
                                     height: 100%;
                                 }
                             }
-                            img {
+                            .avatar {
                                 width: 42px;
                                 height: 42px;
+                                font-size: 20px;
                                 border-radius: 4px;
                             }
                             .user-msg-box {
@@ -431,9 +435,10 @@
                                     align-items: center;
                                     height: 52px;
                                     cursor: pointer;
-                                    img {
+                                    .avatar {
                                         width: 30px;
                                         height: 30px;
+                                        font-size: 16px;
                                         border-radius: 3px;
                                     }
                                     .team-username {
@@ -754,9 +759,10 @@
                     margin: 6px 0;
                     font-size: 24px;
                     &.self {
-                        img {
+                        .avatar {
                             width: 32px;
                             height: 32px;
+                            font-size: 18px;
                         }
                     }
                 }
@@ -962,7 +968,7 @@
                                             }
                                         }
                                     }, [
-                                        h('img', {class: 'chat-notice-userimg', attrs: {src: body.userimg}}),
+                                        h('UserImg', {class: 'chat-notice-userimg', props: {info: body}}),
                                         h('div', {class: 'ivu-notice-with-desc'}, [
                                             h('div', {class: 'ivu-notice-title'}, [
                                                 h('UserView', {props: {username: body.username}})
@@ -1692,7 +1698,7 @@
                                 return h('div', {
                                     class: 'chat-notice-box',
                                 }, [
-                                    h('img', {class: 'chat-notice-userimg', attrs: {src: body.userimg}}),
+                                    h('UserImg', {class: 'chat-notice-userimg', props: {info: body}}),
                                     h('div', {class: 'ivu-notice-with-desc'}, [
                                         h('div', {class: 'ivu-notice-title'}, [
                                             h('UserView', {props: {username: username}})

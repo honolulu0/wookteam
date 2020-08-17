@@ -70,7 +70,9 @@
                                         <div v-if="task.overdue" class="task-status">{{$L('已超期')}}</div>
                                         <div v-else-if="task.complete" class="task-status">{{$L('已完成')}}</div>
                                         <div v-else class="task-status">{{$L('未完成')}}</div>
-                                        <Tooltip class="task-userimg" :content="task.nickname || task.username" transfer><img :src="task.userimg"/></Tooltip>
+                                        <Tooltip class="task-userimg" :content="task.nickname || task.username" transfer>
+                                            <UserImg :info="task" class="avatar"/>
+                                        </Tooltip>
                                     </div>
                                 </div>
                             </div>
@@ -296,11 +298,12 @@
                                     .task-userimg {
                                         width: 26px;
                                         height: 26px;
-                                        img {
-                                            object-fit: cover;
-                                            width: 100%;
-                                            height: 100%;
-                                            border-radius: 50%;
+                                        .avatar {
+                                            width: 26px;
+                                            height: 26px;
+                                            font-size: 14px;
+                                            line-height: 26px;
+                                            border-radius: 13px;
                                         }
                                     }
                                 }

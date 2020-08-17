@@ -25,7 +25,7 @@
                                      :style="`background-color: ${showCard == event.id ? (event.selectedColor||'#C7E6FD') : (event.color||'#C7E6FD')}`"
                                      @click="eventClick(event,$event)">
                                     <img class="avatar" v-if="event.avatar" :src="event.avatar" @error="($set(event, 'avatar', null))"/>
-                                    <span v-else :class="`icon icon${event.id%4}`">{{event.name}}</span>
+                                    <span v-else class="icon" :style="iconStyle(event.name)">{{event.name}}</span>
                                     <p class="info" v-html="isBegin(event, day.date, day.weekDay)"></p>
                                     <div id="card" :class="cardClass" v-if="$slots['body-card'] && event && showCard == event.id" @click.stop>
                                         <slot name="body-card"></slot>
@@ -64,7 +64,7 @@
                                  v-if="isTheday(item.date, event.start) && isInTime(time, event.start)"
                                  @click="eventClick(event,$event)">
                                 <img class="avatar" v-if="event.avatar" :src="event.avatar" @error="($set(event, 'avatar', null))"/>
-                                <span v-else :class="`icon icon${event.id%4}`">{{event.name}}</span>
+                                <span v-else class="icon" :style="iconStyle(event.name)">{{event.name}}</span>
                                 <p class="info" v-html="event.title"></p>
                                 <div id="card" :class="cardClass" v-if="$slots['body-card'] && event && showCard == event.id" @click.stop>
                                     <slot name="body-card"></slot>
@@ -335,6 +335,22 @@
                     this.cardClass += ' ' + 'bottom-card'
                 }
             },
+            isEmojiPrefix(text) {
+                return /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(text);
+            },
+            iconStyle(name) {
+                const style = {
+                    backgroundColor: '#A0D7F1'
+                };
+                if (name) {
+                    let bgColor = '';
+                    for (let i = 0; i < name.length; i++) {
+                        bgColor += parseInt(name[i].charCodeAt(0), 10).toString(16);
+                    }
+                    style.backgroundColor = '#' + bgColor.slice(1, 4);
+                }
+                return style;
+            }
         }
     }
 </script>
@@ -486,22 +502,6 @@
                                         text-align: center;
                                         color: #fff;
                                         display: inline-block;
-
-                                        &.icon0 {
-                                            background: #27BA9C;
-                                        }
-
-                                        &.icon1 {
-                                            background: #5272FF;
-                                        }
-
-                                        &.icon2 {
-                                            background: #FFCC36;
-                                        }
-
-                                        &.icon3 {
-                                            background: #FF7062;
-                                        }
                                     }
 
                                     .info {
@@ -554,14 +554,14 @@
                                     }
 
                                     &.selected {
-                                        .info {
+                                        /*.info {
                                             color: #fff;
                                             font-weight: normal;
                                         }
 
                                         .icon {
                                             background-color: transparent !important;
-                                        }
+                                        }*/
                                     }
                                 }
 
@@ -698,22 +698,6 @@
                             display: inline-block;
                             padding: 0 2px;
                             overflow: hidden;
-
-                            &.icon0 {
-                                background: #27BA9C;
-                            }
-
-                            &.icon1 {
-                                background: #5272FF;
-                            }
-
-                            &.icon2 {
-                                background: #FFCC36;
-                            }
-
-                            &.icon3 {
-                                background: #FF7062;
-                            }
                         }
 
                         .info {
@@ -766,7 +750,7 @@
                         }
 
                         &.selected {
-                            .info {
+                            /*.info {
                                 color: #fff;
                                 font-weight: normal;
                             }
@@ -774,7 +758,7 @@
                             // background-color: #5272FF !important;
                             .icon {
                                 background-color: transparent !important;
-                            }
+                            }*/
                         }
                     }
 
