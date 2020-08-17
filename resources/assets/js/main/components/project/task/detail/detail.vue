@@ -118,7 +118,9 @@
                 <div :style="`${detail.filenum>0?'':'display:none'}`">
                     <div class="detail-h2 detail-file-box detail-icon">
                         <strong class="active">{{$L('附件')}}</strong>
-                        <Button class="detail-button" size="small" @click="handleTask('fileupload')">{{$L('添加附件')}}</Button>
+                        <div class="detail-button">
+                            <Button class="detail-button-btn" size="small" @click="handleTask('fileupload')">{{$L('添加附件')}}</Button>
+                        </div>
                     </div>
                     <project-task-files ref="upload" :taskid="taskid" :projectid="detail.projectid" :simple="true" @change="handleTask('filechange', $event)"></project-task-files>
                 </div>
@@ -958,7 +960,7 @@
                         .detail-button-btn,
                         .detail-button-batch {
                             font-size: 12px;
-                            opacity: 0.5;
+                            opacity: 0.9;
                             transition: all 0.3s;
                             margin-left: 3px;
                             &:hover {
