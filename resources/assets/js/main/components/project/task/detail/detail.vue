@@ -1,6 +1,10 @@
 <template>
     <div class="project-task-detail-window" :class="{'task-detail-show': visible}" @click="$nextTick(()=>{visible=false})">
-        <div class="task-detail-main" @click.stop="">
+        <div class="task-detail-main"
+             @click.stop=""
+             @drop.prevent="commentPasteDrag($event, 'drag')"
+             @dragover.prevent="commentDragOver(true)"
+             @dragleave.prevent="commentDragOver(false)">
             <div class="detail-left">
                 <div class="detail-title-box detail-icon">
                     <Input v-model="detail.title"
@@ -122,14 +126,14 @@
                             <Button class="detail-button-btn" size="small" @click="handleTask('fileupload')">{{$L('添加附件')}}</Button>
                         </div>
                     </div>
-                    <project-task-files ref="upload" :taskid="taskid" :projectid="detail.projectid" :simple="true" @change="handleTask('filechange', $event)"></project-task-files>
+                    <project-task-files ref="projectUpload" :taskid="taskid" :projectid="detail.projectid" :simple="true" @change="handleTask('filechange', $event)"></project-task-files>
                 </div>
                 <div class="detail-h2 detail-comment-box detail-icon"><strong class="link" :class="{active:logType=='评论'}" @click="logType='评论'">{{$L('评论')}}</strong><em></em><strong class="link" :class="{active:logType=='日志'}" @click="logType='日志'">{{$L('操作记录')}}</strong></div>
                 <div class="detail-log-box">
                     <project-task-logs ref="log" :logtype="logType" :projectid="detail.projectid" :taskid="taskid" :pagesize="5"></project-task-logs>
                 </div>
                 <div class="detail-footer-box">
-                    <Input class="comment-input" v-model="commentText" type="textarea" :rows="1" :autosize="{ minRows: 1, maxRows: 3 }" :maxlength="255" @on-keydown="commentKeydown" :placeholder="$L('输入评论，Enter发表评论，Shift+Enter换行')" />
+                    <WInput class="comment-input" v-model="commentText" type="textarea" :rows="1" :autosize="{ minRows: 1, maxRows: 3 }" :maxlength="255" @on-keydown="commentKeydown" @on-input-paste="commentPasteDrag" :placeholder="$L('输入评论，Enter发表评论，Shift+Enter换行')" />
                     <Button :loading="!!loadData.comment" :disabled="!commentText" type="primary" @click="handleTask('comment')">评 论</Button>
                 </div>
             </div>
@@ -193,6 +197,9 @@
                 <Button v-else :loading="!!loadData.unarchived" icon="md-filing" class="btn" @click="handleTask('unarchived')">{{$L('取消归档')}}</Button>
                 <Button :loading="!!loadData.delete" icon="md-trash" class="btn" type="error" ghost @click="handleTask('deleteb')">{{$L('删除')}}</Button>
             </div>
+            <div v-if="detailDragOver" class="detail-drag-over">
+                <div class="detail-drag-text">{{$L('拖动到这里添加附件至 %', detail.title)}}</div>
+            </div>
         </div>
     </div>
 </template>
@@ -202,13 +209,15 @@
     import ProjectTaskFiles from "../files";
     import draggable from 'vuedraggable'
     import cloneDeep from "lodash/cloneDeep";
+    import WInput from "../../../iview/WInput";
 
     export default {
-        components: {ProjectTaskFiles, ProjectTaskLogs, draggable},
+        components: {WInput, ProjectTaskFiles, ProjectTaskLogs, draggable},
         data() {
             return {
                 taskid: 0,
                 detail: {},
+                detailDragOver: false,
 
                 visible: false,
 
@@ -353,7 +362,6 @@
             },
 
             titleKeydown(e) {
-                e = e || event;
                 if (e.keyCode == 13) {
                     e.preventDefault();
                     e.target.blur();
@@ -361,7 +369,6 @@
             },
 
             descKeydown(e) {
-                e = e || event;
                 if (e.keyCode == 13) {
                     if (e.shiftKey) {
                         return;
@@ -372,7 +379,6 @@
             },
 
             commentKeydown(e) {
-                e = e || event;
                 if (e.keyCode == 13) {
                     if (e.shiftKey) {
                         return;
@@ -382,8 +388,32 @@
                 }
             },
 
+            commentDragOver(show) {
+                let random = (this.__detailDragOver = $A.randomString(8));
+                if (!show) {
+                    setTimeout(() => {
+                        if (random === this.__detailDragOver) {
+                            this.detailDragOver = show;
+                        }
+                    }, 150);
+                } else {
+                    this.detailDragOver = show;
+                }
+            },
+
+            commentPasteDrag(e, type) {
+                this.detailDragOver = false;
+                const files = type === 'drag' ? e.dataTransfer.files : e.clipboardData.files;
+                const postFiles = Array.prototype.slice.call(files);
+                if (postFiles.length > 0) {
+                    e.preventDefault();
+                    postFiles.forEach((file) => {
+                        this.$refs.projectUpload.upload(file);
+                    });
+                }
+            },
+
             subtaskKeydown(subindex, e) {
-                e = e || event;
                 if (e.keyCode == 13) {
                     if (e.shiftKey) {
                         return;
@@ -584,7 +614,7 @@
                         break;
 
                     case 'fileupload':
-                        this.$refs.upload.uploadHandleClick();
+                        this.$refs.projectUpload.uploadHandleClick();
                         return;
 
                     case 'filechange':
@@ -1240,6 +1270,34 @@
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
+                }
+            }
+            .detail-drag-over {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 3;
+                background-color: rgba(255, 255, 255, 0.78);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 4px;
+                &:before {
+                    content: "";
+                    position: absolute;
+                    top: 16px;
+                    left: 16px;
+                    right: 16px;
+                    bottom: 16px;
+                    border: 2px dashed #7b7b7b;
+                    border-radius: 12px;
+                }
+                .detail-drag-text {
+                    padding: 12px;
+                    font-size: 18px;
+                    color: #666666;
                 }
             }
         }

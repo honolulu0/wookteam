@@ -104,6 +104,7 @@ class Chat
         if (isset($message['username'])) unset($message['username']);
         if (isset($message['userimg'])) unset($message['userimg']);
         if (isset($message['indate'])) unset($message['indate']);
+        if (isset($message['replaceId'])) unset($message['replaceId']);
         $inArray = [
             'did' => $dialog['id'],
             'username' => $username,
@@ -219,6 +220,9 @@ class Chat
                 break;
             case 'image':
                 $lastText = '[图片]';
+                break;
+            case 'file':
+                $lastText = '[文件]';
                 break;
             case 'taskB':
                 $lastText = $message['text'] . " [来自关注任务]";

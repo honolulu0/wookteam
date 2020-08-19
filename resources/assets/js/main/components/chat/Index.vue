@@ -66,7 +66,11 @@
         </ul>
 
         <!--对话窗口-->
-        <div class="chat-message" :style="{display:(chatTap=='dialog'&&dialogTarget.username)?'block':'none'}">
+        <div class="chat-message"
+             :style="{display:(chatTap=='dialog'&&dialogTarget.username)?'block':'none'}"
+             @drop.prevent="messagePasteDrag($event, 'drag')"
+             @dragover.prevent="messageDragOver(true)"
+             @dragleave.prevent="messageDragOver(false)">
             <div class="manage-title">
                 <user-view :username="dialogTarget.username"/>
                 <Dropdown class="manage-title-right" placement="bottom-end" trigger="click" @on-click="dialogDropdown" transfer>
@@ -87,7 +91,7 @@
                 <div class="manage-lists-message-new" v-if="messageNew > 0" @click="messageBottomGo(true)">{{$L('有%条新消息', messageNew)}}</div>
             </ScrollerY>
             <div class="manage-send" @click="clickDialog(dialogTarget.username)">
-                <textarea ref="textarea" class="manage-input" maxlength="20000" v-model="messageText" :placeholder="$L('请输入要发送的消息')" @keydown="messageSend($event)"></textarea>
+                <textarea ref="textarea" class="manage-input" maxlength="20000" v-model="messageText" :placeholder="$L('请输入要发送的消息')" @keydown="messageSend($event)" @paste="messagePasteDrag"></textarea>
             </div>
             <div class="manage-quick">
                 <emoji-picker @emoji="messageInsertText" :search="messageEmojiSearch">
@@ -110,9 +114,15 @@
                         </div>
                     </div>
                 </emoji-picker>
-                <Tooltip :content="$L('图片')" placement="top">
+                <Tooltip :content="$L('文件/图片')" placement="top">
                     <Icon class="quick-item" type="ios-photos-outline" @click="$refs.messageUpload.handleClick()"/>
-                    <img-upload ref="messageUpload" class="message-upload" type="callback" @on-callback="messageInsertImage" num="3" :otherParams="{from:'chat'}"></img-upload>
+                    <ChatLoad
+                        ref="messageUpload"
+                        class="message-upload"
+                        :target="dialogTarget.username"
+                        @on-progress="messageFile('progress', $event)"
+                        @on-success="messageFile('success', $event)"
+                        @on-error="messageFile('error', $event)"/>
                 </Tooltip>
                 <template v-if="systemConfig.callav=='open'">
                     <Tooltip :content="$L('语音聊天')" placement="top">
@@ -122,6 +132,9 @@
                         <Icon class="quick-item videocam" type="ios-videocam-outline" @click="videoConnect(null, true)"/>
                     </Tooltip>
                 </template>
+            </div>
+            <div v-if="dialogDragOver" class="manage-drag-over">
+                <div class="manage-drag-text">{{$L('拖动到这里发送给 %', dialogTarget.nickname || dialogTarget.username)}}</div>
             </div>
         </div>
 
@@ -627,6 +640,33 @@
                     overflow: hidden;
                 }
             }
+            .manage-drag-over {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 3;
+                background-color: rgba(255, 255, 255, 0.78);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:before {
+                    content: "";
+                    position: absolute;
+                    top: 16px;
+                    left: 16px;
+                    right: 16px;
+                    bottom: 16px;
+                    border: 2px dashed #7b7b7b;
+                    border-radius: 12px;
+                }
+                .manage-drag-text {
+                    padding: 12px;
+                    font-size: 18px;
+                    color: #666666;
+                }
+            }
             @media screen and (max-width: 768px) {
                 .manage-lists {
                     bottom: 96px;
@@ -806,12 +846,13 @@
     import EmojiPicker from 'vue-emoji-picker'
     import DrawerTabsContainer from "../DrawerTabsContainer";
     import ScrollerY from "../../../_components/ScrollerY";
-    import ChatMessage from "./message";
+    import ChatMessage from "./Message";
     import ImgUpload from "../ImgUpload";
+    import ChatLoad from "./Upload";
 
     export default {
         name: 'ChatIndex',
-        components: {ImgUpload, ChatMessage, EmojiPicker, ScrollerY, DrawerTabsContainer},
+        components: {ChatLoad, ImgUpload, ChatMessage, EmojiPicker, ScrollerY, DrawerTabsContainer},
         props: {
             value: {
                 default: 0
@@ -838,6 +879,7 @@
                 dialogTarget: {},
                 dialogLists: [],
                 dialogNoDataText: '',
+                dialogDragOver: false,
 
                 teamSearch: '',
                 teamReady: false,
@@ -1417,39 +1459,41 @@
                 this.messageText+= emoji;
             },
 
-            messageInsertImage(lists) {
-                for (let i = 0; i < lists.length; i++) {
-                    let item = lists[i];
-                    if (typeof item === 'object' && typeof item.url === "string") {
-                        let data = {
-                            type: 'image',
-                            username: this.userInfo.username,
-                            userimg: this.userInfo.userimg,
-                            indate: Math.round(new Date().getTime() / 1000),
-                            url: item.url,
-                            width: $A.getObject(item, 'response.data.width'),
-                            height: $A.getObject(item, 'response.data.height'),
-                        };
-                        $A.WSOB.sendTo('user', this.dialogTarget.username, data, (res) => {
-                            this.$set(data, res.status === 1 ? 'id' : 'error', res.message)
-                        });
-                        //
-                        this.addDialog(Object.assign(this.dialogTarget, {
-                            lasttext: this.$L('[图片]'),
-                            lastdate: data.indate
-                        }));
-                        this.openDialog(this.dialogTarget);
-                        this.addMessageData(data, true);
-                    }
+            messageInsertFile(item) {
+                if (typeof item === 'object' && typeof item.url === "string") {
+                    let data = {
+                        type: ['jpg', 'jpeg', 'png', 'gif'].indexOf(item.ext) !== -1 ? 'image' : 'file',
+                        filename: item.name,
+                        filesize: item.size,
+                        filethumb: item.thumb,
+                        username: this.userInfo.username,
+                        userimg: this.userInfo.userimg,
+                        indate: Math.round(new Date().getTime() / 1000),
+                        url: item.url,
+                        width: $A.getObject(item, 'response.data.width'),
+                        height: $A.getObject(item, 'response.data.height'),
+                        replaceId: item.tempId,
+                    };
+                    $A.WSOB.sendTo('user', this.dialogTarget.username, data, (res) => {
+                        this.$set(data, res.status === 1 ? 'id' : 'error', res.message)
+                    });
+                    //
+                    this.addDialog(Object.assign(this.dialogTarget, {
+                        lasttext: this.$L(data.type == 'image' ? '[图片]' : '[文件]'),
+                        lastdate: data.indate
+                    }));
+                    this.openDialog(this.dialogTarget);
+                    this.addMessageData(data, true);
                 }
             },
 
             addMessageData(data, animation = false, isUnshift = false) {
                 data.self = data.username === this.userInfo.username;
                 let sikp = false;
-                if (data.id) {
+                if (data.id || data.replaceId) {
                     this.messageLists.some((item, index) => {
-                        if (item.id == data.id) {
+                        if (item.id == data.id || item.id == data.replaceId) {
+                            data.nickname = data.nickname || item.nickname;
                             this.messageLists.splice(index, 1, data);
                             return sikp = true;
                         }
@@ -1477,6 +1521,57 @@
                     }
                     e.preventDefault();
                     this.messageSubmit();
+                }
+            },
+
+            messageDragOver(show) {
+                let random = (this.__dialogDragOver = $A.randomString(8));
+                if (!show) {
+                    setTimeout(() => {
+                        if (random === this.__dialogDragOver) {
+                            this.dialogDragOver = show;
+                        }
+                    }, 150);
+                } else {
+                    this.dialogDragOver = show;
+                }
+            },
+
+            messagePasteDrag(e, type) {
+                this.dialogDragOver = false;
+                const files = type === 'drag' ? e.dataTransfer.files : e.clipboardData.files;
+                const postFiles = Array.prototype.slice.call(files);
+                if (postFiles.length > 0) {
+                    e.preventDefault();
+                    postFiles.forEach((file) => {
+                        this.$refs.messageUpload.upload(file);
+                    });
+                }
+            },
+
+            messageFile(type, file) {
+                switch (type) {
+                    case 'progress':
+                        this.addMessageData({
+                            id: file.tempId,
+                            type: 'image',
+                            username: this.userInfo.username,
+                            userimg: this.userInfo.userimg,
+                            indate: Math.round(new Date().getTime() / 1000),
+                            url: 'loading',
+                        }, true);
+                        break;
+                    case 'error':
+                        this.messageLists.some((item, index) => {
+                            if (item.id == file.tempId) {
+                                this.messageLists.splice(index, 1);
+                                return true;
+                            }
+                        });
+                        break;
+                    case 'success':
+                        this.messageInsertFile(file);
+                        break;
                 }
             },
 

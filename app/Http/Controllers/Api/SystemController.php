@@ -137,15 +137,24 @@ class SystemController extends Controller
             $scale = [2160, 4160, -1];
         }
         $path = "uploads/picture/" . Users::token2userid() . "/" . date("Ym") . "/";
-        if (Request::input('from') == 'chat') {
-            $path = "uploads/chat/" . Users::token2userid() . "/" . date("Ym") . "/";
+        $image64 = trim(Base::getPostValue('image64'));
+        $fileName = trim(Base::getPostValue('filename'));
+        if ($image64) {
+            $data = Base::image64save([
+                "image64" => $image64,
+                "path" => $path,
+                "fileName" => $fileName,
+                "scale" => $scale
+            ]);
+        } else {
+            $data = Base::upload([
+                "file" => Request::file('image'),
+                "type" => 'image',
+                "path" => $path,
+                "fileName" => $fileName,
+                "scale" => $scale
+            ]);
         }
-        $data = Base::upload([
-            "file" => Request::file('image'),
-            "type" => 'image',
-            "path" => $path,
-            "scale" => $scale
-        ]);
         if (Base::isError($data)) {
             return Base::retError($data['msg']);
         } else {

@@ -53,8 +53,8 @@
             </div>
         </div>
 
-        <!--图片-->
-        <div v-else-if="info.type==='image'">
+        <!--图片、文件-->
+        <div v-else-if="info.type==='image' || info.type==='file'">
             <div v-if="info.self===true" class="list-right">
                 <div v-if="info.error" class="item-error" @click="clickError(info.error)">
                     <Icon type="md-alert" />
@@ -64,8 +64,18 @@
                         <em class="item-name"><user-view :username="userName" :info="info" placement="left"/></em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
-                    <a class="item-image" :href="info.url" target="_blank">
-                        <img class="item-image-view" :src="info.url"/>
+                    <div v-if="info.url==='loading'" class="item-loading">
+                        <WLoading/>
+                    </div>
+                    <a v-else class="item-file" :href="info.url" target="_blank">
+                        <div v-if="info.type==='file'" class="item-file-box">
+                            <img class="item-file-thumb" :src="info.filethumb"/>
+                            <div class="item-file-info">
+                                <div class="item-file-name">{{info.filename}}</div>
+                                <div class="item-file-size">{{$A.bytesToSize($A.runNum(info.filesize) * 1024)}}</div>
+                            </div>
+                        </div>
+                        <img v-else class="item-file-img" :src="info.url"/>
                     </a>
                 </div>
                 <UserImg :info="info" @click="clickUser" class="item-userimg"/>
@@ -78,8 +88,18 @@
                         <em v-if="info.__usertag" class="item-tag">{{info.__usertag}}</em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
-                    <a class="item-image" :href="info.url" target="_blank">
-                        <img class="item-image-view" :src="info.url"/>
+                    <div v-if="info.url==='loading'" class="item-loading">
+                        <WLoading/>
+                    </div>
+                    <a v-else class="item-file" :href="info.url" target="_blank">
+                        <div v-if="info.type==='file'" class="item-file-box">
+                            <img class="item-file-thumb" :src="info.filethumb"/>
+                            <div class="item-file-info">
+                                <div class="item-file-name">{{info.filename}}</div>
+                                <div class="item-file-size">{{$A.bytesToSize($A.runNum(info.filesize) * 1024)}}</div>
+                            </div>
+                        </div>
+                        <img v-else class="item-file-img" :src="info.url"/>
                     </a>
                 </div>
             </div>
@@ -235,11 +255,53 @@
         }
     }
 
-    /*图片*/
-    .item-image {
+    /*加载中*/
+    .item-loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 28px;
+        height: 28px;
+        margin: 24px;
+    }
+
+    /*文件、图片*/
+    .item-file {
         display: inline-block;
         text-decoration: none;
-        .item-image-view {
+        .item-file-box {
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 3px;
+            .item-file-thumb {
+                width: 36px;
+            }
+            .item-file-info {
+                margin-left: 12px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                .item-file-name {
+                    color: #333333;
+                    font-size: 14px;
+                    max-width: 220px;
+                    word-break: break-all;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                }
+                .item-file-size {
+                    padding-top: 2px;
+                    color: #666666;
+                    font-size: 14px;
+                }
+            }
+        }
+        .item-file-img {
             max-width: 220px;
             max-height: 220px;
             border-radius: 6px;

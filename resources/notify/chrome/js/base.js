@@ -214,6 +214,9 @@
             case 'image':
                 desc = '[图片]';
                 break;
+            case 'file':
+                desc = '[文件]';
+                break;
             case 'taskB':
                 desc = content.text + " [来自关注任务]";
                 break;

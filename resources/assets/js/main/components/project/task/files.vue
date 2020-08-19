@@ -16,7 +16,7 @@
                 </div>
                 <div class="item item-button">
                     <Button type="text" v-if="$A.objImplode(keys)!=''" @click="sreachTab(true)">{{$L('取消筛选')}}</Button>
-                    <Button type="primary" icon="md-search" :loading="loadIng > 0" @click="sreachTab">{{$L('搜索')}}</Button type="primary">
+                    <Button type="primary" icon="md-search" :loading="loadIng > 0" @click="sreachTab">{{$L('搜索')}}</Button>
                 </div>
             </Row>
 
@@ -556,6 +556,10 @@
                     projectid: this.projectid
                 };
                 return true;
+            },
+
+            upload(file) {
+                this.$refs.upload.upload(file);
             },
         }
     }

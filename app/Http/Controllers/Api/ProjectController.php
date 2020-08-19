@@ -2153,8 +2153,11 @@ class ProjectController extends Controller
     /**
      * 项目文件-上传
      *
-     * @apiParam {Number} [projectid]           项目ID
-     * @apiParam {Number} [taskid]              任务ID（如果项目ID为空时此参必须赋值且任务必须是自己负责人）
+     * @apiParam {Number} [projectid]           get-项目ID
+     * @apiParam {Number} [taskid]              get-任务ID（如果项目ID为空时此参必须赋值且任务必须是自己负责人）
+     * @apiParam {String} [filename]            post-文件名称
+     * @apiParam {String} [image64]             post-base64图片（二选一）
+     * @apiParam {File} [files]                 post-文件对象（二选一）
      */
     public function files__upload()
     {
@@ -2183,25 +2186,38 @@ class ProjectController extends Controller
             $projectid = $row['projectid'];
         }
         //
-        $data = Base::upload([
-            "file" => Request::file('files'),
-            "type" => 'file',
-            "path" => "uploads/projects/" . $projectid . "/",
-        ]);
+        $path = "uploads/projects/" . ($projectid ?: Users::token2userid()) . "/";
+        $image64 = trim(Base::getPostValue('image64'));
+        $fileName = trim(Base::getPostValue('filename'));
+        if ($image64) {
+            $data = Base::image64save([
+                "image64" => $image64,
+                "path" => $path,
+                "fileName" => $fileName,
+            ]);
+        } else {
+            $data = Base::upload([
+                "file" => Request::file('files'),
+                "type" => 'file',
+                "path" => $path,
+                "fileName" => $fileName,
+            ]);
+        }
+        //
         if (Base::isError($data)) {
             return Base::retError($data['msg']);
         } else {
             $fileData = $data['data'];
-            $thumb = 'images/files/file.png';
+            $fileData['thumb'] = $fileData['thumb'] ?: 'images/files/file.png';
             switch ($fileData['ext']) {
                 case "docx":
-                    $thumb = 'images/files/doc.png';
+                    $fileData['thumb'] = 'images/files/doc.png';
                     break;
                 case "xlsx":
-                    $thumb = 'images/files/xls.png';
+                    $fileData['thumb'] = 'images/files/xls.png';
                     break;
                 case "pptx":
-                    $thumb = 'images/files/ppt.png';
+                    $fileData['thumb'] = 'images/files/ppt.png';
                     break;
                 case "doc":
                 case "xls":
@@ -2209,14 +2225,7 @@ class ProjectController extends Controller
                 case "txt":
                 case "esp":
                 case "gif":
-                    $thumb = 'images/files/' . $fileData['ext'] . '.png';
-                    break;
-                case "jpg":
-                case "jpeg":
-                case "png":
-                    if (Base::imgThumb($fileData['file'], $fileData['file'] . "_thumb.jpg", 64, 0)) {
-                        $thumb = $fileData['path'] . "_thumb.jpg";
-                    }
+                    $fileData['thumb'] = 'images/files/' . $fileData['ext'] . '.png';
                     break;
             }
             $array = [
@@ -2226,7 +2235,7 @@ class ProjectController extends Controller
                 'size' => $fileData['size'] * 1024,
                 'ext' => $fileData['ext'],
                 'path' => $fileData['path'],
-                'thumb' => $thumb,
+                'thumb' => $fileData['thumb'],
                 'username' => $user['username'],
                 'indate' => Base::time(),
             ];

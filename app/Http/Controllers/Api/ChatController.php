@@ -154,4 +154,92 @@ class ChatController extends Controller
         //
         return Base::retSuccess('success', $lists);
     }
+
+    /**
+     * 文件 - 上传
+     *
+     * @apiParam {String} username            get-发给用户名（群组名）
+     * @apiParam {String} [filename]          post-文件名称
+     * @apiParam {String} [image64]           post-base64图片（二选一）
+     * @apiParam {File} [files]               post-文件对象（二选一）
+     */
+    public function files__upload()
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
+        } else {
+            $user = $user['data'];
+        }
+        //
+        $username = trim(Request::input('username'));
+        if (Base::leftExists($username, "group::")) {
+            $res = Chat::groupOpen($username);
+        } else {
+            $res = Chat::openDialog($user['username'], $username);
+        }
+        if (Base::isError($res)) {
+            return $res;
+        }
+        $did = $res['data']['id'];
+        //
+        $path = "uploads/chat/" . Users::token2userid() . "/";
+        $image64 = trim(Base::getPostValue('image64'));
+        $fileName = trim(Base::getPostValue('filename'));
+        if ($image64) {
+            $data = Base::image64save([
+                "image64" => $image64,
+                "path" => $path,
+                "fileName" => $fileName,
+            ]);
+        } else {
+            $data = Base::upload([
+                "file" => Request::file('files'),
+                "type" => 'file',
+                "path" => $path,
+                "fileName" => $fileName,
+            ]);
+        }
+        //
+        if (Base::isError($data)) {
+            return Base::retError($data['msg']);
+        } else {
+            $fileData = $data['data'];
+            $fileData['thumb'] = $fileData['thumb'] ?: 'images/files/file.png';
+            switch ($fileData['ext']) {
+                case "docx":
+                    $fileData['thumb'] = 'images/files/doc.png';
+                    break;
+                case "xlsx":
+                    $fileData['thumb'] = 'images/files/xls.png';
+                    break;
+                case "pptx":
+                    $fileData['thumb'] = 'images/files/ppt.png';
+                    break;
+                case "doc":
+                case "xls":
+                case "ppt":
+                case "txt":
+                case "esp":
+                case "gif":
+                    $fileData['thumb'] = 'images/files/' . $fileData['ext'] . '.png';
+                    break;
+            }
+            $array = [
+                'did' => $did,
+                'group' => Base::leftExists($username, 'group::') ? $username : '',
+                'name' => $fileData['name'],
+                'size' => $fileData['size'] * 1024,
+                'ext' => $fileData['ext'],
+                'path' => $fileData['path'],
+                'thumb' => $fileData['thumb'],
+                'username' => $user['username'],
+                'indate' => Base::time(),
+            ];
+            DB::table('chat_files')->insertGetId($array);
+            //
+            $fileData['thumb'] = Base::fillUrl($fileData['thumb']);
+            return Base::retSuccess('success', $fileData);
+        }
+    }
 }

@@ -361,6 +361,7 @@ export default {
     "有%条新消息": "There are new messages%",
     "请输入要发送的消息": "Please enter the message to be sent",
     "[图片]": "[image]",
+    "[文件]": "[file]",
     "[来自关注任务]": "[Attention from the task]",
     "[来自工作报告]": "[From work report]",
     "[未知类型]": "[Unknown type]",

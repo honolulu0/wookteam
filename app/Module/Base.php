@@ -1950,6 +1950,101 @@ class Base
     }
 
     /**
+     * image64图片保存
+     * @param array $param [ image64=带前缀的base64, path=>文件路径, fileName=>文件名称, scale=>[压缩原图宽,高, 压缩方式] ]
+     * @return array [name=>文件名, size=>文件大小(单位KB),file=>绝对地址, path=>相对地址, url=>全路径地址, ext=>文件后缀名]
+     */
+    public static function image64save($param)
+    {
+        $imgBase64 = $param['image64'];
+        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $imgBase64, $res)) {
+            $extension = $res[2];
+            if (!in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
+                return Base::retError('图片格式错误！');
+            }
+            $scaleName = "";
+            if ($param['fileName']) {
+                $fileName = $param['fileName'];
+            }else{
+                if ($param['scale'] && is_array($param['scale'])) {
+                    list($width, $height) = $param['scale'];
+                    if ($width > 0 || $height > 0) {
+                        $scaleName = "_{WIDTH}x{HEIGHT}";
+                        if (isset($param['scale'][2])) {
+                            $scaleName.= $param['scale'][2];
+                        }
+                    }
+                }
+                $fileName = 'paste_' . md5($imgBase64) . '.' . $extension;
+                $scaleName = md5_file($imgBase64) . $scaleName . '.' . $extension;
+            }
+            $fileDir = $param['path'];
+            $filePath = public_path($fileDir);
+            Base::makeDir($filePath);
+            if (file_put_contents($filePath . $fileName, base64_decode(str_replace($res[1], '', $imgBase64)))) {
+                $fileSize = filesize($filePath . $fileName);
+                $array = [
+                    "name" => $fileName,                                                //原文件名
+                    "size" => Base::twoFloat($fileSize / 1024, true),         //大小KB
+                    "file" => $filePath . $fileName,                                    //目录的完整路径                "D:\www....KzZ.jpg"
+                    "path" => $fileDir . $fileName,                                     //相对路径                     "uploads/pic....KzZ.jpg"
+                    "url" => Base::fillUrl($fileDir . $fileName),                   //完整的URL                    "https://.....hhsKzZ.jpg"
+                    "thumb" => '',                                                      //缩略图（预览图）               "https://.....hhsKzZ.jpg_thumb.jpg"
+                    "width" => -1,                                                      //图片宽度
+                    "height" => -1,                                                     //图片高度
+                    "ext" => $extension,                                                //文件后缀名
+                ];
+                if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
+                    //图片尺寸
+                    $paramet = getimagesize($array['file']);
+                    $array['width'] = $paramet[0];
+                    $array['height'] = $paramet[1];
+                    //原图压缩
+                    if ($param['scale'] && is_array($param['scale'])) {
+                        list($width, $height) = $param['scale'];
+                        if (($width > 0 && $array['width'] > $width) || ($height > 0 && $array['height'] > $height)) {
+                            $cut = ($width > 0 && $height > 0) ? 1 : -1;
+                            $cut = $param['scale'][2] ?? $cut;
+                            //图片压缩
+                            $tmpFile = $array['file'] . '_tmp.jpg';
+                            if (Base::imgThumb($array['file'], $tmpFile, $width, $height, $cut)) {
+                                $tmpSize = filesize($tmpFile);
+                                if ($tmpSize > $fileSize) {
+                                    @unlink($tmpFile);
+                                }else{
+                                    @unlink($array['file']);
+                                    rename($tmpFile, $array['file']);
+                                }
+                            }
+                            //图片尺寸
+                            $paramet = getimagesize($array['file']);
+                            $array['width'] = $paramet[0];
+                            $array['height'] = $paramet[1];
+                            //重命名
+                            if ($scaleName) {
+                                $scaleName = str_replace(['{WIDTH}', '{HEIGHT}'], [$array['width'], $array['height']], $scaleName);
+                                if (rename($array['file'], Base::rightDelete($array['file'], $fileName) . $scaleName)) {
+                                    $array['file'] = Base::rightDelete($array['file'], $fileName) . $scaleName;
+                                    $array['path'] = Base::rightDelete($array['path'], $fileName) . $scaleName;
+                                    $array['url'] = Base::rightDelete($array['url'], $fileName) . $scaleName;
+                                }
+                            }
+                        }
+                    }
+                    //生成缩略图
+                    $array['thumb'] = $array['path'];
+                    if (Base::imgThumb($array['file'], $array['file']."_thumb.jpg", 180, 0)) {
+                        $array['thumb'].= "_thumb.jpg";
+                    }
+                    $array['thumb'] = Base::fillUrl($array['thumb']);
+                }
+                return Base::retSuccess('success', $array);
+            }
+        }
+        return Base::retError('图片保存失败！');
+    }
+
+    /**
      * 上传文件
      * @param array $param [ type=[文件类型], file=>Request::file, path=>文件路径, fileName=>文件名称, scale=>[压缩原图宽,高, 压缩方式], size=>限制大小KB, autoThumb=>false不要自动生成缩略图 ]
      * @return array [name=>原文件名, size=>文件大小(单位KB),file=>绝对地址, path=>相对地址, url=>全路径地址, ext=>文件后缀名]
@@ -2064,7 +2159,7 @@ class Base
                 }
             }
             //
-            if (in_array($param['type'], ['png', 'png+jpg', 'image'])) {
+            if (in_array($extension, ['jpg', 'jpeg', 'gif', 'png'])) {
                 //图片尺寸
                 $paramet = getimagesize($array['file']);
                 $array['width'] = $paramet[0];

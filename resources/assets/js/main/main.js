@@ -919,6 +919,9 @@ import '../../sass/main.scss';
                     case 'image':
                         desc = $A.app.$L('[图片]');
                         break;
+                    case 'file':
+                        desc = $A.app.$L('[文件]');
+                        break;
                     case 'taskB':
                         desc = content.text + " " + $A.app.$L("[来自关注任务]");
                         break;
