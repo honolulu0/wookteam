@@ -1,7 +1,8 @@
 <template>
-    <div class="project-task-detail-window" :class="{'task-detail-show': visible}" @click="$nextTick(()=>{visible=false})">
+    <div class="project-task-detail-window" :class="{'task-detail-show': visible}">
+        <div class="task-detail-bg"
+             @click="$nextTick(()=>{visible=false})"></div>
         <div class="task-detail-main"
-             @click.stop=""
              @drop.prevent="commentPasteDrag($event, 'drag')"
              @dragover.prevent="commentDragOver(true)"
              @dragleave.prevent="commentDragOver(false)">
@@ -938,7 +939,18 @@
             opacity: 1;
         }
 
+        .task-detail-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+
         .task-detail-main {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: row;
             width: 92%;
