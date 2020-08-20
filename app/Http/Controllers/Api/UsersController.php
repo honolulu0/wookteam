@@ -257,6 +257,7 @@ class UsersController extends Controller
         //
         if ($array) {
             DB::table('users')->where('id', $user['id'])->update($array);
+            Users::AZUpdate($user['id']);
         } else {
             return Base::retError('请设置要修改的内容！');
         }
@@ -316,10 +317,9 @@ class UsersController extends Controller
      * 团队列表
      *
      * @apiParam {Object} [sorts]               排序方式，格式：{key:'', order:''}
-     * - key: username|id(默认)
+     * - key: username|az|id(默认)
      * - order: asc|desc
      * @apiParam {String} [username]            指定获取某个成员（返回对象）
-     * @apiParam {Number} [firstchart]          是否获取首字母，1:获取
      * @apiParam {Number} [page]                当前页，默认:1
      * @apiParam {Number} [pagesize]            每页显示数量，默认:10，最大:100
      */
@@ -345,13 +345,13 @@ class UsersController extends Controller
                 case 'username':
                     $orderBy = '`' . $sorts['key'] . '` ' . $sorts['order'] . ',`id` DESC';
                     break;
-                case 'lists':
-                    $orderBy = '`nickname` ' . $sorts['order'] . ',`username` ' . $sorts['order'] . ',`id` DESC';
+                case 'az':
+                    $orderBy = '`' . $sorts['key'] . '` ' . $sorts['order'] . ',`username` ' . $sorts['order'] . ',`id` DESC';
                     break;
             }
         }
         //
-        $lists = DB::table('users')->where($whereArray)->select(['id', 'identity', 'username', 'nickname', 'userimg', 'profession', 'regdate'])->orderByRaw($orderBy)->paginate(Base::getPaginate(100, 10));
+        $lists = DB::table('users')->where($whereArray)->select(['id', 'identity', 'username', 'nickname', 'az', 'userimg', 'profession', 'regdate'])->orderByRaw($orderBy)->paginate(Base::getPaginate(100, 10));
         $lists = Base::getPageList($lists);
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的团队成员');
@@ -359,7 +359,6 @@ class UsersController extends Controller
         foreach ($lists['lists'] AS $key => $item) {
             $lists['lists'][$key]['identity'] = is_array($item['identity']) ? $item['identity'] : explode(",", trim($item['identity'], ","));
             $lists['lists'][$key]['userimg'] = Users::userimg($item['userimg']);
-            $lists['lists'][$key]['firstchart'] = Base::getFirstCharter($item['nickname'] ?: $item['username']);
         }
         if ($username) {
             return Base::retSuccess('success', $lists['lists'][0]);

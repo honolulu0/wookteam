@@ -19,7 +19,7 @@ class CreatePreUsersTable extends Migration
 			$table->string('identity')->nullable()->default('')->comment('身份');
 			$table->string('token', 100)->nullable()->default('')->index('IDEX_token');
 			$table->string('username', 100)->nullable()->default('')->unique('IDEX_username')->comment('用户名');
-			$table->string('nickname')->nullable()->comment('昵称');
+			$table->string('nickname')->nullable()->default('')->comment('昵称');
 			$table->string('userimg')->nullable()->default('')->comment('已审核头像');
 			$table->string('profession')->nullable()->default('')->comment('职称/职位');
 			$table->string('encrypt', 50)->nullable()->default('');

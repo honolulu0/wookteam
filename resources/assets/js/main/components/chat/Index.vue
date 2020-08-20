@@ -1267,10 +1267,9 @@
                     url: 'users/team/lists',
                     data: {
                         sorts: {
-                            key: 'lists',
+                            key: 'az',
                             order: 'asc'
                         },
-                        firstchart: 1,
                         page: this.teamCurrentPage,
                         pagesize: 100,
                     },
@@ -1283,10 +1282,10 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             res.data.lists.forEach((item) => {
-                                if (typeof this.teamLists[item.firstchart] === "undefined") {
-                                    this.$set(this.teamLists, item.firstchart, []);
+                                if (typeof this.teamLists[item.az] === "undefined") {
+                                    this.$set(this.teamLists, item.az, []);
                                 }
-                                this.teamLists[item.firstchart].push(item);
+                                this.teamLists[item.az].push(item);
                             });
                             this.teamNoDataText = this.$L("没有相关的数据");
                             this.teamHasMorePages = res.data.hasMorePages;

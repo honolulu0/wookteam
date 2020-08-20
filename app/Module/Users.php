@@ -57,6 +57,7 @@ class Users
         if (empty($user)) {
             return Base::retError('注册失败，请稍后再试。');
         }
+        Users::AZUpdate($user['id']);
         return Base::retSuccess('success', $user);
     }
 
@@ -319,5 +320,18 @@ class Users
             }
         }
         return $var ? Base::fillUrl($var) : url('images/other/avatar.png');
+    }
+
+    /**
+     * 更新首字母
+     * @param $userid
+     */
+    public static function AZUpdate($userid) {
+        $row = DB::table('users')->where('id', $userid)->select(['username', 'nickname'])->first();
+        if ($row) {
+            DB::table('users')->where('id', $userid)->update([
+                'az' => Base::getFirstCharter($row['nickname'] ?: $row['username'])
+            ]);
+        }
     }
 }
