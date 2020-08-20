@@ -40,11 +40,11 @@ export default {
         }
     },
 
-    mounted() {
-
+    watch: {
+        target(val) {
+            this.$set(this.params, 'username', val);
+        }
     },
-
-    watch: {},
 
     methods: {
         handleProgress(event, file) {
@@ -108,7 +108,9 @@ export default {
 
         upload(file) {
             //手动传file
-            this.$refs.upload.upload(file);
+            if (this.handleBeforeUpload()) {
+                this.$refs.upload.upload(file);
+            }
         },
     }
 }

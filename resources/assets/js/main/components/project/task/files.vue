@@ -306,15 +306,17 @@
         },
 
         watch: {
-            projectid() {
+            projectid(val) {
                 if (this.loadYet) {
                     this.getLists(true);
                 }
+                this.$set(this.params, 'projectid', val);
             },
-            taskid() {
+            taskid(val) {
                 if (this.loadYet) {
                     this.getLists(true);
                 }
+                this.$set(this.params, 'taskid', val);
             },
             canload(val) {
                 if (val && !this.loadYet) {
@@ -559,7 +561,10 @@
             },
 
             upload(file) {
-                this.$refs.upload.upload(file);
+                //手动传file
+                if (this.handleBeforeUpload()) {
+                    this.$refs.upload.upload(file);
+                }
             },
         }
     }
