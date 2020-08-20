@@ -181,10 +181,7 @@ class WebSocketService implements WebSocketHandlerInterface
              * 总未读消息数
              */
             case 'unread':
-                $username = DB::table('ws')->where([
-                    'fd' => $frame->fd,
-                    'channel' => $data['channel'],
-                ])->value('username');
+                $username = $this->getUsername($frame->fd, $data['channel']);
                 if ($username) {
                     $num = intval(DB::table('chat_dialog')->where('user1', $username)->sum('unread1'));
                     $num+= intval(DB::table('chat_dialog')->where('user2', $username)->sum('unread2'));
@@ -198,10 +195,7 @@ class WebSocketService implements WebSocketHandlerInterface
              * 已读会员消息
              */
             case 'read':
-                $username = DB::table('ws')->where([
-                    'fd' => $frame->fd,
-                    'channel' => $data['channel'],
-                ])->value('username');
+                $username = $this->getUsername($frame->fd, $data['channel']);
                 $dialog = Chat::openDialog($username, $data['target']);
                 if (!Base::isError($dialog)) {
                     $dialog = $dialog['data'];
@@ -224,10 +218,7 @@ class WebSocketService implements WebSocketHandlerInterface
             case 'roger':
                 $contentIds = Base::explodeInt(',', $data['contentId']);
                 if ($contentIds) {
-                    $username = DB::table('ws')->where([
-                        'fd' => $frame->fd,
-                        'channel' => $data['channel'],
-                    ])->value('username');
+                    $username = $this->getUsername($frame->fd, $data['channel']);
                     if ($username) {
                         DB::table('chat_msg')->where('receive', $username)->whereIn('id', $contentIds)->update([
                             'roger' => 1,
@@ -240,10 +231,7 @@ class WebSocketService implements WebSocketHandlerInterface
              * 发给用户
              */
             case 'user':
-                $username = DB::table('ws')->where([
-                    'fd' => $frame->fd,
-                    'channel' => $data['channel'],
-                ])->value('username');
+                $username = $this->getUsername($frame->fd, $data['channel']);
                 $res = Chat::saveMessage($username, $data['target'], $data['body']);
                 if (Base::isError($res)) {
                     $back = [
@@ -461,6 +449,10 @@ class WebSocketService implements WebSocketHandlerInterface
 
     private function getUserOfName($username, $channel = '') {
         return $this->getUser('', $channel, $username);
+    }
+
+    private function getUsername($fd, $channel) {
+        return DB::table('ws')->where(['fd' => $fd, 'channel' => $channel ])->value('username');
     }
 
     /**

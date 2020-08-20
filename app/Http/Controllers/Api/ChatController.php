@@ -174,7 +174,8 @@ class ChatController extends Controller
         //
         $username = trim(Request::input('username'));
         if (Base::leftExists($username, "group::")) {
-            $res = Chat::groupOpen($username);
+            //$res = Chat::groupOpen($username);
+            return Base::retError('参数错误');
         } else {
             $res = Chat::openDialog($user['username'], $username);
         }

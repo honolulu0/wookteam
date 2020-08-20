@@ -19,6 +19,7 @@ return [
         'log'           => true,
     ],
     'event_handlers'           => [
+        'ServerStart' => \App\Events\ServerStartEvent::class,
         'WorkerStart' => \App\Events\WorkerStartEvent::class,
     ],
     'websocket'                => [
