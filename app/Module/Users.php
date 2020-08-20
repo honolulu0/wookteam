@@ -327,7 +327,7 @@ class Users
      * @param $userid
      */
     public static function AZUpdate($userid) {
-        $row = DB::table('users')->where('id', $userid)->select(['username', 'nickname'])->first();
+        $row = Base::DBC2A(DB::table('users')->where('id', $userid)->select(['username', 'nickname'])->first());
         if ($row) {
             DB::table('users')->where('id', $userid)->update([
                 'az' => Base::getFirstCharter($row['nickname'] ?: $row['username'])
