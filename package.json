@@ -1,7 +1,7 @@
 {
-    "version": "1.4.27",
     "name": "wookteam",
-    "private": true,
+    "version": "1.5.1",
+    "description": "WookTeam是一款轻量级的开源在线团队协作工具，提供各类文档工具、在线思维导图、在线流程图、项目管理、任务分发、即时IM，知识库管理等工具。",
     "scripts": {
         "ide-helper": "php artisan ide-helper:generate",
         "laravels-start": "php bin/laravels start",
@@ -14,6 +14,12 @@
         "prod": "npm run production",
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kuaifan/wookteam.git"
+    },
+    "author": "kuaifan <aipaw@live.cn>",
+    "license": "AGPL-3.0",
     "devDependencies": {
         "axios": "^0.19.2",
         "cross-env": "^7.0.2",
@@ -38,5 +44,23 @@
         "vuedraggable": "^2.24.0",
         "x-data-spreadsheet": "^1.1.6",
         "xlsx": "^0.16.6"
-    }
+    },
+    "keywords": [
+        "wookteam",
+        "collaboration",
+        "project-management",
+        "workteam",
+        "team-chat",
+        "task-management-system",
+        "task-manager",
+        "project-management-software",
+        "remote-work",
+        "to-do",
+        "gantt",
+        "schedule",
+        "scheduler",
+        "timeline",
+        "calendar",
+        "task"
+    ]
 }
