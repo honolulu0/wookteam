@@ -222,6 +222,7 @@
             options(isFull) {
                 return {
                     selector: (isFull ? '#T_' : '#') + this.id,
+                    base_url: $A.serverUrl('js/build'),
                     language: "zh_CN",
                     toolbar: this.toolbar,
                     plugins: this.plugins,
