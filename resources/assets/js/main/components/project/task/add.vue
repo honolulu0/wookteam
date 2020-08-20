@@ -6,12 +6,13 @@
         <div class="input-enter">
             <Input
                 v-model="addText"
+                ref="addInput"
                 type="textarea"
                 class="input-enter-textarea"
                 :class="{bright:addFocus===true,highlight:!!addText}"
                 element-id="project-panel-enter-textarea"
-                @on-focus="addFocus=true"
-                @on-blur="addFocus=false"
+                @on-focus="onFocus(true)"
+                @on-blur="onFocus(false)"
                 :autosize="{ minRows: 1, maxRows: 6 }"
                 :maxlength="255"
                 @on-keydown="addKeydown"/>
@@ -279,7 +280,6 @@
                 });
             },
             addKeydown(e) {
-                e = e || event;
                 if (e.keyCode == 13) {
                     if (e.shiftKey) {
                         return;
@@ -287,6 +287,13 @@
                     this.clickAdd();
                     e.preventDefault();
                 }
+            },
+            setFocus() {
+                this.$refs.addInput.focus();
+            },
+            onFocus(focus) {
+                this.addFocus = focus;
+                this.$emit('on-focus', focus);
             }
         }
     }

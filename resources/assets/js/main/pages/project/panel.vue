@@ -32,7 +32,13 @@
                 :animation="150"
                 :disabled="projectSortDisabled"
                 @sort="projectSortUpdate(true)">
-                <div v-if="projectLabel.length > 0" v-for="label in projectLabel" :key="label.id" class="label-item label-draggable">
+                <div
+                    v-if="projectLabel.length > 0"
+                    v-for="label in projectLabel"
+                    :key="label.id"
+                    class="label-item label-draggable"
+                    :class="{'label-scroll': label.hasScroll === true && label.getFocus !== true}"
+                    @mouseenter="projectMouse(label)">
                     <div class="label-body">
                         <div class="title-box">
                             <div v-if="label.loadIng === true" class="title-loading">
@@ -50,6 +56,7 @@
                         </div>
                         <draggable
                             v-model="label.taskLists"
+                            :ref="'draggable_' + label.id"
                             class="task-box"
                             group="task"
                             draggable=".task-draggable"
@@ -77,9 +84,18 @@
                                 </div>
                             </div>
                             <div slot="footer">
-                                <project-add-task :placeholder='`${$L("添加任务至")}"${label.title}"`' :projectid="label.projectid" :labelid="label.id" @on-add-success="addTaskSuccess($event, label)"></project-add-task>
+                                <project-add-task
+                                    :ref="'add_' + label.id"
+                                    :placeholder='`${$L("添加任务至")}"${label.title}"`'
+                                    :projectid="label.projectid"
+                                    :labelid="label.id"
+                                    @on-focus="(f)=>{$set(label,'getFocus',f)}"
+                                    @on-add-success="addTaskSuccess($event, label)"></project-add-task>
                             </div>
                         </draggable>
+                    </div>
+                    <div class="label-bottom" @click="projectFocus(label)">
+                        <Icon class="label-bottom-icon" type="ios-add" />
                     </div>
                 </div>
                 <div v-if="loadDetailed" slot="footer" class="label-item label-create" @click="addLabel">
@@ -161,6 +177,8 @@
                 flex-grow: 0;
                 flex-shrink: 0;
                 flex-basis: auto;
+                position: relative;
+                overflow: hidden;
                 height: 100%;
                 padding-right: 15px;
                 &.label-create {
@@ -168,6 +186,13 @@
                     &:hover {
                         .trigger-box {
                             transform: translate(0, -50%) scale(1.1);
+                        }
+                    }
+                }
+                &.label-scroll {
+                    &:hover {
+                        .label-bottom {
+                            transform: translate(0, 0);
                         }
                     }
                 }
@@ -335,6 +360,26 @@
                         top: 50%;
                         transform: translate(0, -50%) scale(1);
                         transition: all 0.3s;
+                    }
+                }
+                .label-bottom {
+                    position: absolute;
+                    bottom: 14px;
+                    right: 28px;
+                    z-index: 1;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    background-color: #2db7f5;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: transform 0.2s;
+                    transform: translate(0, 200%);
+                    cursor: pointer;
+                    .label-bottom-icon {
+                        color: #ffffff;
+                        font-size: 36px;
                     }
                 }
             }
@@ -841,6 +886,23 @@
                         }
                     }
                 });
+            },
+
+            projectMouse(label) {
+                let hasScroll = false;
+                let el = this.$refs['draggable_' + label.id]
+                if (el && el.length > 0) {
+                    el = el[0].$el;
+                    hasScroll = el.scrollHeight > el.offsetHeight;
+                }
+                this.$set(label, 'hasScroll', hasScroll)
+            },
+
+            projectFocus(label) {
+                let el = this.$refs['add_' + label.id];
+                if (el && el.length > 0) {
+                    el[0].setFocus();
+                }
             },
 
             subtaskProgress(subtask) {
