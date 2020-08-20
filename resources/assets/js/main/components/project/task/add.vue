@@ -39,7 +39,7 @@
                     </div>
                 </Poptip>
                 <div class="enter-module-btn">
-                    <Button class="enter-module-btn-1" type="info" size="small" @click="clickAdd">{{$L('添加任务')}}</Button>
+                    <Button class="enter-module-btn-1" type="info" size="small" @click="clickAdd(false)">{{$L('添加任务')}}</Button>
                     <Dropdown class="enter-module-btn-drop" @on-click="dropAdd" placement="bottom-end" transfer>
                         <Button class="enter-module-btn-2" type="info" size="small"><Icon type="ios-arrow-down"></Icon></Button>
                         <DropdownMenu slot="list" class="enter-module-btn-drop-list">
@@ -284,7 +284,7 @@
                     if (e.shiftKey) {
                         return;
                     }
-                    this.clickAdd();
+                    this.clickAdd(false);
                     e.preventDefault();
                 }
             },
