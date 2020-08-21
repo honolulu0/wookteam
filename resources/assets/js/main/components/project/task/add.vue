@@ -105,6 +105,7 @@
                 display: flex;
                 width: 100%;
                 margin-top: 8px;
+                align-items: center;
                 .enter-module-icon {
                     display: inline-block;
                     width: 16px;

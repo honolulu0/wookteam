@@ -75,7 +75,7 @@
                                 <div class="item-file-size">{{$A.bytesToSize($A.runNum(info.filesize) * 1024)}}</div>
                             </div>
                         </div>
-                        <img v-else class="item-file-img" :src="info.url"/>
+                        <img v-else class="item-file-img" :style="imageStyle(info)" :src="info.url"/>
                     </a>
                 </div>
                 <UserImg :info="info" @click="clickUser" class="item-userimg"/>
@@ -99,7 +99,7 @@
                                 <div class="item-file-size">{{$A.bytesToSize($A.runNum(info.filesize) * 1024)}}</div>
                             </div>
                         </div>
-                        <img v-else class="item-file-img" :src="info.url"/>
+                        <img v-else class="item-file-img" :style="imageStyle(info)" :src="info.url"/>
                     </a>
                 </div>
             </div>
@@ -275,6 +275,7 @@
             align-items: center;
             padding: 10px 14px;
             border-radius: 3px;
+            width: 220px;
             .item-file-thumb {
                 width: 36px;
             }
@@ -286,7 +287,7 @@
                 .item-file-name {
                     color: #333333;
                     font-size: 14px;
-                    max-width: 220px;
+                    line-height: 18px;
                     word-break: break-all;
                     text-overflow: ellipsis;
                     overflow: hidden;
@@ -295,7 +296,7 @@
                     -webkit-box-orient: vertical;
                 }
                 .item-file-size {
-                    padding-top: 2px;
+                    padding-top: 4px;
                     color: #666666;
                     font-size: 14px;
                 }
@@ -340,6 +341,32 @@
             userImg() {
                 return this.info.send_userimg || this.info.userimg;
             },
+
+            imageStyle() {
+                return function (info) {
+                    const {width, height} = info;
+                    if (width && height) {
+                        let maxWidth = 220,
+                            maxHeight = 220,
+                            tempWidth = width,
+                            tempHeight = height;
+                        if (width > maxWidth || height > maxHeight) {
+                            if (width > height) {
+                                tempWidth = maxWidth;
+                                tempHeight = height * (maxWidth / width);
+                            } else {
+                                tempWidth = width * (maxHeight / height);
+                                tempHeight = maxHeight;
+                            }
+                        }
+                        return {
+                            width: tempWidth + 'px',
+                            height: tempHeight + 'px',
+                        };
+                    }
+                    return {};
+                }
+            }
         },
 
         methods: {
