@@ -37,7 +37,7 @@
                     v-for="label in projectLabel"
                     :key="label.id"
                     class="label-item label-draggable"
-                    :class="{'label-scroll': label.hasScroll === true && label.getFocus !== true}"
+                    :class="{'label-scroll': label.hasScroll === true && label.endScroll !== true}"
                     @mouseenter="projectMouse(label)">
                     <div class="label-body">
                         <div class="title-box">
@@ -54,45 +54,46 @@
                                 </DropdownMenu>
                             </Dropdown>
                         </div>
-                        <draggable
-                            v-model="label.taskLists"
-                            :ref="'draggable_' + label.id"
+                        <ScrollerY
+                            :ref="'box_' + label.id"
                             class="task-box"
-                            group="task"
-                            draggable=".task-draggable"
-                            :animation="150"
-                            :disabled="projectSortDisabled"
-                            @sort="projectSortUpdate(false)"
-                            @remove="projectSortUpdate(false)">
-                            <div v-for="task in label.taskLists" :key="task.id" class="task-item task-draggable">
-                                <div class="task-shadow" :class="[
+                            @on-scroll="projectBoxScroll($event, label)">
+                            <draggable
+                                v-model="label.taskLists"
+                                class="task-main"
+                                group="task"
+                                draggable=".task-draggable"
+                                :animation="150"
+                                :disabled="projectSortDisabled"
+                                @sort="projectSortUpdate(false)"
+                                @remove="projectSortUpdate(false)">
+                                <div v-for="task in label.taskLists" :key="task.id" class="task-item task-draggable">
+                                    <div class="task-shadow" :class="[
                                         'p'+task.level,
                                         task.complete ? 'complete' : '',
                                         task.overdue ? 'overdue' : '',
                                         task.isNewtask === true ? 'newtask' : ''
                                     ]" @click="openTaskModal(task)">
-                                    <div v-if="task.subtask.length > 0" class="subtask-progress"><em :style="{width: subtaskProgress(task.subtask) + '%'}"></em></div>
-                                    <div class="task-title">{{task.title}}<Icon v-if="task.desc" type="ios-list-box-outline" /></div>
-                                    <div class="task-more">
-                                        <div v-if="task.overdue" class="task-status">{{$L('已超期')}}</div>
-                                        <div v-else-if="task.complete" class="task-status">{{$L('已完成')}}</div>
-                                        <div v-else class="task-status">{{$L('未完成')}}</div>
-                                        <Tooltip class="task-userimg" :content="task.nickname || task.username" transfer>
-                                            <UserImg :info="task" class="avatar"/>
-                                        </Tooltip>
+                                        <div v-if="task.subtask.length > 0" class="subtask-progress"><em :style="{width: subtaskProgress(task.subtask) + '%'}"></em></div>
+                                        <div class="task-title">{{task.title}}<Icon v-if="task.desc" type="ios-list-box-outline" /></div>
+                                        <div class="task-more">
+                                            <div v-if="task.overdue" class="task-status">{{$L('已超期')}}</div>
+                                            <div v-else-if="task.complete" class="task-status">{{$L('已完成')}}</div>
+                                            <div v-else class="task-status">{{$L('未完成')}}</div>
+                                            <Tooltip class="task-userimg" :content="task.nickname || task.username" transfer><UserImg :info="task" class="avatar"/></Tooltip>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div slot="footer">
-                                <project-add-task
-                                    :ref="'add_' + label.id"
-                                    :placeholder='`${$L("添加任务至")}"${label.title}"`'
-                                    :projectid="label.projectid"
-                                    :labelid="label.id"
-                                    @on-focus="(f)=>{$set(label,'getFocus',f)}"
-                                    @on-add-success="addTaskSuccess($event, label)"></project-add-task>
-                            </div>
-                        </draggable>
+                                <div slot="footer">
+                                    <project-add-task
+                                        :ref="'add_' + label.id"
+                                        :placeholder='`${$L("添加任务至")}"${label.title}"`'
+                                        :projectid="label.projectid"
+                                        :labelid="label.id"
+                                        @on-add-success="addTaskSuccess($event, label)"></project-add-task>
+                                </div>
+                            </draggable>
+                        </ScrollerY>
                     </div>
                     <div class="label-bottom" @click="projectFocus(label)">
                         <Icon class="label-bottom-icon" type="ios-add" />
@@ -192,7 +193,7 @@
                 &.label-scroll {
                     &:hover {
                         .label-bottom {
-                            transform: translate(0, 0);
+                            transform: translate(-50%, 0);
                         }
                     }
                 }
@@ -238,13 +239,15 @@
                         }
                     }
                     .task-box {
+                        position: relative;
                         flex: 1;
                         width: 100%;
-                        overflow: auto;
-                        display: flex;
-                        flex-direction: column;
                         padding: 0 12px 2px;
                         transform: translateZ(0);
+                        .task-main {
+                            display: flex;
+                            flex-direction: column;
+                        }
                         .task-item {
                             width: 100%;
                             .task-shadow {
@@ -364,8 +367,8 @@
                 }
                 .label-bottom {
                     position: absolute;
+                    left: 50%;
                     bottom: 14px;
-                    right: 28px;
                     z-index: 1;
                     width: 36px;
                     height: 36px;
@@ -375,7 +378,7 @@
                     align-items: center;
                     justify-content: center;
                     transition: transform 0.2s;
-                    transform: translate(0, 200%);
+                    transform: translate(-50%, 200%);
                     cursor: pointer;
                     .label-bottom-icon {
                         color: #ffffff;
@@ -400,9 +403,11 @@
     import WDrawer from "../../components/iview/WDrawer";
     import ProjectGantt from "../../components/project/gantt/index";
     import ProjectSetting from "../../components/project/setting";
+    import ScrollerY from "../../../_components/ScrollerY";
 
     export default {
         components: {
+            ScrollerY,
             ProjectSetting,
             ProjectGantt,
             WDrawer,
@@ -890,12 +895,16 @@
 
             projectMouse(label) {
                 let hasScroll = false;
-                let el = this.$refs['draggable_' + label.id]
+                let el = this.$refs['box_' + label.id]
                 if (el && el.length > 0) {
                     el = el[0].$el;
                     hasScroll = el.scrollHeight > el.offsetHeight;
                 }
                 this.$set(label, 'hasScroll', hasScroll)
+            },
+
+            projectBoxScroll(e, label) {
+                this.$set(label, 'endScroll', e.scrollE < 50)
             },
 
             projectFocus(label) {

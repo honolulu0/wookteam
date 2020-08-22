@@ -94,7 +94,8 @@
 
         <Modal
             v-model="loginShow"
-            :mask-closable="false">
+            :mask-closable="false"
+            class-name="simple-modal">
             <Form ref="login" :model="formLogin" :rules="ruleLogin">
                 <FormItem prop="username">
                     <Input type="text" v-model="formLogin.username" :placeholder="$L('用户名')" @on-enter="onLogin">

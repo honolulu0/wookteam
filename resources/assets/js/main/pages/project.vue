@@ -75,7 +75,8 @@
             v-model="addShow"
             :title="$L('新建项目')"
             :closable="false"
-            :mask-closable="false">
+            :mask-closable="false"
+            class-name="simple-modal">
             <Form ref="add" :model="formAdd" :rules="ruleAdd" :label-width="80">
                 <FormItem prop="title" :label="$L('项目名称')">
                     <Input type="text" v-model="formAdd.title"></Input>

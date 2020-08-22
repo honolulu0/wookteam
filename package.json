@@ -1,6 +1,6 @@
 {
     "name": "wookteam",
-    "version": "1.5.3",
+    "version": "1.5.4",
     "description": "WookTeam是一款轻量级的开源在线团队协作工具，提供各类文档工具、在线思维导图、在线流程图、项目管理、任务分发、即时IM，知识库管理等工具。",
     "scripts": {
         "ide-helper": "php artisan ide-helper:generate",

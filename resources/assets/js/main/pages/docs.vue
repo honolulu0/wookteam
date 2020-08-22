@@ -57,7 +57,8 @@
             v-model="addBookShow"
             :title="$L(addBookId > 0 ? '修改标题' : '新建知识库')"
             :closable="false"
-            :mask-closable="false">
+            :mask-closable="false"
+            class-name="simple-modal">
             <Form ref="bookAdd" :model="formBookAdd" :rules="ruleBookAdd" :label-width="110">
                 <FormItem prop="title" :label="$L('知识库名称')" style="margin-right:28px">
                     <Input type="text" v-model="formBookAdd.title" :maxlength="32"></Input>
@@ -73,7 +74,8 @@
             v-model="addSectionShow"
             :title="$L(addSectionId > 0 ? '修改文档标题' : '新建文档')"
             :closable="false"
-            :mask-closable="false">
+            :mask-closable="false"
+            class-name="simple-modal">
             <Form ref="sectionAdd" :model="formSectionAdd" :rules="ruleSectionAdd" :label-width="110">
                 <FormItem prop="title" :label="$L('文档标题')" style="margin-right:28px">
                     <Input type="text" v-model="formSectionAdd.title" :maxlength="32"></Input>

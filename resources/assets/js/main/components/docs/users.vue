@@ -64,6 +64,7 @@
                             fontSize: "16px",
                             lineHeight: "30px",
                             borderRadius: "15px",
+                            verticalAlign: "middle"
                         },
                     });
                 }

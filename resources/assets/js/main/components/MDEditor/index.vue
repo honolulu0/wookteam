@@ -9,7 +9,7 @@
                 <MarkdownPro ref="md2" v-if="transfer" v-model="content" :toolbars="toolbars" :is-custom-fullscreen="transfer" height="100%" @on-custom="customClick"></MarkdownPro>
             </div>
         </Modal>
-        <Modal v-model="html2md" title="html转markdown" okText="转换成markdown" width="680" @on-ok="htmlOk" transfer>
+        <Modal v-model="html2md" title="html转markdown" okText="转换成markdown" width="680" class-name="simple-modal" @on-ok="htmlOk" transfer>
             <Input type="textarea" v-model="htmlValue" :rows="14" placeholder="请输入html代码..." />
         </Modal>
     </div>

@@ -29,7 +29,7 @@
                         <UserImg :info="dialog" class="avatar"/>
                         <div class="user-msg-box">
                             <div class="user-msg-title">
-                                <span><user-view :username="dialog.username" placement="right" @on-result="userViewResult(dialog, $event)"/></span>
+                                <span><UserView :username="dialog.username" placement="right" @on-result="userViewResult(dialog, $event)"/></span>
                                 <em>{{formatCDate(dialog.lastdate)}}</em>
                             </div>
                             <div class="user-msg-text">{{dialog.lasttext}}</div>
@@ -72,7 +72,7 @@
              @dragover.prevent="messageDragOver(true)"
              @dragleave.prevent="messageDragOver(false)">
             <div class="manage-title">
-                <user-view :username="dialogTarget.username"/>
+                <UserView :username="dialogTarget.username"/>
                 <Dropdown class="manage-title-right" placement="bottom-end" trigger="click" @on-click="dialogDropdown" transfer>
                     <Icon type="ios-more"/>
                     <DropdownMenu slot="list">
@@ -576,6 +576,7 @@
                 padding: 8px 0;
                 display: flex;
                 align-items: center;
+                height: 40px;
                 .quick-item {
                     color: #444444;
                     font-size: 24px;

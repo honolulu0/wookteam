@@ -8,7 +8,7 @@
 
 <script>
     export default {
-        name: 'x-scroller',
+        name: 'ScrollerX',
 
         props: ['effect'],
 
@@ -104,7 +104,7 @@
         background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8), #ffffff);
         pointer-events: none
     }
-    
+
     .scroller-uneffect {
         &:before,
         &:after {

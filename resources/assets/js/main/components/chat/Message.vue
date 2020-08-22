@@ -9,7 +9,7 @@
                 </div>
                 <div class="item-right">
                     <div class="item-username" @click="clickUser">
-                        <em class="item-name"><user-view :username="userName" :info="info" placement="left"/></em>
+                        <em class="item-name"><UserView :username="userName" :info="info" placement="left"/></em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
                     <div class="item-text" :class="{'text-emoji':textIsEmoji(info.text), 'text-error':info.error}">
@@ -32,7 +32,7 @@
                 <UserImg :info="info" @click="clickUser" class="item-userimg"/>
                 <div class="item-left">
                     <div class="item-username" @click="clickUser">
-                        <em class="item-name"><user-view :username="userName" :info="info" placement="right"/></em>
+                        <em class="item-name"><UserView :username="userName" :info="info" placement="right"/></em>
                         <em v-if="info.__usertag" class="item-tag">{{info.__usertag}}</em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
@@ -61,7 +61,7 @@
                 </div>
                 <div class="item-right">
                     <div class="item-username" @click="clickUser">
-                        <em class="item-name"><user-view :username="userName" :info="info" placement="left"/></em>
+                        <em class="item-name"><UserView :username="userName" :info="info" placement="left"/></em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>
                     <div v-if="info.url==='loading'" class="item-loading">
@@ -84,7 +84,7 @@
                 <UserImg :info="info" @click="clickUser" class="item-userimg"/>
                 <div class="item-left">
                     <div class="item-username" @click="clickUser">
-                        <em class="item-name"><user-view :username="userName" :info="info" placement="right"/></em>
+                        <em class="item-name"><UserView :username="userName" :info="info" placement="right"/></em>
                         <em v-if="info.__usertag" class="item-tag">{{info.__usertag}}</em>
                         <em v-if="info.indate" class="item-date">{{formatCDate(info.indate)}}</em>
                     </div>

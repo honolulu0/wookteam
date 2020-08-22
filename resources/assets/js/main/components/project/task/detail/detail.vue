@@ -55,7 +55,7 @@
                     <li v-if="followerLength(detail.follower) > 0" class="text-follower detail-icon">
                         <span>{{$L('关注者：')}}</span>
                         <em>
-                            <Tag v-for="(fname, findex) in detail.follower" :key="findex" closable @on-close="handleTask('unattention', {username:fname,uisynch:true})"><UserView :username="fname"/></Tag>
+                            <Tag v-for="(fname, findex) in detail.follower" :key="findex" closable @on-close="handleTask('unattention', {username:fname,uisynch:true})"><UserView :username="fname" showimg/></Tag>
                         </em>
                     </li>
                     <li class="text-level detail-icon">
@@ -1082,6 +1082,14 @@
                         &.text-follower {
                             &:before {
                                 content: "\E90D";
+                            }
+                            .ivu-tag {
+                                padding: 0 6px;
+                            }
+                            .user-view-inline {
+                                height: 20px;
+                                line-height: 20px;
+                                vertical-align: top;
                             }
                         }
                         &.text-level {

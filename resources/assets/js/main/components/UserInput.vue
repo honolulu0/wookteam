@@ -1,9 +1,13 @@
 <template>
     <div v-clickoutside="handleClose" @click="handleClose">
+        <!--已选列表-->
         <div v-if="multipleLists.length > 0" class="user-id-multiple">
-            <Tag v-for="(item, index) in multipleLists" :key="index" @on-close="() => { multipleLists.splice(index, 1); callMultipleLists() }" closable><UserView :username="item.username"/></Tag>
+            <div v-for="(item, index) in multipleLists" :key="index" class="user-id-multiple-item">
+                <Tag @on-close="multipleLists.splice(index,1)" :closable="!existMultipleDisabled(item.username)"><UserView :username="item.username" showimg/></Tag>
+            </div>
         </div>
 
+        <!--输入框区域-->
         <div class="user-id-input" ref="reference">
             <Input v-model="nickName" :placeholder="placeholder" :disabled="disabled" icon="md-search" @on-click="searchEnter" @on-enter="searchEnter" @on-blur="searchEnter(true)">
                 <div v-if="$slots.prepend !== undefined" slot="prepend"><slot name="prepend"></slot></div>
@@ -13,6 +17,7 @@
             <div v-if="spinShow" class="user-id-spin"><div><w-loading></w-loading></div></div>
         </div>
 
+        <!--弹出选择表-->
         <transition name="fade">
             <div
                 v-show="!disabled && visible"
@@ -22,12 +27,14 @@
                 v-transfer-dom>
                 <Table highlight-row
                        v-if="searchShow"
+                       ref="myTable"
                        size="small"
                        class="user-id-input-table"
                        :style="tableStyle"
                        :columns="columns"
                        :data="userLists"
                        @on-row-click="userChange"
+                       @on-selection-change="userSelect"
                        :no-data-text="noDataText"></Table>
             </div>
         </transition>
@@ -35,9 +42,20 @@
 </template>
 <style lang="scss" scoped>
     .user-id-multiple {
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         overflow: auto;
         white-space: normal;
+        .ivu-tag {
+            padding-left: 7px;
+        }
+        .user-id-multiple-item {
+            display: inline-block;
+        }
+        .user-view-inline {
+            height: 20px;
+            line-height: 20px;
+            vertical-align: top;
+        }
     }
     .user-id-input {
         display: inline-block;
@@ -100,6 +118,14 @@
         .ivu-table-small td {
             cursor: pointer;
         }
+
+        .ivu-table-cell {
+            padding-left: 12px;
+            padding-right: 12px;
+            &.ivu-table-cell-with-selection {
+                padding-right: 2px;
+            }
+        }
     }
 </style>
 <script>
@@ -156,6 +182,9 @@
             multiple: {
                 type: Boolean,
                 default: false
+            },
+            multipleDisabled: {
+                default: ''
             }
         },
         data () {
@@ -180,35 +209,46 @@
         created() {
             this.columns = [
                 {
+                    "title": this.$L("头像"),
+                    "width": 60,
+                    "align": 'center',
+                    render: (h, params) => {
+                        return h('UserImg', {
+                            props: {
+                                info: params.row,
+                            },
+                            style: {
+                                width: "28px",
+                                height: "28px",
+                                fontSize: "14px",
+                                lineHeight: "28px",
+                                borderRadius: "14px",
+                                verticalAlign: "middle"
+                            },
+                        });
+                    }
+                }, {
                     "title": this.$L("用户名"),
                     "key": "username",
                     "minWidth": 80,
                     "ellipsis": true,
-                    "tooltip": true,
-                    render: (h, params) => {
-                        let arr = [];
-                        let username = params.row.username;
-                        let mLists = this.multipleLists.filter((item) => { return item.username == username; });
-                        if (mLists.length > 0) {
-                            arr.push(h('Icon', {
-                                props: { type: 'md-checkmark' },
-                                style: { marginRight: '6px', fontSize: '16px', color: '#FF5722' },
-                            }));
-                        }
-                        arr.push(h('span', username));
-                        return h('div', arr);
-                    }
                 }, {
                     "title": this.$L("昵称"),
                     "key": "nickname",
                     "minWidth": 80,
                     "ellipsis": true,
-                    "tooltip": true,
                     render: (h, params) => {
                         return h('span', params.row.nickname || '-');
                     }
                 }
             ];
+            if (this.multiple) {
+                this.columns.unshift({
+                    type: 'selection',
+                    width: 30,
+                    align: 'center'
+                });
+            }
             this.noDataText = this.$L("数据加载中.....");
         },
         watch: {
@@ -247,10 +287,10 @@
                         }
                         this.noDataText = this.$L("数据加载中.....");
                         $A.apiAjax({
-                            url: window.location.origin + '/api/users/searchinfo',
+                            url: 'users/searchinfo',
                             data: {
                                 where: where,
-                                pagesize: 1
+                                take: 1
                             },
                             beforeSend: () => {
                                 this.spinShow = true;
@@ -303,9 +343,20 @@
             searchShow(val) {
                 if (val) {
                     this.handleShowPopper();
+                    this.updateMultipleLists();
                 } else {
                     this.handleClosePopper();
                 }
+            },
+
+            multipleLists: {
+                handler() {
+                    if (this.searchShow) {
+                        this.updateMultipleLists();
+                    }
+                    this.emitMultipleLists();
+                },
+                deep: true
             }
         },
         computed: {
@@ -386,10 +437,10 @@
                 }
                 this.noDataText = this.$L("数据加载中.....");
                 $A.apiAjax({
-                    url: window.location.origin + '/api/users/searchinfo',
+                    url: 'users/searchinfo',
                     data: {
                         where: where,
-                        pagesize: 30
+                        take: 30
                     },
                     beforeSend: () => {
                         this.spinShow = true;
@@ -404,11 +455,18 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.userLists = res.data;
-                            for (let i = 0; i < this.userLists.length; i++) {
-                                if (this.userLists[i].id == this.userName) {
-                                    this.userLists[i]['_highlight'] = true;
+                            this.userLists.forEach((item) => {
+                                if (this.multiple) {
+                                    if (this.existMultipleDisabled(item.username)) {
+                                        item._disabled = true;
+                                    }
+                                } else {
+                                    if (item.username == this.userName) {
+                                        item._highlight = true;
+                                    }
+
                                 }
-                            }
+                            });
                             this.searchShow = true;
                         } else {
                             this.$Message.warning(res.msg);
@@ -420,9 +478,12 @@
 
             userChange(item) {
                 if (this.multiple) {
-                    let tempLists = this.multipleLists.filter((res) => { return res.username == item.username });
+                    if (this.existMultipleDisabled(item.username)) {
+                        return;
+                    }
+                    let tempLists = this.multipleLists.filter(({username}) => username == item.username);
                     if (tempLists.length > 0) {
-                        this.multipleLists = this.multipleLists.filter((res) => { return res.username != item.username });
+                        this.multipleLists = this.multipleLists.filter(({username}) => username != item.username);
                     } else {
                         this.addMultipleLists(item);
                     }
@@ -438,6 +499,23 @@
                 }
             },
 
+            userSelect() {
+                if (this.multiple) {
+                    let lists = this.$refs.myTable.objData, item, inThe;
+                    for (let index in lists) {
+                        if (lists.hasOwnProperty(index)) {
+                            item = lists[index];
+                            inThe = this.multipleLists.find(({username}) => username == item.username);
+                            if (item._isChecked) {
+                                !inThe && this.multipleLists.push(item);
+                            } else {
+                                inThe && (this.multipleLists = this.multipleLists.filter(({username}) => username != item.username));
+                            }
+                        }
+                    }
+                }
+            },
+
             handleClose(e) {
                 if (this.multiple && $A(e.target).parents('.user-id-input-table').length > 0) {
                     return;
@@ -447,20 +525,31 @@
                 }
             },
 
+            existMultipleDisabled(username) {
+                return this.multipleDisabled && $A.strExists(`,${this.multipleDisabled},`, `,${username},`)
+            },
+
             addMultipleLists(item) {
-                let inn = false;
-                this.multipleLists.some((tmp) => {
-                    if (tmp.username == item.username) {
-                        return inn = true;
-                    }
-                })
-                if (!inn) {
+                let inThe = this.multipleLists.find(({username}) => username == item.username);
+                if (!inThe) {
                     this.multipleLists.push(item);
-                    this.callMultipleLists();
                 }
             },
 
-            callMultipleLists() {
+            updateMultipleLists() {
+                this.$nextTick(() => {
+                    let lists = this.$refs.myTable.objData, item, inThe;
+                    for (let index in lists) {
+                        if (lists.hasOwnProperty(index)) {
+                            item = lists[index];
+                            inThe = this.multipleLists.find(({username}) => username == item.username);
+                            this.$set(item, "_isChecked", !!inThe);
+                        }
+                    }
+                });
+            },
+
+            emitMultipleLists() {
                 let val = '';
                 this.multipleLists.forEach((tmp) => {
                     if (val) {
@@ -495,11 +584,10 @@
         mounted() {
             this.updatePopper();
             //
-            if ($A.count(this.value) > 0) {
-                this.userName = this.value;
-            }
             if (this.multiple) {
                 this.multipleLists = this.formatMultipleLists(this.value);
+            } else if ($A.count(this.value) > 0) {
+                this.userName = this.value;
             }
         }
     };

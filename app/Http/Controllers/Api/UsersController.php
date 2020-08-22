@@ -193,7 +193,7 @@ class UsersController extends Controller
             ->whereRaw($whereRaw)
             ->orderBy('id')
             ->cacheMinutes(now()->addSeconds(10))
-            ->take(Min(Max(Base::nullShow(Request::input('take'), 10), 1), 100))
+            ->take(Base::getPaginate(100, 10, 'take'))
             ->get();
         foreach ($lists AS $key => $item) {
             $lists[$key]['userimg'] = Users::userimg($item['userimg']);

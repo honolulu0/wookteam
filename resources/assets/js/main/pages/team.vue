@@ -34,7 +34,8 @@
             v-model="addShow"
             :title="$L('添加团队成员')"
             :closable="false"
-            :mask-closable="false">
+            :mask-closable="false"
+            class-name="simple-modal">
             <Form ref="add" :model="formAdd" :rules="ruleAdd" :label-width="80">
                 <FormItem prop="userimg" :label="$L('头像')">
                     <ImgUpload v-model="formAdd.userimg"></ImgUpload>
@@ -134,6 +135,7 @@
                             fontSize: "16px",
                             lineHeight: "30px",
                             borderRadius: "15px",
+                            verticalAlign: "middle"
                         },
                     });
                 }
