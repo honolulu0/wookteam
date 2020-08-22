@@ -49,7 +49,7 @@
             </li>
             <li class="lists">
                 <ul>
-                    <li v-for="(lists, key) in teamLists">
+                    <li v-for="(lists, key) in teamLists" :key="key" v-if="teamListsS(lists).length > 0">
                         <div class="team-label">{{key}}</div>
                         <ul>
                             <li v-for="(item, index) in teamListsS(lists)" :key="index" @click="openDialog(item, true)">
@@ -1167,6 +1167,7 @@
                         if (res.ret === 1) {
                             this.dialogLists = res.data;
                             this.dialogNoDataText = this.$L("没有相关的数据");
+                            this.scrollToActive();
                         } else {
                             this.dialogLists = [];
                             this.dialogNoDataText = res.msg
@@ -1338,26 +1339,33 @@
                     $A.WSOB.sendTo('read', user.username);
                 }
                 if (autoAddDialog === true) {
-                    //自动滚到焦点
-                    this.$nextTick(() => {
-                        let dialogObj = $A(this.$refs.dialogLists);
-                        let activeObj = dialogObj.find("li.active");
-                        if (activeObj.length > 0) {
-                            let offsetTop = activeObj.offset().top;
-                            if (offsetTop < 0) {
-                                dialogObj.stop().scrollTop(activeObj[0].offsetTop)
-                            } else if (offsetTop > dialogObj.height()) {
-                                dialogObj.stop().scrollTop(activeObj[0].offsetTop + activeObj.height() - dialogObj.height())
-                            }
-                        }
-                    });
+                    this.scrollToActive();
                 }
+            },
+
+            scrollToActive() {
+                //自动滚到焦点
+                this.$nextTick(() => {
+                    let dialogObj = $A(this.$refs.dialogLists);
+                    let activeObj = dialogObj.find("li.active");
+                    if (activeObj.length > 0) {
+                        let offsetTop = activeObj.offset().top;
+                        if (offsetTop < 0) {
+                            dialogObj.stop().scrollTop(activeObj[0].offsetTop - 50)
+                        } else if (offsetTop > dialogObj.height()) {
+                            dialogObj.stop().scrollTop(activeObj[0].offsetTop + 50 + activeObj.height() - dialogObj.height())
+                        }
+                    }
+                });
             },
 
             clickDialog(username, autoPush = false) {
                 let lists = this.dialogLists.filter((item) => {return item.username == username});
                 if (lists.length > 0) {
                     this.openDialog(lists[0]);
+                    if (autoPush === true) {
+                        this.scrollToActive();
+                    }
                 } else if (autoPush === true) {
                     $A.apiAjax({
                         url: 'users/team/lists',
