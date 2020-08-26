@@ -1609,7 +1609,7 @@ class ProjectController extends Controller
                     'content' => $content,
                     'indate' => Base::time()
                 ]);
-                $upArray['desc'] = Base::time();
+                $upArray['desc'] = $content ? Base::time() : '';
                 $logArray[] = [
                     'type' => '日志',
                     'projectid' => $task['projectid'],
