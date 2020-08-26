@@ -30,17 +30,7 @@
                 </div>
                 <div class="detail-desc-box detail-icon">
                     <div class="detail-h2"><strong class="active">{{$L('描述')}}</strong></div>
-                    <Input v-model="detail.desc"
-                           :disabled="!!loadData.desc"
-                           type="textarea"
-                           class="detail-desc-input"
-                           ref="descInput"
-                           :rows="2"
-                           :autosize="{minRows:2,maxRows:8}"
-                           maxlength="500"
-                           :placeholder="$L('添加详细描述...')"
-                           @on-keydown="descKeydown"
-                           @on-blur="handleTask('desc')"/>
+                    <DescEditor :taskid="detail.id" :desc="detail.desc" :placeholder="$L('添加详细描述...')" @save-success="handleTask('desc')"/>
                 </div>
                 <ul class="detail-text-box">
                     <li v-if="detail.startdate > 0 && detail.enddate > 0" class="text-time detail-icon">
@@ -76,7 +66,7 @@
                     </div>
                 </div>
                 <div class="detail-subtask-box">
-                    <div v-if="detail.subtask.length == 0" class="detail-subtask-none" @click="handleTask('subtaskAdd')">{{$L('暂无子任务')}}</div>
+                    <div v-if="detail.subtask.length == 0" class="detail-subtask-none">{{$L('暂无子任务')}}</div>
                     <div v-else>
                         <Progress class="detail-subtask-progress" :percent="subtaskProgress" :stroke-width="5" status="active" />
                         <draggable
@@ -90,6 +80,12 @@
                                           true-value="complete"
                                           false-value="unfinished"
                                           @on-change="handleTask('subtaskBlur')"></Checkbox>
+                                <UserView v-if="subitem.uname"
+                                          :username="subitem.uname"
+                                          imgsize="20"
+                                          imgfontsize="14"
+                                          :showname="false"
+                                          showimg/>
                                 <Input v-model="subitem.detail"
                                        type="textarea"
                                        class="detail-subtask-input"
@@ -102,8 +98,26 @@
                                        :placeholder="$L('子任务描述...')"
                                        @on-keydown="subtaskKeydown(subindex, $event)"
                                        @on-blur="handleTask('subtaskBlur')"/>
-                                <div class="detail-subtask-right" :style="subitem.showPoptip===true?{opacity:1}:{}">
+                                <div class="detail-subtask-right" :style="subitem.stip==='show'?{opacity:1}:{}">
                                     <Icon type="md-menu" class="detail-subtask-ricon detail-subtask-rmenu"/>
+                                    <Poptip
+                                        class="detail-subtask-ricon"
+                                        transfer
+                                        @on-popper-show="$set(subitem, 'stip', 'show')"
+                                        @on-popper-hide="[$set(subitem, 'stip', ''), handleTask('subtaskBlur')]">
+                                        <Icon type="md-person" />
+                                        <div slot="content">
+                                            <div style="width:280px">
+                                                {{$L('子任务负责人')}}
+                                                <UserInput
+                                                    v-model="subitem.uname"
+                                                    :projectid="detail.projectid"
+                                                    :transfer="false"
+                                                    :placeholder="$L('输入关键词搜索')"
+                                                    style="margin:5px 0 3px"></UserInput>
+                                            </div>
+                                        </div>
+                                    </Poptip>
                                     <div v-if="subitem.detail==''" class="detail-subtask-ricon">
                                         <Icon type="md-trash" @click="handleTask('subtaskDelete', subindex)"/>
                                     </div>
@@ -113,8 +127,8 @@
                                         confirm
                                         :title="$L('你确定你要删除这个子任务吗?')"
                                         @on-ok="handleTask('subtaskDelete', subindex)"
-                                        @on-popper-show="$set(subitem, 'showPoptip', true)"
-                                        @on-popper-hide="$set(subitem, 'showPoptip', false)"><Icon type="md-trash" /></Poptip>
+                                        @on-popper-show="$set(subitem, 'stip', 'show')"
+                                        @on-popper-hide="$set(subitem, 'stip', '')"><Icon type="md-trash" /></Poptip>
                                 </div>
                             </div>
                         </draggable>
@@ -211,9 +225,10 @@
     import draggable from 'vuedraggable'
     import cloneDeep from "lodash/cloneDeep";
     import WInput from "../../../iview/WInput";
+    import DescEditor from "./DescEditor";
 
     export default {
-        components: {WInput, ProjectTaskFiles, ProjectTaskLogs, draggable},
+        components: {DescEditor, WInput, ProjectTaskFiles, ProjectTaskLogs, draggable},
         data() {
             return {
                 taskid: 0,
@@ -450,10 +465,9 @@
 
             getTaskDetail() {
                 $A.apiAjax({
-                    url: 'project/task/lists',
+                    url: 'project/task/detail',
                     data: {
                         taskid: this.taskid,
-                        archived: '全部'
                     },
                     error: () => {
                         alert(this.$L('网络繁忙，请稍后再试！'));
@@ -465,7 +479,6 @@
                             this.bakData = cloneDeep(this.detail);
                             this.$nextTick(() => {
                                 this.$refs.titleInput.resizeTextarea();
-                                this.$refs.descInput.resizeTextarea();
                                 this.detail.subtask.forEach((temp, index) => {
                                     this.$refs['subtaskInput_' + (index)][0].resizeTextarea();
                                 })
@@ -520,10 +533,11 @@
                                 detail = detail.trim();
                                 detail && this.detail.subtask.push({
                                     id: $A.randomString(6),
-                                    uname: $A.getUserName(),
+                                    uname: '',
                                     time: Math.round(new Date().getTime()/1000),
                                     status: 'unfinished',
-                                    detail: detail
+                                    detail: detail,
+                                    stip: ''
                                 });
                             });
                             this.handleTask('subtask', () => {
@@ -545,7 +559,6 @@
                 //
                 switch (act) {
                     case 'title':
-                    case 'desc':
                         if (this.detail[act] == this.bakData[act]) {
                             return;
                         }
@@ -561,16 +574,21 @@
                         };
                         break;
 
+                    case 'desc':
+                        this.logType == '日志' && this.$refs.log.getLists(true, true);
+                        return;
+
                     case 'subtaskAdd':
                         if (!$A.isArray(this.detail.subtask)) {
                             this.detail.subtask = [];
                         }
                         this.detail.subtask.push({
                             id: $A.randomString(6),
-                            uname: $A.getUserName(),
+                            uname: '',
                             time: Math.round(new Date().getTime()/1000),
                             status: 'unfinished',
-                            detail: ''
+                            detail: '',
+                            stip: ''
                         });
                         this.$nextTick(() => {
                             this.$refs['subtaskInput_' + (this.detail.subtask.length  - 1)][0].focus();
@@ -821,10 +839,11 @@
                                 tempArray.splice(tempArray.length - 1, 1);
                                 this.detail.subtask.push({
                                     id: $A.randomString(6),
-                                    uname: $A.getUserName(),
+                                    uname: '',
                                     time: Math.round(new Date().getTime()/1000),
                                     status: 'unfinished',
-                                    detail: ''
+                                    detail: '',
+                                    stip: ''
                                 });
                             }
                             $A.triggerTaskInfoListener(ajaxData.act, res.data);
@@ -875,18 +894,6 @@
                     background: #ffffff;
                     width: 100%;
                     border-radius: 3px;
-                    resize: none;
-                }
-            }
-        }
-        .detail-desc-box {
-            .detail-desc-input {
-                margin: 10px 0 6px;
-                textarea {
-                    border: 2px solid #F4F5F7;
-                    padding: 5px 8px;
-                    color: #172b4d;
-                    background: rgba(9, 30, 66, 0.04);
                     resize: none;
                 }
             }
@@ -990,6 +997,9 @@
                         background: #cccccc;
                     }
                     .detail-button {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
                         position: absolute;
                         right: 12px;
                         top: 50%;
@@ -1004,7 +1014,7 @@
                             font-size: 12px;
                             opacity: 0.9;
                             transition: all 0.3s;
-                            margin-left: 3px;
+                            margin-left: 5px;
                             &:hover {
                                 opacity: 1;
                             }
@@ -1200,7 +1210,6 @@
                     }
                     .detail-subtask-none {
                         color: #666666;
-                        cursor: pointer;
                         padding: 0 12px;
                     }
                 }

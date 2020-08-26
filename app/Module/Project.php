@@ -50,6 +50,47 @@ class Project
     }
 
     /**
+     * 任务负责人组
+     * @param $task
+     * @return array
+     */
+    public static function taskPersons($task)
+    {
+        $array = [];
+        $array[] = Users::username2basic($task['username']);
+        $persons = [$task['username']];
+        $subtask = Base::string2array($task['subtask']);
+        foreach ($subtask AS $item) {
+            if ($item['uname'] && !in_array($item['uname'], $persons)) {
+                $persons[] = $item['uname'];
+                $basic = Users::username2basic($item['uname']);
+                if ($basic) {
+                    $array[] = $basic;
+                }
+            }
+        }
+        return $array;
+    }
+
+    /**
+     * 是否负责人（任务负责人、子任务负责人）
+     * @param $task
+     * @param $username
+     * @return bool
+     */
+    public static function isPersons($task, $username)
+    {
+        $persons = [$task['username']];
+        $subtask = Base::string2array($task['subtask']);
+        foreach ($subtask AS $item) {
+            if ($item['uname'] && !in_array($item['uname'], $persons)) {
+                $persons[] = $item['uname'];
+            }
+        }
+        return in_array($username, $persons) ? true : false;
+    }
+
+    /**
      * 任务是否过期
      * @param array $task
      * @return int
@@ -75,18 +116,23 @@ class Project
     }
 
     /**
-     * 获取跟任务有关系的用户（关注的、在项目里的、负责人、创建者）
+     * 获取与任务有关系的用户（关注的、在项目里的、负责人、创建者）
      * @param $taskId
      * @return array
      */
     public static function taskSomeUsers($taskId)
     {
-        $taskDeatil = Base::DBC2A(DB::table('project_task')->select(['follower', 'createuser', 'username', 'projectid'])->where('id', $taskId)->first());
+        $taskDeatil = Base::DBC2A(DB::table('project_task')->select(['follower', 'subtask', 'createuser', 'username', 'projectid'])->where('id', $taskId)->first());
         if (empty($taskDeatil)) {
             return [];
         }
         //关注的用户
         $userArray = Base::string2array($taskDeatil['follower']);
+        //子任务负责人
+        $subtask = Base::string2array($taskDeatil['subtask']);
+        foreach ($subtask AS $item) {
+            $userArray[] = $item['uname'];
+        }
         //创建者
         $userArray[] = $taskDeatil['createuser'];
         //负责人
@@ -99,7 +145,7 @@ class Project
             }
         }
         //
-        return $userArray;
+        return array_values(array_filter(array_unique($userArray)));
     }
 
     /**

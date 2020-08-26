@@ -67,7 +67,11 @@
                                 :disabled="projectSortDisabled"
                                 @sort="projectSortUpdate(false)"
                                 @remove="projectSortUpdate(false)">
-                                <div v-for="task in label.taskLists" :key="task.id" class="task-item task-draggable">
+                                <div v-for="task in label.taskLists"
+                                     :key="task.id"
+                                     :slot="task.complete ? 'footer' : 'default'"
+                                     class="task-item"
+                                     :class="{'task-draggable': !task.complete}">
                                     <div class="task-shadow" :class="[
                                         'p'+task.level,
                                         task.complete ? 'complete' : '',
@@ -80,7 +84,16 @@
                                             <div v-if="task.overdue" class="task-status">{{$L('已超期')}}</div>
                                             <div v-else-if="task.complete" class="task-status">{{$L('已完成')}}</div>
                                             <div v-else class="task-status">{{$L('未完成')}}</div>
-                                            <Tooltip class="task-userimg" :content="task.nickname || task.username" transfer><UserImg :info="task" class="avatar"/></Tooltip>
+                                            <div class="task-persons" :class="{'persons-more':task.persons.length > 1}">
+                                                <Tooltip
+                                                    v-for="(person, iper) in task.persons"
+                                                    class="task-userimg"
+                                                    :key="iper"
+                                                    :content="person.nickname || person.username"
+                                                    transfer>
+                                                    <UserImg :info="person" class="avatar"/>
+                                                </Tooltip>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -250,6 +263,14 @@
                         }
                         .task-item {
                             width: 100%;
+                            &.task-draggable {
+                                .task-shadow {
+                                    cursor: pointer;
+                                    &:hover{
+                                        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.38);
+                                    }
+                                }
+                            }
                             .task-shadow {
                                 margin: 5px 0 4px;
                                 padding: 8px 10px 8px 8px;
@@ -258,13 +279,9 @@
                                 border-right: 0;
                                 color: #091e42;
                                 border-radius: 3px;
-                                cursor: pointer;
                                 box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
                                 transition: all 0.3s;
                                 transform: scale(1);
-                                &:hover{
-                                    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.38);
-                                }
                                 &.p1 {
                                     border-left-color: #ff0000;
                                 }
@@ -323,15 +340,34 @@
                                         font-size: 12px;
                                         flex: 1;
                                     }
-                                    .task-userimg {
-                                        width: 26px;
-                                        height: 26px;
-                                        .avatar {
+                                    .task-persons {
+                                        max-width: 150px;
+                                        &.persons-more {
+                                            text-align: right;
+                                            .task-userimg {
+                                                width: 20px;
+                                                height: 20px;
+                                                margin-left: 4px;
+                                                margin-top: 4px;
+                                                .avatar {
+                                                    width: 20px;
+                                                    height: 20px;
+                                                    font-size: 12px;
+                                                    line-height: 20px;
+                                                }
+                                            }
+                                        }
+                                        .task-userimg {
                                             width: 26px;
                                             height: 26px;
-                                            font-size: 14px;
-                                            line-height: 26px;
-                                            border-radius: 13px;
+                                            vertical-align: bottom;
+                                            .avatar {
+                                                width: 26px;
+                                                height: 26px;
+                                                font-size: 14px;
+                                                line-height: 26px;
+                                                border-radius: 13px;
+                                            }
                                         }
                                     }
                                 }

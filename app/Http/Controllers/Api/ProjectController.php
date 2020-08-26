@@ -113,6 +113,7 @@ class ProjectController extends Controller
             $taskLists = [];
             foreach ($task AS $info) {
                 if ($temp['id'] == $info['labelid']) {
+                    $info['persons'] = Project::taskPersons($info);
                     $info['overdue'] = Project::taskIsOverdue($info);
                     $info['subtask'] = Base::string2array($info['subtask']);
                     $info['follower'] = Base::string2array($info['follower']);
@@ -1078,7 +1079,6 @@ class ProjectController extends Controller
      * 项目任务-列表
      *
      * @apiParam {Number} [projectid]           项目ID
-     * @apiParam {Number} [taskid]              任务ID (1、填写此参数时projectid强制为此任务的projectid；2、赋值返回详细数据，不返回列表数据)
      * @apiParam {Number} [labelid]             项目子分类ID
      * @apiParam {String} [username]            负责人用户名（如果项目ID为空时此参数无效只获取自己的任务）
      * @apiParam {Number} [level]               任务等级（1~4）
@@ -1114,22 +1114,8 @@ class ProjectController extends Controller
             $user = $user['data'];
         }
         //
-        $taskid = intval(Request::input('taskid'));
-        $isOwner = false;
-        if ($taskid > 0) {
-            $taskDetail = Base::DBC2A(DB::table('project_task')->where('id', $taskid)->first());
-            if (empty($taskDetail)) {
-                return Base::retError('任务不存在！');
-            }
-            if ($taskDetail['username'] == $user['username']) {
-                $isOwner = true;
-            }
-            $projectid = $taskDetail['projectid'];
-        } else {
-            $projectid = intval(Request::input('projectid'));
-        }
-        //
-        if ($projectid > 0 && !$isOwner) {
+        $projectid = intval(Request::input('projectid'));
+        if ($projectid > 0) {
             $inRes = Project::inThe($projectid, $user['username']);
             if (Base::isError($inRes)) {
                 return $inRes;
@@ -1156,6 +1142,7 @@ class ProjectController extends Controller
             }
         }
         //
+        $builder = DB::table('project_task');
         $selectArray = ['project_task.*'];
         $whereRaw = null;
         $whereFunc = null;
@@ -1183,11 +1170,16 @@ class ProjectController extends Controller
                     $whereArray[] = ['project_task.username', '=', trim(Request::input('username'))];
                 }
             } else {
-                $whereArray[] = ['project_task.username', '=', $user['username']];
+                $builder->where(function ($query) use ($user) {
+                    $query->where('project_task.username', $user['username']);
+                    $query->orWhereIn('project_task.id', function ($inQuery) use ($user) {
+                        $inQuery->from('project_users')
+                            ->select('taskid')
+                            ->where('username', $user['username'])
+                            ->where('type', '负责人');
+                    });
+                });
             }
-        }
-        if ($taskid > 0) {
-            $whereArray[] = ['project_task.id', '=', intval(Request::input('taskid'))];
         }
         if (intval(Request::input('labelid')) > 0) {
             $whereArray[] = ['project_task.labelid', '=', intval(Request::input('labelid'))];
@@ -1230,7 +1222,6 @@ class ProjectController extends Controller
             $orderBy = '`startdate` DESC';
         }
         //
-        $builder = DB::table('project_task');
         if ($projectid > 0) {
             $builder->join('project_lists', 'project_lists.id', '=', 'project_task.projectid');
         }
@@ -1249,7 +1240,7 @@ class ProjectController extends Controller
             ->where($whereArray)
             ->orderByRaw($orderBy)
             ->paginate(Base::getPaginate(100, 20));
-        $lists = Base::getPageList($lists, $taskid > 0 ? false : true);
+        $lists = Base::getPageList($lists);
         if (intval(Request::input('statistics')) == 1) {
             $lists['statistics_unfinished'] = $type === '未完成' ? $lists['total'] : DB::table('project_task')->where('projectid', $projectid)->where('delete', 0)->where('archived', 0)->where('complete', 0)->count();
             $lists['statistics_overdue'] = $type === '已超期' ? $lists['total'] : DB::table('project_task')->where('projectid', $projectid)->where('delete', 0)->where('archived', 0)->where('complete', 0)->whereBetween('enddate', [1, Base::time()])->count();
@@ -1259,21 +1250,73 @@ class ProjectController extends Controller
             return Base::retError('未找到任何相关的任务！', $lists);
         }
         foreach ($lists['lists'] AS $key => $info) {
+            $info['persons'] = Project::taskPersons($info);
             $info['overdue'] = Project::taskIsOverdue($info);
             $info['subtask'] = Base::string2array($info['subtask']);
             $info['follower'] = Base::string2array($info['follower']);
             $lists['lists'][$key] = array_merge($info, Users::username2basic($info['username']));
         }
-        if ($taskid > 0) {
-            if (count($lists['lists']) == 0) {
-                return Base::retError('未能找到此任务或无法管理此任务！');
-            }
-            $data = $lists['lists'][0];
-            $data['projectTitle'] = $data['projectid'] > 0 ? DB::table('project_lists')->where('id', $data['projectid'])->value('title') : '';
-            return Base::retSuccess('success', $data);
+        return Base::retSuccess('success', $lists);
+    }
+
+    /**
+     * 项目任务-详情（与任务有关系的用户（关注的、在项目里的、负责人、创建者）都可以查到）
+     *
+     * @apiParam {Number} taskid              任务ID
+     */
+    public function task__detail()
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
         } else {
-            return Base::retSuccess('success', $lists);
+            $user = $user['data'];
         }
+        //
+        $taskid = intval(Request::input('taskid'));
+        $tmpLists = Project::taskSomeUsers($taskid);
+        if (!in_array($user['username'], $tmpLists)) {
+            return Base::retError('未能找到此任务或无法管理此任务！');
+        }
+        //
+        $task = Base::DBC2A(DB::table('project_task')->where('id', $taskid)->first());
+        $task['persons'] = Project::taskPersons($task);
+        $task['overdue'] = Project::taskIsOverdue($task);
+        $task['subtask'] = Base::string2array($task['subtask']);
+        $task['follower'] = Base::string2array($task['follower']);
+        $task = array_merge($task, Users::username2basic($task['username']));
+        $task['projectTitle'] = $task['projectid'] > 0 ? DB::table('project_lists')->where('id', $task['projectid'])->value('title') : '';
+        return Base::retSuccess('success', $task);
+    }
+
+    /**
+     * 项目任务-描述（任务有关系的用户（关注的、在项目里的、负责人、创建者）都可以查到）
+     *
+     * @apiParam {Number} taskid              任务ID
+     */
+    public function task__desc()
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
+        } else {
+            $user = $user['data'];
+        }
+        //
+        $taskid = intval(Request::input('taskid'));
+        $tmpLists = Project::taskSomeUsers($taskid);
+        if (!in_array($user['username'], $tmpLists)) {
+            return Base::retError('未能找到此任务或无法管理此任务！');
+        }
+        //
+        $desc = DB::table('project_content')->where('taskid', $taskid)->value('content');
+        if (empty($desc)) {
+            $desc = DB::table('project_task')->where('id', $taskid)->value('desc');
+        }
+        return Base::retSuccess('success', [
+            'taskid' => $taskid,
+            'desc' => $desc
+        ]);
     }
 
     /**
@@ -1420,6 +1463,7 @@ class ProjectController extends Controller
             Project::updateNum($inArray['projectid']);
             //
             $task = Base::DBC2A(DB::table('project_task')->where('id', $taskid)->first());
+            $task['persons'] = Project::taskPersons($task);
             $task['overdue'] = Project::taskIsOverdue($task);
             $task['subtask'] = Base::string2array($task['subtask']);
             $task['follower'] = Base::string2array($task['follower']);
@@ -1472,7 +1516,7 @@ class ProjectController extends Controller
             return Base::retError('任务不存在！');
         }
         if ($task['projectid'] > 0) {
-            if ($task['username'] != $user['username']) {
+            if (!Project::isPersons($task, $user['username'])) {
                 $inRes = Project::inThe($task['projectid'], $user['username']);
                 if (Base::isError($inRes)) {
                     return $inRes;
@@ -1507,7 +1551,7 @@ class ProjectController extends Controller
                 }
             }
         } else {
-            if ($task['username'] != $user['username']) {
+            if (!Project::isPersons($task, $user['username'])) {
                 return Base::retError('此操作只允许任务负责人！');
             }
         }
@@ -1546,10 +1590,26 @@ class ProjectController extends Controller
              * 修改描述
              */
             case 'desc': {
-                if ($content == $task['desc']) {
-                    return Base::retError('描述未做改变！');
+                preg_match_all("/<img\s*src=\"data:image\/(png|jpg|jpeg);base64,(.*?)\"/s", $content, $matchs);
+                foreach ($matchs[2] as $key => $text) {
+                    $p = "uploads/projects/" . ($task['projectid'] ?: Users::token2userid()) . "/";
+                    Base::makeDir(public_path($p));
+                    $p.= md5($text) . "." . $matchs[1][$key];
+                    $r = file_put_contents(public_path($p), base64_decode($text));
+                    if ($r) {
+                        $content = str_replace($matchs[0][$key], '<img src="' . Base::fillUrl($p) . '"', $content);
+                    }
                 }
-                $upArray['desc'] = $content;
+                Base::DBUPIN('project_content', [
+                    'taskid' => $task['id'],
+                ], [
+                    'content' => $content,
+                ], [
+                    'projectid' => $task['projectid'],
+                    'content' => $content,
+                    'indate' => Base::time()
+                ]);
+                $upArray['desc'] = Base::time();
                 $logArray[] = [
                     'type' => '日志',
                     'projectid' => $task['projectid'],
@@ -1932,6 +1992,12 @@ class ProjectController extends Controller
                 if (!is_array($content)) {
                     $content = [];
                 }
+                $subNames = [];
+                foreach ($content AS $tmp) {
+                    if ($tmp['uname'] && !in_array($tmp['uname'], $subNames)) {
+                        $subNames[] = $tmp['uname'];
+                    }
+                }
                 $content = Base::array2string($content);
                 if ($content == $task['subtask']) {
                     return Base::retError('子任务未做改变！');
@@ -1950,6 +2016,37 @@ class ProjectController extends Controller
                     $subtype = 'del';
                 }
                 //
+                if ($subNames) {
+                    DB::transaction(function() use ($task, $subNames) {
+                        foreach ($subNames AS $uname) {
+                            $row = Base::DBC2A(DB::table('project_users')->where([
+                                'type' => '负责人',
+                                'taskid' => $task['id'],
+                                'username' => $uname,
+                            ])->lockForUpdate()->first());
+                            if (empty($row)) {
+                                DB::table('project_users')->insert([
+                                    'type' => '负责人',
+                                    'projectid' => $task['projectid'],
+                                    'taskid' => $task['id'],
+                                    'isowner' => $task['username'] == $uname ? 1 : 0,
+                                    'username' => $uname,
+                                    'indate' => Base::time()
+                                ]);
+                            }
+                        }
+                        DB::table('project_users')->where([
+                            'type' => '负责人',
+                            'taskid' => $task['id'],
+                        ])->whereNotIn('username', $subNames)->delete();
+                    });
+                } else {
+                    DB::table('project_users')->where([
+                        'type' => '负责人',
+                        'taskid' => $task['id'],
+                    ])->delete();
+                }
+                //
                 $logArray[] = [
                     'type' => '日志',
                     'projectid' => $task['projectid'],
@@ -1961,6 +2058,7 @@ class ProjectController extends Controller
                         'type' => 'task',
                         'subtype' => $subtype,
                         'id' => $task['id'],
+                        'title' => $task['title'],
                         'subtask' => $content,
                         'old_subtask' => $task['subtask'],
                     ])
@@ -1970,7 +2068,6 @@ class ProjectController extends Controller
 
             default: {
                 return Base::retError('参数错误！');
-                break;
             }
         }
         //
@@ -1986,6 +2083,7 @@ class ProjectController extends Controller
         }
         //
         $task = array_merge($task, $upArray);
+        $task['persons'] = Project::taskPersons($task);
         $task['overdue'] = Project::taskIsOverdue($task);
         $task['subtask'] = Base::string2array($task['subtask']);
         $task['follower'] = Base::string2array($task['follower']);
@@ -2118,9 +2216,9 @@ class ProjectController extends Controller
             if ($taskid <= 0) {
                 return Base::retError('参数错误！');
             }
-            $count = DB::table('project_task')->where([ 'id' => $taskid, 'username' => $user['username']])->count();
-            if ($count <= 0) {
-                return Base::retError('你不是任务负责人！');
+            $tmpLists = Project::taskSomeUsers($taskid);
+            if (!in_array($user['username'], $tmpLists)) {
+                return Base::retError('未能找到此任务或无法管理此任务！');
             }
             $whereArray[] = ['taskid', '=', $taskid];
         }
@@ -2179,11 +2277,11 @@ class ProjectController extends Controller
             if ($taskid <= 0) {
                 return Base::retError('参数错误！');
             }
-            $row = Base::DBC2A(DB::table('project_task')->select(['projectid'])->where([ 'id' => $taskid, 'username' => $user['username']])->first());
-            if (empty($row)) {
-                return Base::retError('你不是任务负责人！');
+            $tmpLists = Project::taskSomeUsers($taskid);
+            if (!in_array($user['username'], $tmpLists)) {
+                return Base::retError('未能找到此任务或无法管理此任务！');
             }
-            $projectid = $row['projectid'];
+            $projectid = DB::table('project_task')->where('id', $taskid)->value('projectid');
         }
         //
         $path = "uploads/projects/" . ($projectid ?: Users::token2userid()) . "/";
@@ -2433,9 +2531,9 @@ class ProjectController extends Controller
             if ($taskid < 0) {
                 return Base::retError('参数错误！');
             }
-            $count = DB::table('project_task')->where([ 'id' => $taskid, 'username' => $user['username']])->count();
-            if ($count <= 0) {
-                return Base::retError('你不是任务负责人！');
+            $tmpLists = Project::taskSomeUsers($taskid);
+            if (!in_array($user['username'], $tmpLists)) {
+                return Base::retError('未能找到此任务或无法管理此任务！');
             }
             $whereArray[] = ['taskid', '=', $taskid];
         }

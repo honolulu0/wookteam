@@ -46,6 +46,7 @@
         }
         .ivu-modal-close {
             top: 7px;
+            z-index: 2;
         }
         .teditor-transfer-body {
             position: absolute;

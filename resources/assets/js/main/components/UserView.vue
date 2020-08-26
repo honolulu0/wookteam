@@ -1,8 +1,8 @@
 <template>
     <div class="user-view-inline">
         <div class="user-view-info">
-            <UserImg v-if="showimg" class="user-view-img" :info="userInfo"/>
-            <Tooltip :disabled="loadIng" :delay="delay" :transfer="transfer" :placement="placement" maxWidth="auto" @on-popper-show="popperShow">
+            <UserImg v-if="showimg" class="user-view-img" :info="userInfo" :style="imgStyle"/>
+            <Tooltip v-if="showname" :disabled="loadIng" :delay="delay" :transfer="transfer" :placement="placement" maxWidth="auto" @on-popper-show="getUserData(30)">
                 {{nickname || username}}
                 <div slot="content" style="white-space:normal">
                     <div>{{$L('用户名')}}: {{username}}</div>
@@ -81,6 +81,16 @@
                 type: Boolean,
                 default: false
             },
+            imgsize: {
+
+            },
+            imgfontsize: {
+
+            },
+            showname: {
+                type: Boolean,
+                default: true
+            },
             info: {
                 default: null
             },
@@ -112,6 +122,20 @@
             userInfo() {
                 const {username, nickname, userimg} = this;
                 return {username, nickname, userimg}
+            },
+            imgStyle() {
+                const {imgsize, imgfontsize} = this;
+                const myStyle = {};
+                if (imgsize) {
+                    const size = /^\d+$/.test(imgsize) ? (imgsize + 'px') : imgsize;
+                    myStyle.width = size;
+                    myStyle.height = size;
+                    myStyle.lineHeight = size;
+                }
+                if (imgfontsize) {
+                    myStyle.fontSize = /^\d+$/.test(imgfontsize) ? (imgfontsize + 'px') : imgfontsize;
+                }
+                return myStyle;
             }
         },
         methods: {
@@ -124,10 +148,6 @@
                     this.$set(this.info, 'nickname', this.nickname);
                     this.$set(this.info, 'userimg', this.userimg);
                 }
-            },
-
-            popperShow() {
-                this.getUserData(30)
             },
 
             getUserData(cacheTime) {
