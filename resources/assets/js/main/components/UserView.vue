@@ -12,6 +12,7 @@
                 <div v-if="showname" class="user-view-name">{{nickname || username}}</div>
             </div>
             <div slot="content" style="white-space:normal">
+                <div v-if="!showname">{{$L('昵称')}}: {{nickname || '-'}}</div>
                 <div>{{$L('用户名')}}: {{username}}</div>
                 <div>{{$L('职位/职称')}}: {{profession || '-'}}</div>
             </div>
