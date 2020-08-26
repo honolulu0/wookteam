@@ -369,7 +369,8 @@ class UsersController extends Controller
     /**
      * 添加团队成员
      *
-     * @apiParam {String} username              用户名（多个用英文逗号分隔）
+     * @apiParam {Number} [id]                  用户ID（留空为添加用户）
+     * @apiParam {String} username              用户名（修改时无效，多个用英文逗号分隔）
      * @apiParam {String} userpass              密码
      * @apiParam {Object} [userimg]             会员头像
      * @apiParam {String} [nickname]            昵称
@@ -410,25 +411,50 @@ class UsersController extends Controller
                 return Base::retError('昵称最多只能设置20个字！');
             }
         }
-        //开始注册
-        $username = trim(Request::input('username'));
-        $array = explode(",", $username);
-        if (count($array) > 500) {
-            return Base::retError(['一次最多只能添加%个账号！', 500]);
-        }
-        foreach ($array AS $item) {
-            if ($item) {
-                $user = Users::reg(trim($item), trim(Request::input('userpass')), [
-                    'userimg' => $userimg ?: '',
-                    'nickname' => $nickname ?: '',
-                    'profession' => $profession ?: '',
-                ]);
-                if (Base::isError($user)) {
-                    return $user;
+        //
+        $id = intval(Request::input('id'));
+        $userpass = trim(Request::input('userpass'));
+        $otherArray = [
+            'userimg' => $userimg ?: '',
+            'nickname' => $nickname ?: '',
+            'profession' => $profession ?: '',
+        ];
+        if ($id > 0) {
+            //开始修改
+            if ($userpass) {
+                if (strlen($userpass) < 6) {
+                    return Base::retError('密码设置不能小于6位数！');
+                } elseif (strlen($userpass) > 32) {
+                    return Base::retError('密码最多只能设置32位数！');
+                }
+                $encrypt = Base::generatePassword(6);
+                $otherArray['encrypt'] = $encrypt;
+                $otherArray['userpass'] = Base::md52($userpass, $encrypt);
+            }
+            DB::table('users')->where('id', $id)->update($otherArray);
+            Users::AZUpdate($id);
+            return Base::retSuccess('修改成功！');
+        } else {
+            //开始注册
+            $username = trim(Request::input('username'));
+            $array = array_values(array_filter(array_unique(explode(",", $username))));
+            if (empty($array)) {
+                return Base::retError('请填写有效的用户名！');
+            }
+            if (count($array) > 500) {
+                return Base::retError(['一次最多只能添加%个账号！', 500]);
+            }
+            foreach ($array AS $item) {
+                $username = trim($item);
+                if ($username) {
+                    $user = Users::reg($username, $userpass, $otherArray);
+                    if (Base::isError($user)) {
+                        return $user;
+                    }
                 }
             }
+            return Base::retSuccess('添加成功！');
         }
-        return Base::retSuccess('添加成功！');
     }
 
     /**

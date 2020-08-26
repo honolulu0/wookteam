@@ -620,6 +620,11 @@
                         while (tempArray.length > 0 && tempArray[tempArray.length - 1].detail == '') {
                             tempArray.splice(tempArray.length - 1, 1);
                         }
+                        tempArray.forEach((item) => {
+                            if (typeof item.stip !== "undefined") {
+                                delete item.stip;
+                            }
+                        });
                         if ($A.jsonStringify(tempArray) === $A.jsonStringify(this.bakData[act])) {
                             return;
                         }

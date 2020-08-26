@@ -14,7 +14,7 @@
                 </div>
                 <div class="w-nav-flex"></div>
                 <div class="w-nav-right">
-                    <span class="ft hover" @click="addShow=true"><i class="ft icon">&#xE740;</i> {{$L('添加团队成员')}}</span>
+                    <span class="ft hover" @click="handleUser('add')"><i class="ft icon">&#xE740;</i> {{$L('添加团队成员')}}</span>
                 </div>
             </div>
         </div>
@@ -32,36 +32,49 @@
 
         <Modal
             v-model="addShow"
-            :title="$L('添加团队成员')"
+            :title="$L(formData.id > 0 ? '修改团队成员' : '添加团队成员')"
             :closable="false"
             :mask-closable="false"
             class-name="simple-modal">
-            <Form ref="add" :model="formAdd" :rules="ruleAdd" :label-width="80">
+            <Form ref="add" :model="formData" :label-width="80">
                 <FormItem prop="userimg" :label="$L('头像')">
-                    <ImgUpload v-model="formAdd.userimg"></ImgUpload>
+                    <ImgUpload v-model="formData.userimg"></ImgUpload>
                 </FormItem>
                 <FormItem prop="nickname" :label="$L('昵称')">
-                    <Input type="text" v-model="formAdd.nickname"></Input>
+                    <Input type="text" v-model="formData.nickname"></Input>
                 </FormItem>
                 <FormItem prop="profession" :label="$L('职位/职称')">
-                    <Input v-model="formAdd.profession"></Input>
+                    <Input v-model="formData.profession"></Input>
                 </FormItem>
-                <FormItem prop="username" :label="$L('用户名')">
-                    <TagInput v-model="formAdd.username" :placeholder="$L('添加后不可修改，使用英文逗号添加多个。')"/>
+                <FormItem prop="username">
+                    <div slot="label"><em v-if="formData.id == 0" class="team-add-red-input">*</em>{{$L('用户名')}}</div>
+                    <Input v-if="formData.id > 0" disabled v-model="formData.username"></Input>
+                    <TagInput v-else v-model="formData.username" :placeholder="$L('添加后不可修改，使用英文逗号添加多个。')"/>
                 </FormItem>
-                <FormItem prop="userpass" :label="$L('登录密码')">
-                    <Input type="password" v-model="formAdd.userpass" :placeholder="$L('最少6位数')"></Input>
+                <FormItem prop="userpass">
+                    <div slot="label"><em v-if="formData.id == 0" class="team-add-red-input">*</em>{{$L('登录密码')}}</div>
+                    <Input type="password" v-model="formData.userpass" :placeholder="$L(formData.id > 0 ? '留空不修改' : '最少6位数')"></Input>
                 </FormItem>
             </Form>
             <div slot="footer">
                 <Button type="default" @click="addShow=false">{{$L('取消')}}</Button>
-                <Button type="primary" :loading="loadIng > 0" @click="onAdd">{{$L('添加')}}</Button>
+                <Button type="primary" :loading="loadIng > 0" @click="onAdd">{{$L(formData.id > 0 ? '修改' : '添加')}}</Button>
             </div>
         </Modal>
 
     </div>
 </template>
 
+<style lang="scss">
+    .team-add-red-input {
+        display: inline-block;
+        margin-right: 4px;
+        line-height: 1;
+        font-family: SimSun,serif;
+        font-size: 14px;
+        color: #ed4014;
+    }
+</style>
 <style lang="scss" scoped>
     .team {
         .team-main {
@@ -107,14 +120,14 @@
                 noDataText: "",
 
                 addShow: false,
-                formAdd: {
+                formData: {
+                    id: 0,
                     userimg: '',
                     profession: '',
                     username: '',
                     nickname: '',
-                    userpass: ''
+                    userpass: '',
                 },
-                ruleAdd: {}
             }
         },
         created() {
@@ -217,7 +230,7 @@
                             },
                             on: {
                                 'on-click': (name) => {
-                                    this.handleUser(name, params.row.username)
+                                    this.handleUser(name, params.row)
                                 }
                             }
                         }, [
@@ -236,6 +249,11 @@
                             }, [
                                 h('DropdownItem', {
                                     props: {
+                                        name: 'edit',
+                                    },
+                                }, this.$L('修改成员信息')),
+                                h('DropdownItem', {
+                                    props: {
                                         name: $A.identityRaw('admin', params.row.identity) ? 'deladmin' : 'setadmin',
                                     },
                                 }, this.$L($A.identityRaw('admin', params.row.identity) ? '取消管理员' : '设为管理员')),
@@ -250,17 +268,6 @@
                     return h('div', array);
                 }
             }];
-            //
-            this.ruleAdd = {
-                username: [
-                    { required: true, message: this.$L('请填写用户名！'), trigger: 'change' },
-                    { type: 'string', min: 2, message: this.$L('用户名长度至少2位！'), trigger: 'change' }
-                ],
-                userpass: [
-                    { required: true, message: this.$L('请填写登录密码！'), trigger: 'change' },
-                    { type: 'string', min: 6, message: this.$L('密码长度至少6位！'), trigger: 'change' }
-                ]
-            };
         },
         mounted() {
             this.getLists(true);
@@ -322,33 +329,47 @@
             },
 
             onAdd() {
-                this.$refs.add.validate((valid) => {
-                    if (valid) {
-                        this.loadIng++;
-                        $A.apiAjax({
-                            url: 'users/team/add',
-                            data: this.formAdd,
-                            complete: () => {
-                                this.loadIng--;
-                            },
-                            success: (res) => {
-                                if (res.ret === 1) {
-                                    this.addShow = false;
-                                    this.$Message.success(res.msg);
-                                    this.$refs.add.resetFields();
-                                    //
-                                    this.getLists(true);
-                                }else{
-                                    this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });
-                                }
-                            }
-                        });
+                this.loadIng++;
+                let id = $A.runNum(this.formData.id);
+                $A.apiAjax({
+                    url: 'users/team/add',
+                    data: this.formData,
+                    complete: () => {
+                        this.loadIng--;
+                    },
+                    success: (res) => {
+                        if (res.ret === 1) {
+                            this.addShow = false;
+                            this.$Message.success(res.msg);
+                            this.$refs.add.resetFields();
+                            //
+                            this.getLists(id == 0);
+                        }else{
+                            this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });
+                        }
                     }
                 });
             },
 
-            handleUser(act, username) {
+            handleUser(act, info) {
                 switch (act) {
+                    case "add": {
+                        this.addShow = true;
+                        this.formData = {
+                            id: 0,
+                            userimg: '',
+                            profession: '',
+                            username: '',
+                            nickname: '',
+                            userpass: '',
+                        }
+                        break;
+                    }
+                    case "edit": {
+                        this.addShow = true;
+                        this.formData = Object.assign($A.cloneData(info))
+                        break;
+                    }
                     case "delete": {
                         this.$Modal.confirm({
                             title: this.$L('删除团队成员'),
@@ -356,7 +377,7 @@
                             loading: true,
                             onOk: () => {
                                 $A.apiAjax({
-                                    url: 'users/team/delete?username=' + username,
+                                    url: 'users/team/delete?username=' + info.username,
                                     error: () => {
                                         this.$Modal.remove();
                                         alert(this.$L('网络繁忙，请稍后再试！'));
@@ -385,7 +406,7 @@
                             loading: true,
                             onOk: () => {
                                 $A.apiAjax({
-                                    url: 'users/team/admin?act=' + (act=='deladmin'?'del':'set') + '&username=' + username,
+                                    url: 'users/team/admin?act=' + (act=='deladmin'?'del':'set') + '&username=' + info.username,
                                     error: () => {
                                         this.$Modal.remove();
                                         alert(this.$L('网络繁忙，请稍后再试！'));
@@ -394,7 +415,7 @@
                                         this.$Modal.remove();
                                         if (res.ret === 1) {
                                             this.lists.some((item) => {
-                                                if (item.username == username) {
+                                                if (item.username == info.username) {
                                                     this.$set(item, 'identity', res.data.identity);
                                                     return true;
                                                 }
@@ -407,8 +428,8 @@
                                                     indate: Math.round(new Date().getTime() / 1000),
                                                     text: this.$L(act=='deladmin' ? '您的管理员身份已被撤销。' : '恭喜您成为管理员。')
                                                 };
-                                                $A.WSOB.sendTo('user', username, data, 'special');
-                                                $A.WSOB.sendTo('info', username, { 'type': 'update'});
+                                                $A.WSOB.sendTo('user', info.username, data, 'special');
+                                                $A.WSOB.sendTo('info', info.username, { 'type': 'update'});
                                             }
                                         }
                                         setTimeout(() => {
