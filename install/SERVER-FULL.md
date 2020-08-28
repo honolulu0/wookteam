@@ -1,8 +1,6 @@
 # 安装教程
 
-- [安装教程(Docker)](DOCKER.md)
-- **安装教程(服务器-完整版)**
-- [安装教程(宝塔面板)](BT.md)
+[本文视频教程 https://youtu.be/TOnPkEpjbig](https://youtu.be/TOnPkEpjbig)
 
 ## 准备
 
