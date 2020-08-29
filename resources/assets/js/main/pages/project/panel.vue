@@ -69,9 +69,7 @@
                                 @remove="projectSortUpdate(false)">
                                 <div v-for="task in label.taskLists"
                                      :key="task.id"
-                                     :slot="task.complete ? 'footer' : 'default'"
-                                     class="task-item"
-                                     :class="{'task-draggable': !task.complete}">
+                                     class="task-item task-draggable">
                                     <div class="task-shadow" :class="[
                                         'p'+task.level,
                                         task.complete ? 'complete' : '',
@@ -440,6 +438,7 @@
     import ProjectGantt from "../../components/project/gantt/index";
     import ProjectSetting from "../../components/project/setting";
     import ScrollerY from "../../../_components/ScrollerY";
+    import cloneDeep from "lodash/cloneDeep";
 
     export default {
         components: {
@@ -633,8 +632,9 @@
                     },
                     success: (res) => {
                         if (res.ret === 1) {
-                            this.projectDetail = res.data.project;
                             this.projectLabel = res.data.label;
+                            this.projectLabel.forEach((item) => { item.taskLists = this.taskNewSort(item.taskLists) });
+                            this.projectDetail = res.data.project;
                             this.projectSimpleLabel = res.data.simpleLabel;
                             this.projectSortData = this.getProjectSort();
                             if (successTip === true) {
@@ -920,6 +920,7 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.$Message.success(res.msg);
+                            this.projectLabel.forEach((item) => { item.taskLists = this.taskNewSort(item.taskLists) });
                             $A.triggerTaskInfoListener(isLabel ? 'labelsort' : 'tasksort', { projectid: this.projectid, nickname: $A.getNickName(), time: Math.round(new Date().getTime()/1000) });
                         } else {
                             this.getDetail();
@@ -961,6 +962,13 @@
             openTaskModal(taskDetail) {
                 this.taskDetail(taskDetail);
             },
+
+            taskNewSort(lists) {
+                let array = [];
+                array.unshift(...cloneDeep(lists.filter(({complete}) => complete )));
+                array.unshift(...cloneDeep(lists.filter(({complete}) => !complete )));
+                return array;
+            }
         },
     }
 </script>
