@@ -925,8 +925,15 @@
                     },
                     success: (res) => {
                         if (res.ret === 1) {
-                            this.$Message.success(res.msg);
+                            this.projectLabel.forEach((label) => {
+                                let length = label.taskLists.length;
+                                label.taskLists.forEach((task, index) => {
+                                    task.inorder = length - index;
+                                });
+                            });
                             this.taskNewSort();
+                            //
+                            this.$Message.success(res.msg);
                             $A.triggerTaskInfoListener(isLabel ? 'labelsort' : 'tasksort', { projectid: this.projectid, nickname: $A.getNickName(), time: Math.round(new Date().getTime()/1000) });
                         } else {
                             this.getDetail();
