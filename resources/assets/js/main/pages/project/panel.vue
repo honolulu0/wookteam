@@ -438,7 +438,7 @@
     import ProjectGantt from "../../components/project/gantt/index";
     import ProjectSetting from "../../components/project/setting";
     import ScrollerY from "../../../_components/ScrollerY";
-    import cloneDeep from "lodash/cloneDeep";
+    import orderBy from "lodash/orderBy";
 
     export default {
         components: {
@@ -579,6 +579,12 @@
                         });
                         this.projectSortData = this.getProjectSort();
                         break;
+
+
+                    case "complete":        // 标记完成
+                    case "unfinished":      // 标记未完成
+                        this.taskNewSort();
+                        break;
                 }
             }, true);
         },
@@ -633,7 +639,7 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.projectLabel = res.data.label;
-                            this.projectLabel.forEach((item) => { item.taskLists = this.taskNewSort(item.taskLists) });
+                            this.taskNewSort();
                             this.projectDetail = res.data.project;
                             this.projectSimpleLabel = res.data.simpleLabel;
                             this.projectSortData = this.getProjectSort();
@@ -920,7 +926,7 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.$Message.success(res.msg);
-                            this.projectLabel.forEach((item) => { item.taskLists = this.taskNewSort(item.taskLists) });
+                            this.taskNewSort();
                             $A.triggerTaskInfoListener(isLabel ? 'labelsort' : 'tasksort', { projectid: this.projectid, nickname: $A.getNickName(), time: Math.round(new Date().getTime()/1000) });
                         } else {
                             this.getDetail();
@@ -963,10 +969,17 @@
                 this.taskDetail(taskDetail);
             },
 
-            taskNewSort(lists) {
+            taskNewSort() {
+                this.$nextTick(() => {
+                    this.projectLabel.forEach((item) => { item.taskLists = this.taskReturnNewSort(item.taskLists) });
+                })
+            },
+
+            taskReturnNewSort(lists) {
+                let tmpLists = orderBy(lists, ['complete', 'inorder'], ['asc', 'desc']);
                 let array = [];
-                array.unshift(...cloneDeep(lists.filter(({complete}) => complete )));
-                array.unshift(...cloneDeep(lists.filter(({complete}) => !complete )));
+                array.unshift(...tmpLists.filter(({complete}) => complete ));
+                array.unshift(...tmpLists.filter(({complete}) => !complete ));
                 return array;
             }
         },
