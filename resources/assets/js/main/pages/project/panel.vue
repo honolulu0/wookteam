@@ -76,7 +76,7 @@
                                         task.overdue ? 'overdue' : '',
                                         task.isNewtask === true ? 'newtask' : ''
                                     ]" @click="openTaskModal(task)">
-                                        <div v-if="task.subtask.length > 0" class="subtask-progress"><em :style="{width: subtaskProgress(task.subtask) + '%'}"></em></div>
+                                        <div class="subtask-progress"><em :style="{width: subtaskProgress(task) + '%'}"></em></div>
                                         <div class="task-title">{{task.title}}<Icon v-if="task.desc" type="ios-list-box-outline" /></div>
                                         <div class="task-more">
                                             <div v-if="task.overdue" class="task-status">{{$L('已超期')}}</div>
@@ -964,9 +964,10 @@
                 }
             },
 
-            subtaskProgress(subtask) {
+            subtaskProgress(task) {
+                const {subtask, complete} = task;
                 if (subtask.length === 0) {
-                    return 0;
+                    return complete ? 100 : 0;
                 }
                 const completeLists = subtask.filter((item) => { return item.status == 'complete'});
                 return parseFloat(((completeLists.length / subtask.length) * 100).toFixed(2));

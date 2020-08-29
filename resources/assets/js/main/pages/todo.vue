@@ -52,7 +52,7 @@
                                     @sort="taskSortUpdate"
                                     @remove="taskSortUpdate">
                                     <div v-for="task in taskDatas[index].lists" class="content-li task-draggable" :key="task.id" :class="{complete:task.complete}" @click="openTaskModal(task)">
-                                        <div v-if="task.subtask.length > 0" class="subtask-progress"><em :style="{width: subtaskProgress(task.subtask) + '%'}"></em></div>
+                                        <div class="subtask-progress"><em :style="{width: subtaskProgress(task) + '%'}"></em></div>
                                         <Icon v-if="task.complete" class="task-check" type="md-checkbox-outline" @click.stop="taskComplete(task, false)"/>
                                         <Icon v-else class="task-check" type="md-square-outline" @click.stop="taskComplete(task, true)"/>
                                         <div v-if="!!task.loadIng" class="task-loading"><w-loading></w-loading></div>
@@ -724,9 +724,10 @@
                 });
             },
 
-            subtaskProgress(subtask) {
+            subtaskProgress(task) {
+                const {subtask, complete} = task;
                 if (subtask.length === 0) {
-                    return 0;
+                    return complete ? 100 : 0;
                 }
                 const completeLists = subtask.filter((item) => { return item.status == 'complete'});
                 return parseFloat(((completeLists.length / subtask.length) * 100).toFixed(2));
