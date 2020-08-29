@@ -14,10 +14,20 @@
                 </div>
                 <div class="w-nav-flex"></div>
                 <div class="w-nav-right">
-                    <span class="ft hover" @click="openProjectDrawer('lists')"><i class="ft icon">&#xE89E;</i> {{$L('任务列表')}}</span>
+                    <span class="ft hover" :class="{active:filtrTask!=''}">
+                        <Dropdown @on-click="(res)=>{filtrTask=res}" transfer>
+                            <Icon type="md-funnel" class="icon"/> {{$L('筛选')}}
+                            <DropdownMenu slot="list">
+                                <DropdownItem name="" :class="{'dropdown-active':filtrTask==''}">全部任务</DropdownItem>
+                                <DropdownItem name="persons" :class="{'dropdown-active':filtrTask=='persons'}">我负责的任务</DropdownItem>
+                                <DropdownItem name="follower" :class="{'dropdown-active':filtrTask=='follower'}">我关注的任务</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </span>
+                    <span class="ft hover" @click="openProjectDrawer('lists')"><i class="ft icon">&#xE89E;</i> {{$L('列表')}}</span>
                     <span class="ft hover" :class="{active:projectGanttShow}" @click="projectGanttShow=!projectGanttShow"><i class="ft icon">&#59141;</i> {{$L('甘特图')}}</span>
-                    <span class="ft hover" @click="openProjectDrawer('files')"><i class="ft icon">&#xE701;</i> {{$L('文件列表')}}</span>
-                    <span class="ft hover" @click="openProjectDrawer('logs')"><i class="ft icon">&#xE753;</i> {{$L('项目动态')}}</span>
+                    <span class="ft hover" @click="openProjectDrawer('files')"><i class="ft icon">&#xE701;</i> {{$L('文件')}}</span>
+                    <span class="ft hover" @click="openProjectDrawer('logs')"><i class="ft icon">&#xE753;</i> {{$L('动态')}}</span>
                     <span class="ft hover" @click="openProjectSettingDrawer('setting')"><i class="ft icon">&#xE7A7;</i> {{$L('设置')}}</span>
                 </div>
             </div>
@@ -61,6 +71,7 @@
                             <draggable
                                 v-model="label.taskLists"
                                 class="task-main"
+                                :class="[filtrTask ? 'filtr-' + filtrTask : '']"
                                 group="task"
                                 draggable=".task-draggable"
                                 :animation="150"
@@ -69,8 +80,9 @@
                                 @remove="projectSortUpdate(false)">
                                 <div v-for="task in label.taskLists"
                                      :key="task.id"
-                                     class="task-item task-draggable">
-                                    <div class="task-shadow" :class="[
+                                     class="task-item task-draggable"
+                                     :class="{'persons-item':isPersonsTask(task), 'follower-item': isFollowerTask(task)}">
+                                <div class="task-shadow" :class="[
                                         'p'+task.level,
                                         task.complete ? 'complete' : '',
                                         task.overdue ? 'overdue' : '',
@@ -258,6 +270,22 @@
                         .task-main {
                             display: flex;
                             flex-direction: column;
+                            &.filtr-persons {
+                                .task-item {
+                                    display: none;
+                                    &.persons-item {
+                                        display: block;
+                                    }
+                                }
+                            }
+                            &.filtr-follower {
+                                .task-item {
+                                    display: none;
+                                    &.follower-item {
+                                        display: block;
+                                    }
+                                }
+                            }
                         }
                         .task-item {
                             width: 100%;
@@ -471,11 +499,17 @@
 
                 projectGanttShow: false,
 
+                userInfo: {},
+
+                filtrTask: '',
                 routeName: '',
             }
         },
         mounted() {
             this.routeName = this.$route.name;
+            this.userInfo = $A.getUserInfo((res) => {
+                this.userInfo = res;
+            }, false);
             $A.setOnTaskInfoListener('pages/project-panel',(act, detail) => {
                 if (detail.projectid != this.projectid) {
                     return;
@@ -989,6 +1023,14 @@
                 array.unshift(...tmpLists.filter(({complete}) => complete ));
                 array.unshift(...tmpLists.filter(({complete}) => !complete ));
                 return array;
+            },
+
+            isPersonsTask(task) {
+                return task.persons && !!task.persons.find(({username}) => username == this.userInfo.username);
+            },
+
+            isFollowerTask(task) {
+                return task.follower && task.follower.indexOf(this.userInfo.username) !== -1;
             }
         },
     }

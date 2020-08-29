@@ -300,3 +300,9 @@
         }
     }
 }
+
+.ivu-dropdown-item {
+    &.dropdown-active {
+        color: #058ce4;
+    }
+}

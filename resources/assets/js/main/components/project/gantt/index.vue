@@ -5,16 +5,16 @@
             <Icon class="project-gstc-dropdown-icon" type="md-eye" />
             <DropdownMenu slot="list">
                 <DropdownItem name="now">{{$L('现在')}}</DropdownItem>
-                <DropdownItem name="day" :class="{'project-gstc-dropdown-period':period=='day'}">{{$L('天视图')}}</DropdownItem>
-                <DropdownItem name="week" :class="{'project-gstc-dropdown-period':period=='week'}">{{$L('周视图')}}</DropdownItem>
-                <DropdownItem name="month" :class="{'project-gstc-dropdown-period':period=='month'}">{{$L('月视图')}}</DropdownItem>
+                <DropdownItem name="day" :class="{'dropdown-active':period=='day'}">{{$L('天视图')}}</DropdownItem>
+                <DropdownItem name="week" :class="{'dropdown-active':period=='week'}">{{$L('周视图')}}</DropdownItem>
+                <DropdownItem name="month" :class="{'dropdown-active':period=='month'}">{{$L('月视图')}}</DropdownItem>
             </DropdownMenu>
         </Dropdown>
         <Dropdown class="project-gstc-dropdown-filtr" @on-click="tapProject">
             <Icon class="project-gstc-dropdown-icon" :class="{filtr:filtrProjectId>0}" type="md-funnel" />
             <DropdownMenu slot="list">
-                <DropdownItem :name="0" :class="{'project-gstc-dropdown-period':filtrProjectId==0}">{{$L('全部')}}</DropdownItem>
-                <DropdownItem v-for="(item, index) in projectLabel" :key="index" :name="item.id" :class="{'project-gstc-dropdown-period':filtrProjectId==item.id}">{{item.title}} ({{item.taskLists.length}})</DropdownItem>
+                <DropdownItem :name="0" :class="{'dropdown-active':filtrProjectId==0}">{{$L('全部')}}</DropdownItem>
+                <DropdownItem v-for="(item, index) in projectLabel" :key="index" :name="item.id" :class="{'dropdown-active':filtrProjectId==item.id}">{{item.title}} ({{item.taskLists.length}})</DropdownItem>
             </DropdownMenu>
         </Dropdown>
         <div class="project-gstc-close" @click="$emit('on-close')"><Icon type="md-close" /></div>
@@ -70,9 +70,6 @@
                 &.filtr {
                     color: #058ce4;
                 }
-            }
-            .project-gstc-dropdown-period {
-                color: #058ce4;
             }
         }
         .project-gstc-dropdown-eye {
