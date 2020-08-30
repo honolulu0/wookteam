@@ -512,4 +512,8 @@ export default {
     "全部任务": "All tasks",
     "我负责的任务": "I am responsible for the task",
     "使用我上次抄送的人": "Use the person I cc'd last time",
+    "没有任何修改！": "No changes!",
+    "分享文档": "Share documents",
+    "历史版本": "Historic version",
+    "浏览文档": "View the document",
 }

@@ -71,11 +71,11 @@
             <div class="docs-body">
                 <template v-if="docDetail.type=='document'">
                     <MDEditor v-if="docContent.type=='md'" class="body-text" v-model="docContent.content" height="100%"></MDEditor>
-                    <TEditor v-else class="body-text" v-model="docContent.content" height="100%"></TEditor>
+                    <TEditor v-else class="body-text" v-model="docContent.content" height="100%" @editorSave="handleClick('saveBefore')"></TEditor>
                 </template>
-                <minder v-else-if="docDetail.type=='mind'" ref="myMind" class="body-mind" v-model="docContent"></minder>
+                <minder v-else-if="docDetail.type=='mind'" ref="myMind" class="body-mind" v-model="docContent" @saveData="handleClick('saveBefore')"></minder>
                 <sheet v-else-if="docDetail.type=='sheet'" ref="mySheet" class="body-sheet" v-model="docContent.content"></sheet>
-                <flow v-else-if="docDetail.type=='flow'" ref="myFlow" class="body-flow" v-model="docContent.content"></flow>
+                <flow v-else-if="docDetail.type=='flow'" ref="myFlow" class="body-flow" v-model="docContent.content" @saveData="handleClick('saveBefore')"></flow>
             </div>
         </div>
 
@@ -501,6 +501,7 @@
             //
             this.refreshSid();
             this.synergy(true);
+            document.addEventListener("keydown", this.keySave);
         },
         deactivated() {
             if (this.isLock && this.docDetail.lockname == this.userInfo.username) {
@@ -514,6 +515,7 @@
             }
             //
             this.synergy(false);
+            document.removeEventListener("keydown", this.keySave);
             this.docDrawerShow = false;
             if ($A.getToken() === false) {
                 this.sid = 0;
@@ -534,7 +536,7 @@
                     this.sid = To.params.sid;
                 }
             },
-            
+
             docDrawerTab(act) {
                 switch (act) {
                     case "menu":
@@ -617,6 +619,13 @@
             }
         },
         methods: {
+            keySave(e) {
+                if ((e.ctrlKey || e.metaKey) && e.keyCode === 83) {
+                    this.handleClick('saveBefore');
+                    e.preventDefault();
+                }
+            },
+
             goBackDirect() {
                 this.bakContent = $A.jsonStringify(this.docContent);
                 this.goBack({name:'docs'});
@@ -766,6 +775,14 @@
                             }
                         });
                         break;
+
+                    case "saveBefore":
+                        if (!this.equalContent && this.loadIng == 0) {
+                            this.handleClick('save');
+                        } else {
+                            this.$Message.warning(this.$L('没有任何修改！'));
+                        }
+                        return;
 
                     case "save":
                         this.bakContent = $A.jsonStringify(this.docContent);

@@ -137,7 +137,7 @@
                         'advlist autolink lists link image charmap print preview hr anchor pagebreak imagetools',
                         'searchreplace visualblocks visualchars code',
                         'insertdatetime media nonbreaking save table contextmenu directionality',
-                        'emoticons paste textcolor colorpicker imagetools codesample'
+                        'emoticons paste textcolor colorpicker imagetools codesample save'
                     ];
                 }
             },
@@ -227,6 +227,9 @@
                     language: "zh_CN",
                     toolbar: this.toolbar,
                     plugins: this.plugins,
+                    save_onsavecallback: (e) => {
+                        this.$emit('editorSave', e);
+                    },
                     paste_data_images: true,
                     menu: {
                         view: {

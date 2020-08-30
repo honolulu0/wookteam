@@ -82,6 +82,10 @@
                         this.$emit('input', data.params.xml);
                         break
 
+                    case 'save':
+                        this.$emit('saveData');
+                        break
+
                     case 'imageContent':
                         let pdf = new JSPDF({
                             format: [data.params.width, data.params.height]

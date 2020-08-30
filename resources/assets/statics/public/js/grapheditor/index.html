@@ -54,9 +54,18 @@
             this.actions.get('export').setEnabled(false);
             this.actions.get('open').setEnabled(false);
             this.actions.get('import').setEnabled(false);
-            this.actions.get('save').setEnabled(false);
+            this.actions.get('save').setEnabled(true);
             this.actions.get('saveAs').setEnabled(false);
             this.actions.get('export').setEnabled(false);
+        };
+
+        EditorUi.prototype.saveFile = function () {
+            window.parent.postMessage({
+                act: 'save',
+                params: {
+
+                }
+            }, '*');
         };
 
         EditorUi.prototype.menubarHeight = 0;
