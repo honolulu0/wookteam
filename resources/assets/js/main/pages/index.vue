@@ -15,6 +15,7 @@
                 <div class="z-1">
                     <dl>
                         <dd>
+                            <Button v-if="systemConfig.enterprise=='show'" type="success" size="small" class="right-enterprise" @click="enterpriseOpen">{{$L('企业版')}}</Button>
                             <a v-if="systemConfig.github=='show'" class="right-info" target="_blank" href="https://github.com/kuaifan/wookteam">
                                 <Icon class="right-icon" type="logo-github"/>
                             </a>
@@ -200,6 +201,14 @@
                             color: #fff;
                             cursor: pointer;
                             margin-right: 1px;
+                            .right-enterprise {
+                                padding: 1px 10px;
+                                font-size: 12px;
+                                color: #f6ca9d;
+                                background: #1d1e23;
+                                background: linear-gradient(90deg, #1d1e23, #3f4045);
+                                border: none;
+                            }
                             .right-info {
                                 display: inline-block;
                                 cursor: pointer;
@@ -440,7 +449,9 @@
                     }
                 });
             },
-
+            enterpriseOpen() {
+                this.goForward({path: '/contrast'});
+            },
             loginChack() {
                 if ($A.getToken() !== false) {
                     this.goForward({path: '/todo'}, true);

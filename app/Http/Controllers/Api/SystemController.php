@@ -66,6 +66,7 @@ class SystemController extends Controller
             $setting = Base::setting('system');
         }
         $setting['logo'] = Base::fillUrl($setting['logo']);
+        $setting['enterprise'] = env('ENTERPRISE_SHOW') ? 'show': '';
         return Base::retSuccess('success', $setting ? $setting : json_decode('{}'));
     }
 

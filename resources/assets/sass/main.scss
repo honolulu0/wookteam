@@ -292,6 +292,16 @@
     }
 }
 
+.ivu-drawer-body {
+    .ivu-tabs-bar {
+        padding-right: 32px;
+    }
+}
+
+.ivu-select-dropdown-max {
+    max-height: 300px;
+}
+
 .ivu-modal-wrap {
     &.simple-modal {
         .ivu-modal-header,
