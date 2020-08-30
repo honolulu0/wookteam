@@ -18,9 +18,10 @@
                         <Dropdown @on-click="(res)=>{filtrTask=res}" transfer>
                             <Icon type="md-funnel" class="icon"/> {{$L('筛选')}}
                             <DropdownMenu slot="list">
-                                <DropdownItem name="" :class="{'dropdown-active':filtrTask==''}">全部任务</DropdownItem>
-                                <DropdownItem name="persons" :class="{'dropdown-active':filtrTask=='persons'}">我负责的任务</DropdownItem>
-                                <DropdownItem name="follower" :class="{'dropdown-active':filtrTask=='follower'}">我关注的任务</DropdownItem>
+                                <DropdownItem name="" :class="{'dropdown-active':filtrTask==''}">{{$L('全部任务')}}</DropdownItem>
+                                <DropdownItem name="persons" :class="{'dropdown-active':filtrTask=='persons'}">{{$L('我负责的任务')}}</DropdownItem>
+                                <DropdownItem name="follower" :class="{'dropdown-active':filtrTask=='follower'}">{{$L('我关注的任务')}}</DropdownItem>
+                                <DropdownItem name="create" :class="{'dropdown-active':filtrTask=='create'}">{{$L('我创建的任务')}}</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                     </span>
@@ -81,7 +82,7 @@
                                 <div v-for="task in label.taskLists"
                                      :key="task.id"
                                      class="task-item task-draggable"
-                                     :class="{'persons-item':isPersonsTask(task), 'follower-item': isFollowerTask(task)}">
+                                     :class="{'persons-item':isPersonsTask(task), 'follower-item': isFollowerTask(task), 'create-item': isCreateTask(task)}">
                                 <div class="task-shadow" :class="[
                                         'p'+task.level,
                                         task.complete ? 'complete' : '',
@@ -282,6 +283,14 @@
                                 .task-item {
                                     display: none;
                                     &.follower-item {
+                                        display: block;
+                                    }
+                                }
+                            }
+                            &.filtr-create {
+                                .task-item {
+                                    display: none;
+                                    &.create-item {
                                         display: block;
                                     }
                                 }
@@ -1036,6 +1045,10 @@
 
             isFollowerTask(task) {
                 return task.follower && task.follower.indexOf(this.userInfo.username) !== -1;
+            },
+
+            isCreateTask(task) {
+                return task.createuser == this.userInfo.username;
             }
         },
     }

@@ -509,4 +509,6 @@ export default {
     "所属项目：": "View project:",
     "拖动到这里添加附件至 %": "Drag here to add attachments to%",
     "拖动到这里发送给 %": "Send to drag%",
+    "全部任务": "All tasks",
+    "我负责的任务": "I am responsible for the task",
 }
