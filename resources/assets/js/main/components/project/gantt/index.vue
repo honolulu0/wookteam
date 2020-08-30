@@ -292,7 +292,7 @@
                             }
                         }
                         //
-                        let label = `<div class="gantt-schedule-timeline-calendar-title${taskData.complete?' complete-title':''}">${taskData['title']}</div>`;
+                        let label = `<div class="gantt-schedule-timeline-calendar-title${taskData.complete?' complete-title':''}">${this.html2Escape(taskData.title)}</div>`;
                         if (taskData.overdue) {
                             label = `<div class="gantt-schedule-timeline-calendar-overdue"><em>${this.$L('已超期')}</em></div>${label}`;
                         }
@@ -300,20 +300,20 @@
                         this.rows[index] = {
                             id: index,
                             label: label,
-                            taskId: taskData['id'],
+                            taskId: taskData.id,
                             complete: taskData.complete,
                             overdue: taskData.overdue,
                         };
                         let tempTime = { start, end };
-                        let findData = this.editData.find((t) => { return t.id == taskData['id'] });
+                        let findData = this.editData.find((t) => { return t.id == taskData.id });
                         if (findData) {
                             findData.backTime = $A.cloneData(tempTime)
                             tempTime = $A.cloneData(findData.newTime);
                         }
-                        this.items[taskData['id']] = {
+                        this.items[taskData.id] = {
                             rowId: index,
-                            id: taskData['id'],
-                            label: taskData['title'],
+                            id: taskData.id,
+                            label: taskData.title,
                             time: tempTime,
                             notime: notime,
                             style: { background: color },
@@ -587,6 +587,12 @@
             tapProject(e) {
                 this.filtrProjectId = $A.runNum(e);
                 this.initData();
+            },
+
+            html2Escape(sHtml) {
+                return sHtml.replace(/[<>&"]/g, function (c) {
+                    return {'<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;'}[c];
+                });
             }
         }
     }
