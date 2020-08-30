@@ -529,6 +529,12 @@
                 this.refreshDetail();
             },
 
+            '$route' (To) {
+                if (To.name == 'docs-edit') {
+                    this.sid = To.params.sid;
+                }
+            },
+            
             docDrawerTab(act) {
                 switch (act) {
                     case "menu":

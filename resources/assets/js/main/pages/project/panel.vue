@@ -652,6 +652,11 @@
                 this.projectLabel = [];
                 this.projectSimpleLabel = [];
                 this.getDetail();
+            },
+            '$route' (To) {
+                if (To.name == 'project-panel') {
+                    this.projectid = To.params.projectid;
+                }
             }
         },
         methods: {

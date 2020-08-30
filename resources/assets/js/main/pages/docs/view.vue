@@ -226,7 +226,9 @@
                 }
             },
             '$route' (To) {
-                this.sid = To.params.sid;
+                if (To.name == 'docs-view') {
+                    this.sid = To.params.sid;
+                }
             },
         },
         methods: {

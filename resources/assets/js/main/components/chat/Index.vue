@@ -195,6 +195,31 @@
             overflow: hidden;
             -webkit-box-orient: vertical;
         }
+        .chat-user {
+            .user-msg-title {
+                .user-view-inline {
+                    .user-view-name {
+                        max-width: 100%;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+            }
+        }
+        .chat-message {
+            .manage-title {
+                .user-view-inline {
+                    max-width: 70%;
+                    .user-view-name {
+                        max-width: 100%;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+            }
+        }
     }
 </style>
 <style lang="scss" scoped>
