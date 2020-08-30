@@ -40,7 +40,7 @@ export default {
     "个人中心": "Personal center",
     "退出登录": "Sign out",
     "个人资料": "Personal information",
-    "头像": "Head portrait",
+    "头像": "Head",
     "职位/职称": "Position / Title",
     "提交": "Submit",
     "重置": "Reset",
