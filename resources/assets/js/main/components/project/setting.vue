@@ -143,6 +143,7 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.formSystem = res.data;
+                            this.formSystem__reset = $A.cloneData(this.formSystem);
                             if (save) {
                                 this.$Message.success(this.$L('修改成功'));
                                 this.$emit('on-change', res.data);
@@ -168,6 +169,10 @@
                 })
             },
             handleReset(name) {
+                if (typeof this[name + '__reset'] !== "undefined") {
+                    this[name] = $A.cloneData(this[name + '__reset']);
+                    return;
+                }
                 this.$refs[name].resetFields();
             },
         }

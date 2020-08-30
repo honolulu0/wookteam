@@ -422,6 +422,9 @@
                 this.$set(this.formDatum, 'nickname', this.userInfo.nickname)
                 this.$set(this.formDatum, 'profession', this.userInfo.profession)
                 this.$set(this.formSetting, 'bgid', this.userInfo.bgid)
+                this.formDatum__reset = $A.cloneData(this.formDatum);
+                this.formSetting__reset = $A.cloneData(this.formSetting);
+                this.formPass__reset = $A.cloneData(this.formPass);
             };
             this.userInfo = $A.getUserInfo((res) => {
                 this.userInfo = res;
@@ -488,12 +491,14 @@
                     },
                     success: (res) => {
                         if (res.ret === 1) {
-                            this.formSystem = res.data;
-                            this.formSystem.github = this.formSystem.github || 'show';
-                            this.formSystem.reg = this.formSystem.reg || 'open';
-                            this.formSystem.callav = this.formSystem.callav || 'open';
-                            this.formSystem.autoArchived = this.formSystem.autoArchived || 'close';
-                            this.formSystem.archivedDay = this.formSystem.archivedDay || 7;
+                            let tempData = res.data;
+                            tempData.github = tempData.github || 'show';
+                            tempData.reg = tempData.reg || 'open';
+                            tempData.callav = tempData.callav || 'open';
+                            tempData.autoArchived = tempData.autoArchived || 'close';
+                            tempData.archivedDay = tempData.archivedDay || 7;
+                            this.formSystem = tempData;
+                            this.formSystem__reset = $A.cloneData(this.formSystem);
                             if (save) {
                                 this.$Message.success(this.$L('修改成功'));
                             }
@@ -578,6 +583,10 @@
                 })
             },
             handleReset(name) {
+                if (typeof this[name + '__reset'] !== "undefined") {
+                    this[name] = $A.cloneData(this[name + '__reset']);
+                    return;
+                }
                 this.$refs[name].resetFields();
             },
             formArchived(value) {

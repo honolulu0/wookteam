@@ -160,6 +160,7 @@
                             data.role_look = data.role_look || 'edit';
                             data.role_view = data.role_view || 'all';
                             this.formSystem = data;
+                            this.formSystem__reset = $A.cloneData(this.formSystem);
                             if (save) {
                                 this.$Message.success(this.$L('修改成功'));
                             }
@@ -184,6 +185,10 @@
                 })
             },
             handleReset(name) {
+                if (typeof this[name + '__reset'] !== "undefined") {
+                    this[name] = $A.cloneData(this[name + '__reset']);
+                    return;
+                }
                 this.$refs[name].resetFields();
             },
         }
