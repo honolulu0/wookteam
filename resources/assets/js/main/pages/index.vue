@@ -450,7 +450,7 @@
                 });
             },
             enterpriseOpen() {
-                this.goForward({path: '/contrast'});
+                this.goForward({path: '/plans'});
             },
             loginChack() {
                 if ($A.getToken() !== false) {

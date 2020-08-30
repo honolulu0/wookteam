@@ -1,5 +1,5 @@
 <template>
-    <div class="page-contrast">
+    <div class="page-plans">
         <v-title>{{$L('选择合适你的 WookTeam')}}</v-title>
 
         <div class="top-bg"></div>
@@ -45,236 +45,236 @@
                 {{$L('WookTeam 是新一代企业协作平台，您可以根据您企业的业务需求，选择合适的产品功能。')}} <br>
                 {{$L('从现在开始，WookTeam 为世界各地的团队提供支持，探索适合您的选项。')}}
             </div>
-            <div class="price-table">
-                <div class="price-table-bd price-table-info">
-                    <div class="price-table-item first">
-                        <div class="price-table-info-th"></div>
-                        <div class="price-table-info-price"><em>{{$L('价格')}}</em></div>
-                        <div class="price-table-info-desc"><em>{{$L('概述')}}</em></div>
-                        <div class="price-table-info-desc"><em>{{$L('人数')}}</em></div>
-                        <div class="price-table-info-btn"></div>
+            <div class="plans-table">
+                <div class="plans-table-bd plans-table-info">
+                    <div class="plans-table-item first">
+                        <div class="plans-table-info-th"></div>
+                        <div class="plans-table-info-price"><em>{{$L('价格')}}</em></div>
+                        <div class="plans-table-info-desc"><em>{{$L('概述')}}</em></div>
+                        <div class="plans-table-info-desc"><em>{{$L('人数')}}</em></div>
+                        <div class="plans-table-info-btn"></div>
                     </div>
-                    <div @mouseenter="active=1" class="price-table-item" :class="{active:active==1}">
-                        <div class="price-table-info-th">{{$L('社区版')}}</div>
-                        <div class="price-table-info-price">
-                            <img class="price-version" src="../../../statics/images/contrast/free.png">
+                    <div @mouseenter="active=1" class="plans-table-item" :class="{active:active==1}">
+                        <div class="plans-table-info-th">{{$L('社区版')}}</div>
+                        <div class="plans-table-info-price">
+                            <img class="plans-version" src="../../../statics/images/plans/free.png">
                             <div class="currency"><em>0</em></div>
                         </div>
-                        <div class="price-table-info-desc">{{$L('适用于轻团队的任务协作')}}</div>
-                        <div class="price-table-info-desc">{{$L('无限制')}}</div>
-                        <div class="price-table-info-btn">
+                        <div class="plans-table-info-desc">{{$L('适用于轻团队的任务协作')}}</div>
+                        <div class="plans-table-info-desc">{{$L('无限制')}}</div>
+                        <div class="plans-table-info-btn">
                             <Tooltip :content="$L('账号：%、密码：%', 'admin', '123456')" transfer>
                                 <a href="https://demo.wookteam.com" class="btn" target="_blank">{{$L('体验DEMO')}}</a>
                             </Tooltip>
                         </div>
                     </div>
-                    <div @mouseenter="active=2" class="price-table-item" :class="{active:active==2}">
-                        <div class="price-table-info-th">{{$L('企业版')}} <span>{{$L('推荐')}}</span></div>
-                        <div class="price-table-info-price">
-                            <img class="price-version" src="../../../statics/images/contrast/pro.png">
+                    <div @mouseenter="active=2" class="plans-table-item" :class="{active:active==2}">
+                        <div class="plans-table-info-th">{{$L('企业版')}} <span>{{$L('推荐')}}</span></div>
+                        <div class="plans-table-info-price">
+                            <img class="plans-version" src="../../../statics/images/plans/pro.png">
                             <div class="currency"><em>18800</em></div>
                         </div>
-                        <div class="price-table-info-desc">{{$L('适用于群组共享和高级权限')}}</div>
-                        <div class="price-table-info-desc">{{$L('无限制')}}</div>
-                        <div class="price-table-info-btn">
+                        <div class="plans-table-info-desc">{{$L('适用于群组共享和高级权限')}}</div>
+                        <div class="plans-table-info-desc">{{$L('无限制')}}</div>
+                        <div class="plans-table-info-btn">
                             <Tooltip :content="$L('账号：%、密码：%', 'admin', '123456')" transfer>
                                 <a href="https://pro.wookteam.com" class="btn" target="_blank">{{$L('体验DEMO')}}</a>
                             </Tooltip>
                         </div>
                     </div>
-                    <div @mouseenter="active=3" class="price-table-item" :class="{active:active==3}">
-                        <div class="price-table-info-th">{{$L('定制版')}}</div>
-                        <div class="price-table-info-price">
-                            <img class="price-version" src="../../../statics/images/contrast/Ultimate.png">
+                    <div @mouseenter="active=3" class="plans-table-item" :class="{active:active==3}">
+                        <div class="plans-table-info-th">{{$L('定制版')}}</div>
+                        <div class="plans-table-info-price">
+                            <img class="plans-version" src="../../../statics/images/plans/Ultimate.png">
                             <div class="currency"><em class="custom">{{$L('自定义')}}</em></div>
                         </div>
-                        <div class="price-table-info-desc">{{$L('根据您的需求量身定制')}}</div>
-                        <div class="price-table-info-desc">{{$L('无限制')}}</div>
-                        <div class="price-table-info-btn">
+                        <div class="plans-table-info-desc">{{$L('根据您的需求量身定制')}}</div>
+                        <div class="plans-table-info-desc">{{$L('无限制')}}</div>
+                        <div class="plans-table-info-btn">
                             <a href="javascript:void(0)" class="btn btn-contact" @click="contactShow=true">{{$L('联系我们')}}</a>
                         </div>
                     </div>
                 </div>
-                <div class="price-accordion-head" :class="{'price-accordion-close':!body1}" @click="body1=!body1">
+                <div class="plans-accordion-head" :class="{'plans-accordion-close':!body1}" @click="body1=!body1">
                     <div class="first"><span>{{$L('应用支持')}}</span></div>
-                    <div @mouseenter="active=1" class="price-table-item" :class="{active:active==1}"></div>
-                    <div @mouseenter="active=2" class="price-table-item" :class="{active:active==2}"></div>
-                    <div @mouseenter="active=3" class="price-table-item" :class="{active:active==3}"></div>
+                    <div @mouseenter="active=1" class="plans-table-item" :class="{active:active==1}"></div>
+                    <div @mouseenter="active=2" class="plans-table-item" :class="{active:active==2}"></div>
+                    <div @mouseenter="active=3" class="plans-table-item" :class="{active:active==3}"></div>
                     <span><Icon type="ios-arrow-down" /></span>
                 </div>
-                <div v-if="body1" class="price-accordion-body">
-                    <div class="price-table-bd price-table-app">
-                        <div class="price-table-item first">
-                            <div class="price-table-td">{{$L('项目管理')}}</div>
-                            <div class="price-table-td">{{$L('文档/知识库')}}</div>
-                            <div class="price-table-td">{{$L('团队管理')}}</div>
-                            <div class="price-table-td">IM{{$L('聊天')}}</div>
-                            <div class="price-table-td">{{$L('子任务')}}</div>
-                            <div class="price-table-td">{{$L('国际化')}}</div>
-                            <div class="price-table-td">{{$L('甘特图')}}</div>
-                            <div class="price-table-td">{{$L('任务动态')}}</div>
-                            <div class="price-table-td">{{$L('日程')}}</div>
-                            <div class="price-table-td">{{$L('周报/日报')}}</div>
+                <div v-if="body1" class="plans-accordion-body">
+                    <div class="plans-table-bd plans-table-app">
+                        <div class="plans-table-item first">
+                            <div class="plans-table-td">{{$L('项目管理')}}</div>
+                            <div class="plans-table-td">{{$L('文档/知识库')}}</div>
+                            <div class="plans-table-td">{{$L('团队管理')}}</div>
+                            <div class="plans-table-td">IM{{$L('聊天')}}</div>
+                            <div class="plans-table-td">{{$L('子任务')}}</div>
+                            <div class="plans-table-td">{{$L('国际化')}}</div>
+                            <div class="plans-table-td">{{$L('甘特图')}}</div>
+                            <div class="plans-table-td">{{$L('任务动态')}}</div>
+                            <div class="plans-table-td">{{$L('日程')}}</div>
+                            <div class="plans-table-td">{{$L('周报/日报')}}</div>
 
-                            <div class="price-table-td">{{$L('IM群聊')}}</div>
-                            <div class="price-table-td">{{$L('项目群聊')}}</div>
-                            <div class="price-table-td">{{$L('项目权限')}}</div>
-                            <div class="price-table-td">{{$L('项目搜索')}}</div>
-                            <div class="price-table-td">{{$L('任务类型')}}</div>
-                            <div class="price-table-td">{{$L('知识库搜索')}}</div>
-                            <div class="price-table-td">{{$L('团队分组')}}</div>
-                            <div class="price-table-td">{{$L('分组权限')}}</div>
-                            <div class="price-table-td">{{$L('成员统计')}}</div>
-                            <div class="price-table-td">{{$L('签到功能')}}</div>
+                            <div class="plans-table-td">{{$L('IM群聊')}}</div>
+                            <div class="plans-table-td">{{$L('项目群聊')}}</div>
+                            <div class="plans-table-td">{{$L('项目权限')}}</div>
+                            <div class="plans-table-td">{{$L('项目搜索')}}</div>
+                            <div class="plans-table-td">{{$L('任务类型')}}</div>
+                            <div class="plans-table-td">{{$L('知识库搜索')}}</div>
+                            <div class="plans-table-td">{{$L('团队分组')}}</div>
+                            <div class="plans-table-td">{{$L('分组权限')}}</div>
+                            <div class="plans-table-td">{{$L('成员统计')}}</div>
+                            <div class="plans-table-td">{{$L('签到功能')}}</div>
                         </div>
-                        <div @mouseenter="active=1" class="price-table-item" :class="{active:active==1}">
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
-                            <div class="price-table-td"> - </div>
+                        <div @mouseenter="active=1" class="plans-table-item" :class="{active:active==1}">
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
+                            <div class="plans-table-td"> - </div>
                         </div>
-                        <div @mouseenter="active=2" class="price-table-item" :class="{active:active==2}">
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
+                        <div @mouseenter="active=2" class="plans-table-item" :class="{active:active==2}">
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                         </div>
-                        <div @mouseenter="active=3" class="price-table-item" :class="{active:active==3}">
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
+                        <div @mouseenter="active=3" class="plans-table-item" :class="{active:active==3}">
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                         </div>
                     </div>
                 </div>
-                <div class="price-accordion-head" :class="{'price-accordion-close':!body2}" @click="body2=!body2">
+                <div class="plans-accordion-head" :class="{'plans-accordion-close':!body2}" @click="body2=!body2">
                     <div class="first"><span>{{$L('服务支持')}}</span></div>
-                    <div @mouseenter="active=1" class="price-table-item" :class="{active:active==1}"></div>
-                    <div @mouseenter="active=2" class="price-table-item" :class="{active:active==2}"></div>
-                    <div @mouseenter="active=3" class="price-table-item" :class="{active:active==3}"></div>
+                    <div @mouseenter="active=1" class="plans-table-item" :class="{active:active==1}"></div>
+                    <div @mouseenter="active=2" class="plans-table-item" :class="{active:active==2}"></div>
+                    <div @mouseenter="active=3" class="plans-table-item" :class="{active:active==3}"></div>
                     <span><Icon type="ios-arrow-down" /></span>
                 </div>
-                <div v-if="body2" class="price-accordion-body">
-                    <div class="price-table-bd price-table-app price-table-service">
-                        <div class="price-table-item first">
-                            <div class="price-table-td">{{$L('自助支持')}} <span>{{$L('（Issues/文档/社群）')}}</span></div>
-                            <div class="price-table-td">{{$L('支持私有化部署')}}</div>
-                            <div class="price-table-td">{{$L('绑定自有域名')}}</div>
-                            <div class="price-table-td">{{$L('二次开发')}}</div>
-                            <div class="price-table-td">{{$L('在线咨询支持')}}</div>
-                            <div class="price-table-td">{{$L('电话咨询支持')}}</div>
-                            <div class="price-table-td">{{$L('中英文邮件支持')}}</div>
-                            <div class="price-table-td">{{$L('一对一客户顾问')}}</div>
-                            <div class="price-table-td">{{$L('产品培训')}}</div>
-                            <div class="price-table-td">{{$L('上门支持')}}</div>
-                            <div class="price-table-td">{{$L('专属客户成功经理')}}</div>
-                            <div class="price-table-td">{{$L('免费提供一次企业内训')}}</div>
-                            <div class="price-table-td">{{$L('明星客户案例')}}</div>
-                            <div class="price-table-info-btn"></div>
+                <div v-if="body2" class="plans-accordion-body">
+                    <div class="plans-table-bd plans-table-app plans-table-service">
+                        <div class="plans-table-item first">
+                            <div class="plans-table-td">{{$L('自助支持')}} <span>{{$L('（Issues/文档/社群）')}}</span></div>
+                            <div class="plans-table-td">{{$L('支持私有化部署')}}</div>
+                            <div class="plans-table-td">{{$L('绑定自有域名')}}</div>
+                            <div class="plans-table-td">{{$L('二次开发')}}</div>
+                            <div class="plans-table-td">{{$L('在线咨询支持')}}</div>
+                            <div class="plans-table-td">{{$L('电话咨询支持')}}</div>
+                            <div class="plans-table-td">{{$L('中英文邮件支持')}}</div>
+                            <div class="plans-table-td">{{$L('一对一客户顾问')}}</div>
+                            <div class="plans-table-td">{{$L('产品培训')}}</div>
+                            <div class="plans-table-td">{{$L('上门支持')}}</div>
+                            <div class="plans-table-td">{{$L('专属客户成功经理')}}</div>
+                            <div class="plans-table-td">{{$L('免费提供一次企业内训')}}</div>
+                            <div class="plans-table-td">{{$L('明星客户案例')}}</div>
+                            <div class="plans-table-info-btn"></div>
                         </div>
-                        <div @mouseenter="active=1" class="price-table-item" :class="{active:active==1}">
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-info-btn">
+                        <div @mouseenter="active=1" class="plans-table-item" :class="{active:active==1}">
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-info-btn">
                                 <Tooltip :content="$L('账号：%、密码：%', 'admin', '123456')" transfer>
                                     <a href="https://demo.wookteam.com" class="btn" target="_blank">{{$L('体验DEMO')}}</a>
                                 </Tooltip>
                             </div>
                         </div>
-                        <div @mouseenter="active=2" class="price-table-item" :class="{active:active==2}">
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-td"><span> - </span></div>
-                            <div class="price-table-info-btn">
+                        <div @mouseenter="active=2" class="plans-table-item" :class="{active:active==2}">
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-td"><span> - </span></div>
+                            <div class="plans-table-info-btn">
                                 <Tooltip :content="$L('账号：%、密码：%', 'admin', '123456')" transfer>
                                     <a href="https://pro.wookteam.com" class="btn" target="_blank">{{$L('体验DEMO')}}</a>
                                 </Tooltip>
                             </div>
                         </div>
-                        <div @mouseenter="active=3" class="price-table-item" :class="{active:active==3}">
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-td"><Icon type="md-checkmark" /></div>
-                            <div class="price-table-info-btn">
+                        <div @mouseenter="active=3" class="plans-table-item" :class="{active:active==3}">
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-info-btn">
                                 <a href="javascript:void(0)" class="btn btn-contact" @click="contactShow=true">{{$L('联系我们')}}</a>
                             </div>
                         </div>
@@ -292,7 +292,7 @@
                     <div class="info-function">
                         <div class="func-item">
                             <div class="image">
-                                <img src="../../../statics/images/contrast/1.svg">
+                                <img src="../../../statics/images/plans/1.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -305,7 +305,7 @@
                         </div>
                         <div class="func-item">
                             <div class="image">
-                                <img src="../../../statics/images/contrast/2.svg">
+                                <img src="../../../statics/images/plans/2.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -318,7 +318,7 @@
                         </div>
                         <div class="func-item">
                             <div class="image image-80">
-                                <img src="../../../statics/images/contrast/3.svg">
+                                <img src="../../../statics/images/plans/3.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -340,7 +340,7 @@
                     <div class="info-function">
                         <div class="func-item">
                             <div class="image">
-                                <img src="../../../statics/images/contrast/4.svg">
+                                <img src="../../../statics/images/plans/4.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -353,7 +353,7 @@
                         </div>
                         <div class="func-item">
                             <div class="image image-80">
-                                <img src="../../../statics/images/contrast/5.svg">
+                                <img src="../../../statics/images/plans/5.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -366,7 +366,7 @@
                         </div>
                         <div class="func-item">
                             <div class="image">
-                                <img src="../../../statics/images/contrast/6.svg">
+                                <img src="../../../statics/images/plans/6.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -388,7 +388,7 @@
                     <div class="info-function">
                         <div class="func-item">
                             <div class="image">
-                                <img src="../../../statics/images/contrast/7.svg">
+                                <img src="../../../statics/images/plans/7.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -401,7 +401,7 @@
                         </div>
                         <div class="func-item">
                             <div class="image image-80">
-                                <img src="../../../statics/images/contrast/8.svg">
+                                <img src="../../../statics/images/plans/8.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -414,7 +414,7 @@
                         </div>
                         <div class="func-item">
                             <div class="image image-50">
-                                <img src="../../../statics/images/contrast/9.svg">
+                                <img src="../../../statics/images/plans/9.svg">
                             </div>
                             <div class="func-desc">
                                 <div class="desc-title">
@@ -440,7 +440,7 @@
             footer-hide>
             <div class="contact-modal">
                 <p>{{$L('如有任何问题，欢迎使用微信与我们联系。')}}</p>
-                <p><img src="../../../statics/images/contrast/wechat.png"></p>
+                <p><img src="../../../statics/images/plans/wechat.png"></p>
             </div>
         </Modal>
     </div>
@@ -461,7 +461,7 @@
 }
 </style>
 <style lang="scss" scoped>
-.page-contrast {
+.page-plans {
     .top-bg {
         position: absolute;
         top: 0;
@@ -470,7 +470,7 @@
         height: 640px;
         padding-top: 192px;
         z-index: 0;
-        background: url(../../../statics/images/contrast/banner-bg.png) center top no-repeat;
+        background: url(../../../statics/images/plans/banner-bg.png) center top no-repeat;
         background-size: 100% 100%;
     }
 
@@ -562,7 +562,7 @@
             line-height: 30px;
         }
 
-        .price-table {
+        .plans-table {
             max-width: 1120px;
             margin: 110px auto 100px;
             box-shadow: 0 10px 30px rgba(172, 184, 207, 0.3);
@@ -571,10 +571,10 @@
                 font-size: 14px;
                 color: #666666;
             }
-            .price-table-bd {
+            .plans-table-bd {
                 background-color: #fff;
                 display: flex;
-                .price-table-item {
+                .plans-table-item {
                     flex: 1;
                     border-left: 1px solid #eee;
                     position: relative;
@@ -619,14 +619,14 @@
                             transform: scaleY(1.05);
                             box-shadow: 0 10px 30px rgba(172, 184, 207, 0.3);
                         }
-                        & + .price-table-item {
+                        & + .plans-table-item {
                             border-left-color: transparent;
                         }
                     }
                 }
             }
-            .price-table-app {
-                .price-table-td {
+            .plans-table-app {
+                .plans-table-td {
                     height: 60px;
                     display: flex;
                     justify-content: center;
@@ -638,8 +638,8 @@
                         font-family:-apple-system, Arial, sans-serif;
                     }
                 }
-                .price-table-item {
-                    .price-table-td {
+                .plans-table-item {
+                    .plans-table-td {
                         position: relative;
                         i {
                             color: #22d7bb;
@@ -654,7 +654,7 @@
                             transform: translate(30%, -50%);
                         }
                     }
-                    .price-table-info-btn {
+                    .plans-table-info-btn {
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
@@ -662,7 +662,7 @@
                         height: 100px;
                     }
                     &.first {
-                        .price-table-td {
+                        .plans-table-td {
                             font-size: 14px;
                             color: #666;
                             i {
@@ -711,7 +711,7 @@
                                     color: #ff5b57;
                                 }
                             }
-                            &.price-table-app-okr {
+                            &.plans-table-app-okr {
                                 position: relative;
                                 &::after {
                                     content: "(OKR)";
@@ -725,14 +725,14 @@
                     }
                 }
             }
-            .price-table-info-flex {
+            .plans-table-info-flex {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
             }
-            .price-table-info {
-                .price-table-info-th {
+            .plans-table-info {
+                .plans-table-info-th {
                     height: 70px;
                     background-color: #eef2f8;
                     font-size: 16px;
@@ -755,13 +755,13 @@
                         margin-left: 7px;
                     }
                 }
-                .price-table-info-price {
+                .plans-table-info-price {
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
                     align-items: center;
                     height: 265px;
-                    .price-version {
+                    .plans-version {
                         margin-bottom: 30px;
                     }
                     .currency {
@@ -791,7 +791,7 @@
                         }
                     }
                 }
-                .price-table-info-desc {
+                .plans-table-info-desc {
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -801,7 +801,7 @@
                     color: #aaaaaa;
                 }
             }
-            .price-table-info-btn {
+            .plans-table-info-btn {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -823,7 +823,7 @@
                     }
                 }
             }
-            .price-accordion-head {
+            .plans-accordion-head {
                 height: 60px;
                 line-height: 60px;
                 background-color: #eef2f8;
@@ -857,7 +857,7 @@
                         color: #aaa;
                     }
                 }
-                &.price-accordion-close {
+                &.plans-accordion-close {
                     & > span {
                         transform: rotate(90deg);
                     }
@@ -874,7 +874,7 @@
                 border-bottom: 1px solid #dddddd;
             }
             &.fluid-info-3 {
-                background: url(../../../statics/images/contrast/bg_04.jpg);
+                background: url(../../../statics/images/plans/bg_04.jpg);
                 background-size: 100% 100%;
             }
             .fluid-info-item {
