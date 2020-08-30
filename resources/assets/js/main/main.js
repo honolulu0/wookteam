@@ -314,10 +314,11 @@ import '../../sass/main.scss';
             $A.token("");
             $A.storage("userInfo", {});
             $A.triggerUserInfoListener({});
+            let from = window.location.pathname == '/' ? '' : encodeURIComponent(window.location.href);
             if (typeof $A.app === "object") {
-                $A.app.goForward({path: '/', query:{from:encodeURIComponent(window.location.href)}}, true);
+                $A.app.goForward({path: '/', query: from ? {from: from} : {}}, true);
             } else {
-                window.location.replace($A.webUrl() + '?from=' + encodeURIComponent(window.location.href));
+                window.location.replace($A.webUrl() + (from ? ('?from=' + from) : ''));
             }
         },
 

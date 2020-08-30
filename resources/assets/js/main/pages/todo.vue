@@ -382,7 +382,6 @@
         },
         mounted() {
             if ($A.getToken() === false) {
-                this.goForward({path: '/'}, true);
                 return;
             }
             this.refreshTask();
