@@ -43,7 +43,7 @@
             </div>
         </div>
         <WDrawer v-model="systemDrawerShow" maxWidth="640" :title="$L('系统设置')">
-            <Form ref="formSystem" :model="formSystem" :label-width="120">
+            <Form ref="formSystem" :model="formSystem" :label-width="120" @submit.native.prevent>
                 <FormItem :label="$L('首页Logo')">
                     <ImgUpload v-model="formSystem.logo" :num="1"></ImgUpload>
                     <span style="color:#777">{{$L('建议尺寸：%', '300x52')}}</span>
@@ -87,7 +87,7 @@
         <WDrawer v-model="userDrawerShow" maxWidth="1000">
             <Tabs v-model="userDrawerTab">
                 <TabPane :label="$L('个人资料')" name="personal">
-                    <Form ref="formDatum" :model="formDatum" :rules="ruleDatum" :label-width="80">
+                    <Form ref="formDatum" :model="formDatum" :rules="ruleDatum" :label-width="80" @submit.native.prevent>
                         <FormItem :label="$L('头像')" prop="userimg">
                             <ImgUpload v-model="formDatum.userimg" :num="1"></ImgUpload>
                             <span style="color:#777">{{$L('建议尺寸：%', '200x200')}}</span>
@@ -108,7 +108,7 @@
                     </Form>
                 </TabPane>
                 <TabPane :label="$L('偏好设置')" name="setting">
-                    <Form ref="formSetting" :model="formSetting" :label-width="100">
+                    <Form ref="formSetting" :model="formSetting" :label-width="100" @submit.native.prevent>
                         <FormItem :label="$L('系统皮肤')" prop="bgid">
                             <ul class="setting-bg">
                                 <li v-for="i in [1,2,3,4,5,6,7,8,9,10,11,12]"
@@ -125,7 +125,7 @@
                     </Form>
                 </TabPane>
                 <TabPane :label="$L('账号密码')" name="account">
-                    <Form ref="formPass" :model="formPass" :rules="rulePass" :label-width="100">
+                    <Form ref="formPass" :model="formPass" :rules="rulePass" :label-width="100" @submit.native.prevent>
                         <FormItem :label="$L('旧密码')" prop="oldpass">
                             <Input v-model="formPass.oldpass" type="password"></Input>
                         </FormItem>

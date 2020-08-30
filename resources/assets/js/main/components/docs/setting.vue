@@ -1,7 +1,7 @@
 <template>
     <drawer-tabs-container>
         <div class="book-setting">
-            <Form ref="formSystem" :model="formSystem" :label-width="80">
+            <Form ref="formSystem" :model="formSystem" :label-width="80" @submit.native.prevent>
                 <FormItem :label="$L('文档链接')">
                     <a class="form-link" target="_blank" :href="$A.webUrl('docs/view/b' + this.id)">{{$A.webUrl('docs/view/b' + this.id)}}</a>
                 </FormItem>

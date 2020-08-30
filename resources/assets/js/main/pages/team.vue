@@ -36,7 +36,7 @@
             :closable="false"
             :mask-closable="false"
             class-name="simple-modal">
-            <Form ref="add" :model="formData" :label-width="80">
+            <Form ref="add" :model="formData" :label-width="80" @submit.native.prevent>
                 <FormItem prop="userimg" :label="$L('头像')">
                     <ImgUpload v-model="formData.userimg"></ImgUpload>
                 </FormItem>

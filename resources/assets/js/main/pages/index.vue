@@ -97,7 +97,7 @@
             v-model="loginShow"
             :mask-closable="false"
             class-name="simple-modal">
-            <Form ref="login" :model="formLogin" :rules="ruleLogin">
+            <Form ref="login" :model="formLogin" :rules="ruleLogin" @submit.native.prevent>
                 <FormItem prop="username">
                     <Input type="text" v-model="formLogin.username" :placeholder="$L('用户名')" @on-enter="onLogin">
                         <Icon type="ios-person-outline" slot="prepend"></Icon>

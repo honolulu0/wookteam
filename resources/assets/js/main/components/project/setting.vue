@@ -1,7 +1,7 @@
 <template>
     <drawer-tabs-container>
         <div class="project-setting">
-            <Form ref="formSystem" :model="formSystem" :label-width="110">
+            <Form ref="formSystem" :model="formSystem" :label-width="110" @submit.native.prevent>
                 <div class="project-setting-title">{{$L('项目信息')}}:</div>
                 <FormItem :label="$L('项目简介')">
                     <Input v-model="formSystem.project_desc" type="textarea" :autosize="{minRows:3,maxRows:20}" style="max-width:450px"/>
