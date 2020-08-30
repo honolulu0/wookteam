@@ -350,4 +350,33 @@ class ReportController extends Controller
         }
         return Base::retSuccess('success', $lists);
     }
+
+    /**
+     * 获取我上次抄送的人
+     * @return array|mixed
+     */
+    public function prevcc()
+    {
+        $user = Users::authE();
+        if (Base::isError($user)) {
+            return $user;
+        } else {
+            $user = $user['data'];
+        }
+        //
+        $rid = DB::table('report_ccuser')
+            ->join('report_lists', 'report_lists.id', '=', 'report_ccuser.rid')
+            ->where('report_lists.username', $user['username'])
+            ->value('rid');
+        if (empty($rid)) {
+            return Base::retError('没有相关数据！');
+        }
+        $lists = Base::DBC2A(DB::table('report_ccuser')->select(['username'])->where('rid', $rid)->pluck('username'));
+        if (empty($lists)) {
+            return Base::retError('没有相关数据！');
+        }
+        return Base::retSuccess('success', [
+            'lists' => $lists
+        ]);
+    }
 }

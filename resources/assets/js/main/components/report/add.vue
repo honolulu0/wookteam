@@ -13,6 +13,7 @@
             <t-editor class="add-edit" v-model="dataDetail.content" height="100%"></t-editor>
             <div class="add-input">
                 <UserInput v-model="dataDetail.ccuser" :nousername="$A.getUserName()" :placeholder="$L('输入关键词搜索')" multiple><span slot="prepend">{{$L('抄送人')}}</span></UserInput>
+                <div class="add-prev-btn" @click="getPrevCc">{{$L('使用我上次抄送的人')}}</div>
             </div>
             <div class="add-footer">
                 <Button :loading="loadIng > 0" type="primary" @click="handleSubmit" style="margin-right:6px">{{$L('保存')}}</Button>
@@ -55,6 +56,16 @@
         .add-input,
         .add-footer {
             margin-top: 14px;
+        }
+        .add-prev-btn {
+            cursor: pointer;
+            opacity: 0.9;
+            margin-top: 8px;
+            text-decoration: underline;
+            &:hover {
+                opacity: 1;
+                color: #2d8cf0;
+            }
         }
     }
 </style>
@@ -141,6 +152,23 @@
                     success: (res) => {
                         if (res.ret === 1) {
                             this.dataDetail = res.data;
+                        }
+                    }
+                });
+            },
+
+            getPrevCc() {
+                this.loadIng++;
+                $A.apiAjax({
+                    url: 'report/prevcc',
+                    complete: () => {
+                        this.loadIng--;
+                    },
+                    success: (res) => {
+                        if (res.ret === 1) {
+                            this.dataDetail.ccuser = res.data.lists.join(',');
+                        } else {
+                            this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
                         }
                     }
                 });
