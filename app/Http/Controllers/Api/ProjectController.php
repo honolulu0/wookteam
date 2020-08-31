@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Model\DBCache;
 use App\Module\Base;
+use App\Module\BillExport;
 use App\Module\Project;
 use App\Module\Users;
 use DB;
+use Madzipper;
 use Request;
 use Session;
 
@@ -1104,6 +1107,7 @@ class ProjectController extends Controller
      *
      * @apiParam {Number} [page]                当前页，默认:1
      * @apiParam {Number} [pagesize]            每页显示数量，默认:20，最大:100
+     * @apiParam {Number} [export]              是否导出并返回下载地址（1:是；仅支持projectid赋值时）
      */
     public function task__lists()
     {
@@ -1115,11 +1119,14 @@ class ProjectController extends Controller
         }
         //
         $projectid = intval(Request::input('projectid'));
+        $export = intval(Request::input('export'));
         if ($projectid > 0) {
             $inRes = Project::inThe($projectid, $user['username']);
             if (Base::isError($inRes)) {
                 return $inRes;
             }
+        } else {
+            $export = 0;
         }
         //
         $orderBy = '`inorder` DESC,`id` DESC';
@@ -1236,10 +1243,83 @@ class ProjectController extends Controller
         if ($whereRaw) {
             $builder->whereRaw($whereRaw);
         }
-        $lists = $builder->select($selectArray)
-            ->where($whereArray)
-            ->orderByRaw($orderBy)
-            ->paginate(Base::getPaginate(100, 20));
+        $builder->select($selectArray)->where($whereArray)->orderByRaw($orderBy);
+        if ($export) {
+            //导出excel
+            $checkRole = Project::role('project_role_export', $projectid);
+            if (Base::isError($checkRole)) {
+                return $checkRole;
+            }
+            $lists = Base::DBC2A($builder->get());
+            if (empty($lists)) {
+                return Base::retError('未找到任何相关的任务！');
+            }
+            $labels = DB::table('project_label')->select(['id', 'title'])->where('projectid', $projectid)->pluck('title', 'id');
+            $fileName = str_replace(['/', '\\', ':', '*', '"', '<', '>', '|', '?'], '_', $checkRole['data']['title'] ?: $projectid) . '_' . Base::time() . '.xls';
+            $filePath = "temp/task/export/" . date("Ym", Base::time());
+            $headings = [];
+            $headings[] = '任务ID';
+            $headings[] = '任务标题';
+            $headings[] = '任务阶段';
+            $headings[] = '计划时间(开始)';
+            $headings[] = '计划时间(结束)';
+            $headings[] = '负责人';
+            $headings[] = '负责人(昵称)';
+            $headings[] = '创建人';
+            $headings[] = '创建人(昵称)';
+            $headings[] = '优先级';
+            $headings[] = '状态';
+            $headings[] = '是否超期';
+            $headings[] = '创建时间';
+            $data = [];
+            foreach ($lists AS $info) {
+                $overdue = Project::taskIsOverdue($info);
+                $data[] = [
+                    $info['id'],
+                    $info['title'],
+                    $labels[$info['labelid']] ?: '-',
+                    $info['startdate'] ? date("Y-m-d H:i:s", $info['startdate']) : '-',
+                    $info['enddate'] ? date("Y-m-d H:i:s", $info['enddate']) : '-',
+                    $info['username'],
+                    DBCache::table('users')->where('username', $info['username'])->value('nickname') ?: $info['username'],
+                    $info['createuser'],
+                    DBCache::table('users')->where('username', $info['createuser'])->value('nickname') ?: $info['createuser'],
+                    'P' . $info['level'],
+                    ($overdue ? '已超期' : ($info['complete'] ? '已完成' : '未完成')),
+                    $overdue ? '是' : '-',
+                    date("Y-m-d H:i:s", $info['indate'])
+                ];
+            }
+            $res = BillExport::create()->setHeadings($headings)->setData($data)->store($filePath . "/" . $fileName);
+            if ($res != 1) {
+                return Base::retError(['导出失败，%！', $fileName]);
+            }
+            //
+            $xlsPath = storage_path("app/" . $filePath . "/" . $fileName);
+            $zipFile = "app/" . $filePath . "/" . Base::rightDelete($fileName, '.xls'). ".zip";
+            $zipPath = storage_path($zipFile);
+            if (file_exists($zipPath)) {
+                Base::deleteDirAndFile($zipPath, true);
+            }
+            try {
+                Madzipper::make($zipPath)->add($xlsPath)->close();
+            } catch (\Exception $e) { }
+            //
+            if (file_exists($zipPath)) {
+                $base64 = base64_encode(Base::array2string([
+                    'projectid' => $projectid,
+                    'file' => $zipFile,
+                ]));
+                Session::put('task::export:username', $user['username']);
+                return Base::retSuccess("success", [
+                    'size' => Base::twoFloat(filesize($zipPath) / 1024, true),
+                    'url' => Base::fillUrl('api/project/task/export?data=' . urlencode($base64)),
+                ]);
+            } else {
+                return Base::retError('打包失败，请稍后再试...');
+            }
+        }
+        $lists = $builder->paginate(Base::getPaginate(100, 20));
         $lists = Base::getPageList($lists);
         if (intval(Request::input('statistics')) == 1) {
             $lists['statistics_unfinished'] = $type === '未完成' ? $lists['total'] : DB::table('project_task')->where('projectid', $projectid)->where('delete', 0)->where('archived', 0)->where('complete', 0)->count();
@@ -1257,6 +1337,33 @@ class ProjectController extends Controller
             $lists['lists'][$key] = array_merge($info, Users::username2basic($info['username']));
         }
         return Base::retSuccess('success', $lists);
+    }
+
+    /**
+     * 项目任务-导出结果
+     *
+     * @apiParam {String} data              base64
+     */
+    public function task__export()
+    {
+        $username = Session::get('task::export:username');
+        if (empty($username)) {
+            return Base::ajaxError("请求已过期，请重新导出！", [], 0, 502);
+        }
+        $array = Base::string2array(base64_decode(urldecode(Request::input('data'))));
+        $projectid = intval($array['projectid']);
+        $file = $array['file'];
+        if (empty($projectid)) {
+            return Base::ajaxError("参数错误！", [], 0, 502);
+        }
+        if (empty($file) || !file_exists(storage_path($file))) {
+            return Base::ajaxError("文件不存在！", [], 0, 502);
+        }
+        $checkRole = Project::role('project_role_export', $projectid, 0, $username);
+        if (Base::isError($checkRole)) {
+            return Base::ajaxError($checkRole['msg'], [], 0, 502);
+        }
+        return response()->download(storage_path($file), ($checkRole['data']['title'] ?: Base::time()) . '.zip');
     }
 
     /**

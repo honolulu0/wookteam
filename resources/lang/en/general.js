@@ -516,4 +516,8 @@ export default {
     "分享文档": "Share documents",
     "历史版本": "Historic version",
     "浏览文档": "View the document",
+    "导出任务": "Export Task",
+    "导出列表": "Export List",
+    "导出结果": "Export Results",
+    "点击下载 (%)": "Click to download (%)",
 }

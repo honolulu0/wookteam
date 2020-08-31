@@ -6,7 +6,19 @@
                 <FormItem :label="$L('项目简介')">
                     <Input v-model="formSystem.project_desc" type="textarea" :autosize="{minRows:3,maxRows:20}" style="max-width:450px"/>
                 </FormItem>
-                <div class="project-setting-title">{{$L('权限设置')}}:</div>
+
+                <div class="project-setting-title">{{$L('项目权限')}}:</div>
+                <FormItem prop="project_role_export">
+                    <div slot="label">
+                        <Tooltip :content="$L('任务列表导出Excel')" transfer>{{$L('导出列表')}}</Tooltip>
+                    </div>
+                    <Checkbox :value="true" disabled>{{$L('项目负责人')}}</Checkbox>
+                    <CheckboxGroup v-model="formSystem.project_role_export" class="project-setting-group">
+                        <Checkbox label="member">{{$L('项目成员')}}</Checkbox>
+                    </CheckboxGroup>
+                </FormItem>
+
+                <div class="project-setting-title">{{$L('任务权限')}}:</div>
                 <FormItem :label="$L('添加任务')">
                     <Checkbox :value="true" disabled>{{$L('项目负责人')}}</Checkbox>
                     <CheckboxGroup v-model="formSystem.add_role" class="project-setting-group">
@@ -41,6 +53,7 @@
                         <Checkbox label="member">{{$L('项目成员')}}</Checkbox>
                     </CheckboxGroup>
                 </FormItem>
+
                 <div class="project-setting-title">{{$L('面板显示')}}:</div>
                 <FormItem :label="$L('显示已完成')">
                     <div>

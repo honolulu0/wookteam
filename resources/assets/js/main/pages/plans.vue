@@ -55,7 +55,7 @@
                         <div class="plans-table-info-btn"></div>
                     </div>
                     <div @mouseenter="active=1" class="plans-table-item" :class="{active:active==1}">
-                        <div class="plans-table-info-th">{{$L('社区版')}}</div>
+                        <div class="plans-table-info-th">{{$L('团队版')}}</div>
                         <div class="plans-table-info-price">
                             <img class="plans-version" src="../../../statics/images/plans/free.png">
                             <div class="currency"><em>0</em></div>
@@ -63,9 +63,12 @@
                         <div class="plans-table-info-desc">{{$L('适用于轻团队的任务协作')}}</div>
                         <div class="plans-table-info-desc">{{$L('无限制')}}</div>
                         <div class="plans-table-info-btn">
-                            <Tooltip :content="$L('账号：%、密码：%', 'admin', '123456')" transfer>
-                                <a href="https://demo.wookteam.com" class="btn" target="_blank">{{$L('体验DEMO')}}</a>
-                            </Tooltip>
+                            <div class="plans-info-btns">
+                                <Tooltip :content="$L('账号：%、密码：%', 'admin', '123456')" transfer>
+                                    <a href="https://demo.wookteam.com" class="btn" target="_blank">{{$L('体验DEMO')}}</a>
+                                </Tooltip>
+                                <a href="https://github.com/kuaifan/wookteam" class="github" target="_blank"><Icon type="logo-github"/></a>
+                            </div>
                         </div>
                     </div>
                     <div @mouseenter="active=2" class="plans-table-item" :class="{active:active==2}">
@@ -113,6 +116,7 @@
                             <div class="plans-table-td">{{$L('国际化')}}</div>
                             <div class="plans-table-td">{{$L('甘特图')}}</div>
                             <div class="plans-table-td">{{$L('任务动态')}}</div>
+                            <div class="plans-table-td">{{$L('导出任务')}}</div>
                             <div class="plans-table-td">{{$L('日程')}}</div>
                             <div class="plans-table-td">{{$L('周报/日报')}}</div>
 
@@ -128,6 +132,7 @@
                             <div class="plans-table-td">{{$L('签到功能')}}</div>
                         </div>
                         <div @mouseenter="active=1" class="plans-table-item" :class="{active:active==1}">
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
@@ -170,8 +175,10 @@
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                         </div>
                         <div @mouseenter="active=3" class="plans-table-item" :class="{active:active==3}">
+                            <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
                             <div class="plans-table-td"><Icon type="md-checkmark" /></div>
@@ -235,9 +242,12 @@
                             <div class="plans-table-td"><span> - </span></div>
                             <div class="plans-table-td"><span> - </span></div>
                             <div class="plans-table-info-btn">
-                                <Tooltip :content="$L('账号：%、密码：%', 'admin', '123456')" transfer>
-                                    <a href="https://demo.wookteam.com" class="btn" target="_blank">{{$L('体验DEMO')}}</a>
-                                </Tooltip>
+                                <div class="plans-info-btns">
+                                    <Tooltip :content="$L('账号：%、密码：%', 'admin', '123456')" transfer>
+                                        <a href="https://demo.wookteam.com" class="btn" target="_blank">{{$L('体验DEMO')}}</a>
+                                    </Tooltip>
+                                    <a href="https://github.com/kuaifan/wookteam" class="github" target="_blank"><Icon type="logo-github"/></a>
+                                </div>
                             </div>
                         </div>
                         <div @mouseenter="active=2" class="plans-table-item" :class="{active:active==2}">
@@ -807,6 +817,20 @@
                 justify-content: center;
                 align-items: center;
                 height: 115px;
+                .plans-info-btns {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    .btn {
+                        padding: 14px 36px;
+                    }
+                    .github {
+                        margin-left: 10px;
+                        & > i {
+                            font-size: 32px;
+                        }
+                    }
+                }
                 .btn {
                     display: inline-block;
                     color: #fff;

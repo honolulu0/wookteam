@@ -153,24 +153,29 @@ class Project
      * @param $type
      * @param $projectid
      * @param int $taskid
+     * @param string $username
      * @return array|mixed
      */
-    public static function role($type, $projectid, $taskid = 0)
+    public static function role($type, $projectid, $taskid = 0, $username = '')
     {
-        $user = Users::authE();
-        if (Base::isError($user)) {
-            return $user;
-        } else {
-            $user = $user['data'];
+        if (empty($username)) {
+            $user = Users::authE();
+            if (Base::isError($user)) {
+                return $user;
+            } else {
+                $user = $user['data'];
+            }
+            $username = $user['username'];
         }
         //
-        $project = Base::DBC2A(DB::table('project_lists')->select(['username', 'setting'])->where('id', $projectid)->where('delete', 0)->first());
+        $project = Base::DBC2A(DB::table('project_lists')->select(['username', 'title', 'setting'])->where('id', $projectid)->where('delete', 0)->first());
         if (empty($project)) {
             return Base::retError('项目不存在或已被删除！');
         }
         // 项目负责人最高权限
-        if ($project['username'] == $user['username']) {
-            return Base::retSuccess('success');
+        if ($project['username'] == $username) {
+            unset($project['setting']);
+            return Base::retSuccess('success', $project);
         }
         //
         $setting = Base::string2array($project['setting']);
@@ -184,7 +189,7 @@ class Project
             return Base::retError('操作权限不足！');
         }
         if (in_array('member', $role)) {
-            $inRes = Project::inThe($projectid, $user['username']);
+            $inRes = Project::inThe($projectid, $username);
             if (Base::isError($inRes)) {
                 return $inRes;
             }
@@ -202,13 +207,14 @@ class Project
             if (empty($task)) {
                 return Base::retError('任务不存在！');
             }
-            if ($task['username'] != $user['username']) {
+            if ($task['username'] != $username) {
                 return Base::retError('此操作只允许项目管理员或者任务负责人！');
             }
         } else {
             return Base::retError('此操作仅限项目负责人！');
         }
         //
-        return Base::retSuccess('success');
+        unset($project['setting']);
+        return Base::retSuccess('success', $project);
     }
 }

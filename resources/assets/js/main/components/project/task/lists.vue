@@ -40,6 +40,7 @@
                     </div>
                 </div>
                 <div class="item item-button">
+                    <Button type="info" class="left-btn" icon="md-swap" :loading="exportLoad > 0" @click="exportTab">{{$L('导出列表')}}</Button>
                     <Button type="text" v-if="$A.objImplode(keys)!=''" @click="sreachTab(true)">{{$L('取消筛选')}}</Button>
                     <Button type="primary" icon="md-search" :loading="loadIng > 0" @click="sreachTab">{{$L('搜索')}}</Button>
                 </div>
@@ -96,6 +97,7 @@
                 loadYet: false,
 
                 loadIng: 0,
+                exportLoad: 0,
 
                 columns: [],
 
@@ -283,6 +285,49 @@
         },
 
         methods: {
+            exportTab() {
+                let whereData = $A.cloneData(this.keys);
+                whereData.page = Math.max(this.listPage, 1);
+                whereData.pagesize = Math.max($A.runNum(this.listPageSize), 10);
+                whereData.projectid = this.projectid;
+                whereData.sorts = $A.cloneData(this.sorts);
+                whereData.export = 1;
+                this.exportLoad++;
+                $A.apiAjax({
+                    url: 'project/task/lists',
+                    data: whereData,
+                    complete: () => {
+                        this.exportLoad--;
+                    },
+                    error: () => {
+                        alert(this.$L('网络繁忙，请稍后再试！'));
+                    },
+                    success: (res) => {
+                        if (res.ret === 1) {
+                            this.$Modal.info({
+                                okText: this.$L('关闭'),
+                                render: (h) => {
+                                    return h('div', [
+                                        h('div', {
+                                            style: {
+                                                fontSize: '16px',
+                                                fontWeight: '500',
+                                                marginBottom: '20px',
+                                            }
+                                        }, this.$L('导出结果')),
+                                        h('a', {
+                                            attrs: { href: res.data.url, target: '_blank' },
+                                        }, this.$L('点击下载 (%)', `${res.data.size} KB`))
+                                    ])
+                                },
+                            });
+                        } else {
+                            this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                        }
+                    }
+                });
+            },
+
             sreachTab(clear) {
                 if (clear === true) {
                     this.keys = {};

@@ -1341,14 +1341,15 @@ class Base
      * @param $msg
      * @param array $data
      * @param int $ret
+     * @param int $abortCode
      * @return array|void
      */
-    public static function ajaxError($msg, $data = [], $ret = 0)
+    public static function ajaxError($msg, $data = [], $ret = 0, $abortCode = 404)
     {
         if (Request::input('__Access-Control-Allow-Origin') || Request::header('Content-Type') === 'application/json') {
             return Base::retError($msg, $data, $ret);
         }else{
-            return abort(404);
+            return abort($abortCode, $msg);
         }
     }
 
