@@ -990,6 +990,7 @@ export default {
                 "概述": "Outline",
                 "人数": "Number of people",
                 "社区版": "Community Edition",
+                "团队版": "Team Edition",
                 "适用于轻团队的任务协作": "Suitable for light task team collaboration",
                 "无限制": "Unlimited",
                 "账号：%、密码：%": "Account password:%",
