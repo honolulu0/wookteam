@@ -1,15 +1,6 @@
 <template>
     <div class="project-gstc-gantt">
-        <GSTC v-if="loadFinish" ref="gstc" :config="config" @state="emitState"/>
-        <Dropdown class="project-gstc-dropdown-eye" @on-click="tapView">
-            <Icon class="project-gstc-dropdown-icon" type="md-eye" />
-            <DropdownMenu slot="list">
-                <DropdownItem name="now">{{$L('现在')}}</DropdownItem>
-                <DropdownItem name="day" :class="{'dropdown-active':period=='day'}">{{$L('天视图')}}</DropdownItem>
-                <DropdownItem name="week" :class="{'dropdown-active':period=='week'}">{{$L('周视图')}}</DropdownItem>
-                <DropdownItem name="month" :class="{'dropdown-active':period=='month'}">{{$L('月视图')}}</DropdownItem>
-            </DropdownMenu>
-        </Dropdown>
+        <GanttView :lists="lists" :menuWidth="260" :itemWidth="80" @on-change="updateTime" @on-click="clickItem"/>
         <Dropdown class="project-gstc-dropdown-filtr" @on-click="tapProject">
             <Icon class="project-gstc-dropdown-icon" :class="{filtr:filtrProjectId>0}" type="md-funnel" />
             <DropdownMenu slot="list">
@@ -47,22 +38,11 @@
         transform: translateZ(0);
         background-color: #fdfdfd;
         border-radius: 3px;
-        .gantt-schedule-timeline-calendar {
-            background-color: transparent;
-            padding: 12px;
-        }
-        .gantt-schedule-timeline-calendar__list-column-header-resizer-container {
-            line-height: 90px;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .project-gstc-dropdown-eye,
+        overflow: hidden;
         .project-gstc-dropdown-filtr {
             position: absolute;
-            top: 46px;
-            left: 276px;
+            top: 38px;
+            left: 222px;
             .project-gstc-dropdown-icon {
                 cursor: pointer;
                 color: #999;
@@ -71,9 +51,6 @@
                     color: #058ce4;
                 }
             }
-        }
-        .project-gstc-dropdown-eye {
-            left: 238px;
         }
         .project-gstc-close {
             position: absolute;
@@ -161,29 +138,16 @@
             }
         }
     }
-    .gantt-notice-box {
-        .ivu-notice-desc-btn {
-            margin-top: 6px;
-            text-align: right;
-            .ivu-btn {
-                margin-left: 4px;
-                font-size: 13px;
-            }
-        }
-    }
 </style>
 <script>
-    import GSTC from "./GSTC";
-    import ItemMovement from "gantt-schedule-timeline-calendar/dist/ItemMovement.plugin.js"
-    import CalendarScroll from "gantt-schedule-timeline-calendar/dist/CalendarScroll.plugin.js"
-    import WeekendHighlight from "gantt-schedule-timeline-calendar/dist/WeekendHighlight.plugin.js"
+    import GanttView from "../../gantt/index";
 
     /**
      * 甘特图
      */
     export default {
         name: 'ProjectGantt',
-        components: { GSTC },
+        components: {GanttView },
         props: {
             projectLabel: {
                 default: []
@@ -194,12 +158,7 @@
             return {
                 loadFinish: false,
 
-                period: 'day',
-
-                rows: {},
-                items: {},
-
-                config: {},
+                lists: [],
 
                 editColumns: [],
                 editData: [],
@@ -249,21 +208,20 @@
             //
             this.initData();
             this.loadFinish = true;
-            //
-            this.$watch("projectLabel",
-                (projectLabel) => {
+        },
+
+        watch:{
+            projectLabel: {
+                handler() {
                     this.initData();
                 },
-                {deep: true}
-            );
+                deep: true,
+            }
         },
 
         methods: {
             initData() {
-                let isUpdate = this.loadFinish == true;
-                this.rows = {};
-                this.items = {};
-                let index = 0;
+                this.lists = [];
                 this.projectLabel.forEach((item) => {
                     if (this.filtrProjectId > 0) {
                         if (item.id != this.filtrProjectId) {
@@ -271,7 +229,6 @@
                         }
                     }
                     item.taskLists.forEach((taskData) => {
-                        index++;
                         let notime = taskData.startdate == 0 || taskData.enddate == 0;
                         let times = this.getTimeObj(taskData);
                         let start = times.start;
@@ -292,36 +249,24 @@
                             }
                         }
                         //
-                        let label = `<div class="gantt-schedule-timeline-calendar-title${taskData.complete?' complete-title':''}">${this.html2Escape(taskData.title)}</div>`;
-                        if (taskData.overdue) {
-                            label = `<div class="gantt-schedule-timeline-calendar-overdue"><em>${this.$L('已超期')}</em></div>${label}`;
-                        }
-                        label = `${label}<div class="gantt-schedule-timeline-calendar-goto"></div>`;
-                        this.rows[index] = {
-                            id: index,
-                            label: label,
-                            taskId: taskData.id,
-                            complete: taskData.complete,
-                            overdue: taskData.overdue,
-                        };
                         let tempTime = { start, end };
                         let findData = this.editData.find((t) => { return t.id == taskData.id });
                         if (findData) {
                             findData.backTime = $A.cloneData(tempTime)
                             tempTime = $A.cloneData(findData.newTime);
                         }
-                        this.items[taskData.id] = {
-                            rowId: index,
+                        //
+                        this.lists.push({
                             id: taskData.id,
                             label: taskData.title,
                             time: tempTime,
                             notime: notime,
                             style: { background: color },
-                        };
+                        });
                     });
                 });
                 //
-                if (Object.keys(this.rows).length == 0 && this.filtrProjectId == 0) {
+                if (this.lists.length == 0 && this.filtrProjectId == 0) {
                     this.$Modal.warning({
                         title: this.$L("温馨提示"),
                         content: this.$L('任务列表为空，请先添加任务。'),
@@ -330,157 +275,97 @@
                         },
                     });
                 }
-                //
-                if (isUpdate) {
-                    this.$refs.gstc.getState().update('config.list.rows', this.rows);
-                    this.$refs.gstc.getState().update('config.chart.items', this.items);
-                    return;
-                }
-                //
-                this.config = {
-                    plugins: [ItemMovement({
-                        moveable: 'x',
-                        resizeable: true,
-                        collisionDetection: true
-                    }), CalendarScroll(), WeekendHighlight()],
-                    height: this.$el.clientHeight - 24,
-                    list: {
-                        toggle: {
-                            display: false
-                        },
-                        rows: this.rows,
-                        columns: {
-                            percent: 100,
-                            resizer: {
-                                inRealTime: true,
-                                dots: 0
-                            },
-                            data: {
-                                label: {
-                                    id: "label",
-                                    data: "label",
-                                    width: 300,
-                                    isHTML: true,
-                                    header: {
-                                        content: this.$L("任务名称")
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    chart: {
-                        time: {
-                            period: 'day',
-                            additionalSpaces: {
-                                hour: { before: 24, after: 24, period: 'hour' },
-                                day: { before: 1, after: 1, period: 'month' },
-                                week: { before: 1, after: 1, period: 'year' },
-                                month: { before: 6, after: 6, period: 'year' },
-                                year: { before: 12, after: 12, period: 'year' }
-                            }
-                        },
-                        items: this.items
-                    },
-                    actions: {
-                        "list-column-row": [this.actionRow],
-                        'chart-timeline-items-row-item': [this.actionResizing]
-                    },
-                    locale: this.getLanguage() == 'en' ? {} : {
-                        name: "zh-cn",
-                        weekdays: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
-                        weekdaysShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
-                        weekdaysMin: ["日", "一", "二", "三", "四", "五", "六"],
-                        months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
-                        monthsShort: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
-                        ordinal: function(t, e) {
-                            switch (e) {
-                                case "W":
-                                    return "".concat(t, "周");
-                                default:
-                                    return "".concat(t, "日")
-                            }
-                        },
-                        weekStart: 1,
-                        yearStart: 4,
-                        formats: {
-                            LT: "HH:mm",
-                            LTS: "HH:mm:ss",
-                            L: "YYYY/MM/DD",
-                            LL: "YYYY年M月D日",
-                            LLL: "YYYY年M月D日Ah点mm分",
-                            LLLL: "YYYY年M月D日ddddAh点mm分",
-                            l: "YYYY/M/D",
-                            ll: "YYYY年M月D日",
-                            lll: "YYYY年M月D日 HH:mm",
-                            llll: "YYYY年M月D日dddd HH:mm"
-                        },
-                        relativeTime: {
-                            future: "%s内",
-                            past: "%s前",
-                            s: "几秒",
-                            m: "1 分钟",
-                            mm: "%d 分钟",
-                            h: "1 小时",
-                            hh: "%d 小时",
-                            d: "1 天",
-                            dd: "%d 天",
-                            M: "1 个月",
-                            MM: "%d 个月",
-                            y: "1 年",
-                            yy: "%d 年"
-                        },
-                    },
-                };
             },
 
-            actionRow(element, data) {
-                let onClick = (event) => {
-                    //打开任务
-                    let id = this.rows[data.rowId].taskId;
-                    if (event.target.className == 'gantt-schedule-timeline-calendar-goto') {
-                        id && this.$refs.gstc.getGstc().api.scrollToTime(this.items[id].time.start)
+            updateTime(item) {
+                let original = this.getRawTime(item.id);
+                if (Math.abs(original.end - item.time.end) > 1000 || Math.abs(original.start - item.time.start) > 1000) {
+                    //修改时间（变化超过1秒钟)
+                    let backTime = $A.cloneData(original);
+                    let newTime = $A.cloneData(item.time);
+                    let findData = this.editData.find(({id}) => id == item.id);
+                    if (findData) {
+                        findData.newTime = newTime;
                     } else {
-                        id && this.taskDetail(id);
+                        this.editData.push({
+                            id: item.id,
+                            label: item.label,
+                            notime: item.notime,
+                            backTime,
+                            newTime,
+                        })
                     }
                 }
-                element.addEventListener('click', onClick);
-                return {
-                    update(element, newData) {
-                        data = newData;
-                    },
-                    destroy(element, data) {
-                        element.removeEventListener('click', onClick);
-                    }
-                };
             },
 
-            actionResizing(element, data) {
-                let thas = this;
-                return {
-                    update(element, newData) {
-                        data = newData;
-                        if (data.item.isResizing) {
-                            let original = thas.getRawTime(data.item.id);
-                            if (Math.abs(original.end - data.item.time.end) > 1000 || Math.abs(original.start - data.item.time.start) > 1000) {
-                                //修改时间（变化超过1秒钟)
-                                let backTime = $A.cloneData(original);
-                                let newTime = $A.cloneData(data.item.time);
-                                let findData = thas.editData.find((item) => { return item.id == data.item.id });
-                                if (findData) {
-                                    findData.newTime = newTime;
-                                } else {
-                                    thas.editData.push({
-                                        id: data.item.id,
-                                        label: data.item.label,
-                                        notime: data.item.notime,
-                                        backTime,
-                                        newTime,
+            clickItem(item) {
+                this.taskDetail(item.id);
+            },
+
+            editSubmit(save) {
+                let triggerTask = [];
+                this.editData.forEach((item) => {
+                    if (save) {
+                        this.editLoad++;
+                        let timeStart = $A.formatDate('Y-m-d H:i', Math.round(item.newTime.start / 1000));
+                        let timeEnd = $A.formatDate('Y-m-d H:i', Math.round(item.newTime.end / 1000));
+                        let ajaxData = {
+                            act: 'plannedtime',
+                            taskid: item.id,
+                            content: timeStart + "," + timeEnd,
+                        };
+                        $A.apiAjax({
+                            url: 'project/task/edit',
+                            method: 'post',
+                            data: ajaxData,
+                            error: () => {
+                                this.lists.some((task) => {
+                                    if (task.id == item.id) {
+                                        this.$set(task, 'time', item.backTime);
+                                        return true;
+                                    }
+                                });
+                            },
+                            success: (res) => {
+                                if (res.ret === 1) {
+                                    triggerTask.push({
+                                        status: 'await',
+                                        act: ajaxData.act,
+                                        taskid: ajaxData.taskid,
+                                        data: res.data,
                                     })
+                                } else {
+                                    this.lists.some((task) => {
+                                        if (task.id == item.id) {
+                                            this.$set(task, 'time', item.backTime);
+                                            return true;
+                                        }
+                                    });
                                 }
+                            },
+                            afterComplete: () => {
+                                this.editLoad--;
+                                if (this.editLoad <= 0) {
+                                    triggerTask.forEach((info) => {
+                                        if (info.status == 'await') {
+                                            info.status = 'trigger';
+                                            $A.triggerTaskInfoListener(info.act, info.data);
+                                            $A.triggerTaskInfoChange(info.taskid);
+                                        }
+                                    });
+                                }
+                            },
+                        });
+                    } else {
+                        this.lists.some((task) => {
+                            if (task.id == item.id) {
+                                this.$set(task, 'time', item.backTime);
+                                return true;
                             }
-                        }
+                        })
                     }
-                };
+                });
+                this.editData = [];
             },
 
             getRawTime(taskId) {
@@ -511,89 +396,10 @@
                 return {start, end};
             },
 
-            editSubmit(save) {
-                let triggerTask = [];
-                this.editData.forEach((item) => {
-                    if (!this.items[item.id]) {
-                        return;
-                    }
-                    if (save) {
-                        this.editLoad++;
-                        let timeStart = $A.formatDate('Y-m-d H:i', Math.round(item.newTime.start / 1000));
-                        let timeEnd = $A.formatDate('Y-m-d H:i', Math.round(item.newTime.end / 1000));
-                        let ajaxData = {
-                            act: 'plannedtime',
-                            taskid: item.id,
-                            content: timeStart + "," + timeEnd,
-                        };
-                        $A.apiAjax({
-                            url: 'project/task/edit',
-                            method: 'post',
-                            data: ajaxData,
-                            error: () => {
-                                this.items[item.id].time = item.backTime;
-                                this.$refs.gstc.updateTime(item.id, item.backTime);
-                            },
-                            success: (res) => {
-                                if (res.ret === 1) {
-                                    triggerTask.push({
-                                        status: 'await',
-                                        act: ajaxData.act,
-                                        taskid: ajaxData.taskid,
-                                        data: res.data,
-                                    })
-                                } else {
-                                    this.items[item.id].time = item.backTime;
-                                    this.$refs.gstc.updateTime(item.id, item.backTime);
-                                }
-                            },
-                            afterComplete: () => {
-                                this.editLoad--;
-                                if (this.editLoad <= 0) {
-                                    triggerTask.forEach((info) => {
-                                        if (info.status == 'await') {
-                                            info.status = 'trigger';
-                                            $A.triggerTaskInfoListener(info.act, info.data);
-                                            $A.triggerTaskInfoChange(info.taskid);
-                                        }
-                                    });
-                                }
-                            },
-                        });
-                    } else {
-                        this.items[item.id].time = item.backTime;
-                        this.$refs.gstc.updateTime(item.id, item.backTime);
-                    }
-                });
-                this.editData = [];
-            },
-
-            emitState(GSTCState) {
-                GSTCState.subscribe('config.plugin.ItemMovement.item', data => {
-                    if (!data) return;
-                    GSTCState.update(`config.chart.items.${data.id}.isResizing`, !(data.waiting || data.moving || data.resizing));
-                });
-            },
-
-            tapView(e) {
-                if ("now" === e) {
-                    var i = this.$refs.gstc.getGstc()
-                    return i.api.scrollToTime(i.api.time.date().valueOf())
-                }
-                this.period = e;
-                this.$refs.gstc.setPeriod(e);
-            },
-
             tapProject(e) {
                 this.filtrProjectId = $A.runNum(e);
                 this.initData();
             },
-
-            html2Escape(sHtml) {
-                return sHtml.replace(/[<>&"]/g, function (c) {
-                    return {'<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;'}[c];
-                });
-            }
         }
     }
 </script>
