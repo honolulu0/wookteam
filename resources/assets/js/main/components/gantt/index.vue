@@ -14,14 +14,14 @@
                 </li>
             </ul>
         </div>
-        <div class="gantt-right">
+        <div ref="ganttRight" class="gantt-right">
             <div class="gantt-chart">
                 <ul class="gantt-month">
                     <li v-for="(item, key) in monthNum" :key="key" :style="monthStyle(key)">
                         <div class="month-format">{{monthFormat(key)}}</div>
                     </li>
                 </ul>
-                <ul class="gantt-date">
+                <ul class="gantt-date" @mousedown="dateMouseDown">
                     <li v-for="(item, key) in dateNum" :key="key" :style="dateStyle(key)">
                         <div class="date-format">
                             <div class="format-day">{{dateFormat(key, 'day')}}</div>
@@ -75,18 +75,20 @@ export default {
 
             mouseItem: null,
             mouseBak: {},
+
+            dateMove: null
         }
     },
     mounted() {
         this.dateWidth = this.itemWidth;
-        this.$refs.ganttTimeline.addEventListener('mousewheel', this.handleScroll, false);
+        this.$refs.ganttRight.addEventListener('mousewheel', this.handleScroll, false);
         document.addEventListener('mousemove', this.itemMouseMove);
         document.addEventListener('mouseup', this.itemMouseUp);
         window.addEventListener("resize", this.handleResize, false);
         this.handleResize();
     },
     beforeDestroy() {
-        this.$refs.ganttTimeline.removeEventListener('mousewheel', this.handleScroll, false);
+        this.$refs.ganttRight.removeEventListener('mousewheel', this.handleScroll, false);
         document.removeEventListener('mousemove', this.itemMouseMove);
         document.removeEventListener('mouseup', this.itemMouseUp);
         window.removeEventListener("resize", this.handleResize, false);
@@ -182,7 +184,7 @@ export default {
                 if (type == 'day') {
                     return date.getDate();
                 } else if (type == 'wook') {
-                    return `星期${'日一二三四五六'.charAt(date.getDay())}`;
+                    return this.$L(`星期${'日一二三四五六'.charAt(date.getDay())}`);
                 } else {
                     return date;
                 }
@@ -268,6 +270,13 @@ export default {
         handleResize() {
             this.ganttWidth = this.$refs.ganttTimeline.clientWidth;
         },
+        dateMouseDown(e) {
+            e.preventDefault();
+            this.mouseItem = null;
+            this.dateMove = {
+                clientX: e.clientX
+            };
+        },
         itemMouseDown(e, item) {
             e.preventDefault();
             let type = 'moveX';
@@ -283,45 +292,52 @@ export default {
                 value: item[type],
             };
             this.mouseItem = item;
+            this.dateMove = null;
         },
         itemMouseMove(e) {
-            if (this.mouseItem == null) {
-                return;
+            if (this.mouseItem != null) {
+                e.preventDefault();
+                var diff = e.clientX - this.mouseBak.clientX;
+                this.$set(this.mouseItem, this.mouseBak.type, this.mouseBak.value + diff);
+            } else if (this.dateMove != null) {
+                e.preventDefault();
+                let moveX = (this.dateMove.clientX - e.clientX) * 5;
+                this.dateMove.clientX = e.clientX;
+                this.mouseWidth+= moveX;
+                this.mouseScaleWidth+= moveX * (100 / this.dateWidth);
             }
-            e.preventDefault();
-            var diff = e.clientX - this.mouseBak.clientX;
-            this.$set(this.mouseItem, this.mouseBak.type, this.mouseBak.value + diff);
         },
         itemMouseUp(e) {
-            if (this.mouseItem == null) {
-                return;
+            if (this.mouseItem != null) {
+                const {start, end} = this.mouseItem.time;
+                let isM = false;
+                //一个宽度的时间
+                let oneWidthTime = 86400000 / this.dateWidth;
+                //修改起止时间
+                if (typeof this.mouseItem.moveX === "number" && this.mouseItem.moveX != 0) {
+                    let moveTime = this.mouseItem.moveX * oneWidthTime;
+                    this.$set(this.mouseItem.time, 'start', start + moveTime);
+                    this.$set(this.mouseItem.time, 'end', end + moveTime);
+                    this.$set(this.mouseItem, 'moveX', 0);
+                    isM = true;
+                }
+                //修改结束时间
+                if (typeof this.mouseItem.moveW === "number" && this.mouseItem.moveW != 0) {
+                    let moveTime = this.mouseItem.moveW * oneWidthTime;
+                    this.$set(this.mouseItem.time, 'end', end + moveTime);
+                    this.$set(this.mouseItem, 'moveW', 0);
+                    isM = true;
+                }
+                //
+                if (isM) {
+                    this.$emit("on-change", this.mouseItem)
+                } else if (e.target.className == 'timeline-title') {
+                    this.clickItem(this.mouseItem);
+                }
+                this.mouseItem = null;
+            } else if (this.dateMove != null) {
+                this.dateMove = null;
             }
-            const {start, end} = this.mouseItem.time;
-            let isM = false;
-            //一个宽度的时间
-            let oneWidthTime = 86400000 / this.dateWidth;
-            //修改起止时间
-            if (typeof this.mouseItem.moveX === "number" && this.mouseItem.moveX != 0) {
-                let moveTime = this.mouseItem.moveX * oneWidthTime;
-                this.$set(this.mouseItem.time, 'start', start + moveTime);
-                this.$set(this.mouseItem.time, 'end', end + moveTime);
-                this.$set(this.mouseItem, 'moveX', 0);
-                isM = true;
-            }
-            //修改结束时间
-            if (typeof this.mouseItem.moveW === "number" && this.mouseItem.moveW != 0) {
-                let moveTime = this.mouseItem.moveW * oneWidthTime;
-                this.$set(this.mouseItem.time, 'end', end + moveTime);
-                this.$set(this.mouseItem, 'moveW', 0);
-                isM = true;
-            }
-            //
-            if (isM) {
-                this.$emit("on-change", this.mouseItem)
-            } else if (e.target.className == 'timeline-title') {
-                this.clickItem(this.mouseItem);
-            }
-            this.mouseItem = null;
         },
         scrollPosition(pos) {
             let date = new Date();
@@ -483,6 +499,7 @@ export default {
                 right: 0;
                 bottom: 0;
                 z-index: 2;
+                cursor: move;
                 &:before {
                     content: "";
                     position: absolute;
@@ -534,7 +551,8 @@ export default {
                 right: 0;
                 bottom: 0;
                 z-index: 3;
-                overflow: auto;
+                overflow-x: hidden;
+                overflow-y: auto;
                 > li {
                     cursor: default;
                     height: 40px;

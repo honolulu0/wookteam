@@ -88,6 +88,9 @@
                 } else {
                     $A(this.$refs.scrollerView).stop().animate({"scrollTop": top});
                 }
+            },
+            scrollToBottom(animate) {
+                this.scrollTo(this.$refs.scrollerView.scrollHeight, animate);
             }
         }
     }

@@ -36,7 +36,7 @@
                                     <Radio label="reg" disabled>{{$L('注册会员')}}</Radio>
                                 </RadioGroup>
                                 <RadioGroup v-else v-model="formSystem.role_look">
-                                    <Radio label="edit">{{$L('修改权限')}}</Radio>
+                                    <Radio label="edit">{{$L('同修改权限')}}</Radio>
                                     <Radio label="reg">{{$L('注册会员')}}</Radio>
                                 </RadioGroup>
                             </div>

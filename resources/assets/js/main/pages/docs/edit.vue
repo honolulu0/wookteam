@@ -902,7 +902,7 @@
                         break;
 
                     case 'flow':
-                        this.$refs.myFlow[act == 'pdf' ? 'exportPDF' : 'exportPNG'](this.docDetail.title, 1);
+                        this.$refs.myFlow[act == 'pdf' ? 'exportPDF' : 'exportPNG'](this.docDetail.title, 3);
                         break;
 
                     case 'sheet':

@@ -4,6 +4,8 @@
 
 新增`toolbars.custom_uploadImage`参数
 
+新增`toolbars.custom_uploadFile`参数
+
 新增`toolbars.custom_fullscreen`参数
 
 新增`isCustomFullscreen`参数

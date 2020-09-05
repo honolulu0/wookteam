@@ -249,6 +249,35 @@ class SystemController extends Controller
     }
 
     /**
+     * 上传文件
+     */
+    public function fileupload()
+    {
+        if (Users::token2userid() === 0) {
+            return Base::retError('身份失效，等重新登录！');
+        }
+        $path = "uploads/files/" . Users::token2userid() . "/" . date("Ym") . "/";
+        $image64 = trim(Base::getPostValue('image64'));
+        $fileName = trim(Base::getPostValue('filename'));
+        if ($image64) {
+            $data = Base::image64save([
+                "image64" => $image64,
+                "path" => $path,
+                "fileName" => $fileName,
+            ]);
+        } else {
+            $data = Base::upload([
+                "file" => Request::file('files'),
+                "type" => 'file',
+                "path" => $path,
+                "fileName" => $fileName,
+            ]);
+        }
+        //
+        return $data;
+    }
+
+    /**
      * 清理opcache数据
      * @return int
      */

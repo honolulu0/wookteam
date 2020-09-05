@@ -7,7 +7,28 @@
                 <div>{{$L('加载组件中...')}}</div>
             </Spin>
             <img-upload ref="myUpload" class="teditor-upload" type="callback" @on-callback="editorImage" num="50" style="margin-top:5px;height:26px;"></img-upload>
+            <Upload
+                name="files"
+                ref="fileUpload"
+                class="teditor-upload"
+                :action="actionUrl"
+                :data="params"
+                multiple
+                :format="uploadFormat"
+                :show-upload-list="false"
+                :max-size="maxSize"
+                :on-progress="handleProgress"
+                :on-success="handleSuccess"
+                :on-error="handleError"
+                :on-format-error="handleFormatError"
+                :on-exceeded-size="handleMaxSize"
+                :before-upload="handleBeforeUpload">
+            </Upload>
         </div>
+        <Spin fix v-if="uploadIng > 0">
+            <Icon type="ios-loading" size=18 class="teditor-spin-icon-load"></Icon>
+            <div>{{$L('正在上传文件...')}}</div>
+        </Spin>
         <Modal v-model="transfer" class="teditor-transfer" @on-visible-change="transferChange" footer-hide fullscreen transfer>
             <div slot="close">
                 <Button type="primary" size="small">{{$L('完成')}}</Button>
@@ -143,7 +164,7 @@
             },
             toolbar: {
                 type: String,
-                default: ' undo redo | styleselect | uploadImages | bold italic underline forecolor backcolor | alignleft aligncenter alignright | bullist numlist outdent indent | link image emoticons media codesample | preview screenload',
+                default: ' undo redo | styleselect | uploadImages | uploadFiles | bold italic underline forecolor backcolor | alignleft aligncenter alignright | bullist numlist outdent indent | link image emoticons media codesample | preview screenload',
             },
             other_options: {
                 type: Object,
@@ -167,6 +188,12 @@
 
                 spinShow: true,
                 transfer: false,
+
+                uploadIng: 0,
+                uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz'],
+                actionUrl: $A.apiUrl('system/fileupload'),
+                params: { token: $A.getToken() },
+                maxSize: 10240
             };
         },
         mounted() {
@@ -238,7 +265,7 @@
                         },
                         insert: {
                             title: "Insert",
-                            items: "image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor toc | insertdatetime | uploadImages browseImages"
+                            items: "image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor toc | insertdatetime | uploadImages browseImages | uploadFiles"
                         }
                     },
                     codesample_languages: [
@@ -289,6 +316,23 @@
                             text: this.$L('浏览图片'),
                             onAction: () => {
                                 this.$refs.myUpload.browsePicture();
+                            }
+                        });
+                        editor.ui.registry.addButton('uploadFiles', {
+                            text: this.$L('文件'),
+                            tooltip: this.$L('上传文件'),
+                            onAction: () => {
+                                if (this.handleBeforeUpload()) {
+                                    this.$refs.fileUpload.handleClick();
+                                }
+                            }
+                        });
+                        editor.ui.registry.addMenuItem('uploadFiles', {
+                            text: this.$L('上传文件'),
+                            onAction: () => {
+                                if (this.handleBeforeUpload()) {
+                                    this.$refs.fileUpload.handleClick();
+                                }
                             }
                         });
                         if (isFull) {
@@ -438,6 +482,55 @@
                         this.insertImage(item.url);
                     }
                 }
+            },
+
+            /********************文件上传部分************************/
+
+            handleProgress() {
+                //开始上传
+                this.uploadIng++;
+            },
+
+            handleSuccess(res, file) {
+                //上传完成
+                this.uploadIng--;
+                if (res.ret === 1) {
+                    this.insertContent(`<a href="${res.data.url}" target="_blank">${res.data.name} (${$A.bytesToSize(res.data.size * 1024)})</a>`);
+                } else {
+                    this.$Modal.warning({
+                        title: this.$L('上传失败'),
+                        content: this.$L('文件 % 上传失败，%', file.name, res.msg)
+                    });
+                }
+            },
+
+            handleError() {
+                //上传错误
+                this.uploadIng--;
+            },
+
+            handleFormatError(file) {
+                //上传类型错误
+                this.$Modal.warning({
+                    title: this.$L('文件格式不正确'),
+                    content: this.$L('文件 % 格式不正确，仅支持上传：%', file.name, this.uploadFormat.join(','))
+                });
+            },
+
+            handleMaxSize(file) {
+                //上传大小错误
+                this.$Modal.warning({
+                    title: this.$L('超出文件大小限制'),
+                    content: this.$L('文件 % 太大，不能超过%。', file.name, $A.bytesToSize(this.maxSize * 1024))
+                });
+            },
+
+            handleBeforeUpload() {
+                //上传前判断
+                this.params = {
+                    token: $A.getToken(),
+                };
+                return true;
             },
         }
     }

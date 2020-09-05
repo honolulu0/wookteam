@@ -21,6 +21,7 @@ export default {
     uploadImage:false,
     custom_image:false,
     custom_uploadImage:false,
+    custom_uploadFile:false,
     table: true,
     checked: true,
     notChecked: true,

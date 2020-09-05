@@ -20,9 +20,12 @@
                             <p class="day-number">{{day.monthDay}}</p>
                             <div class="event-box" v-if="day.events.length">
                                 <div class="event-item"
-                                     :class="{selected: showCard == event.id}"
                                      v-for="event in day.events"
-                                     :style="`background-color: ${showCard == event.id ? (event.selectedColor||'#C7E6FD') : (event.color||'#C7E6FD')}`"
+                                     :class="{selected: showCard == event.id}"
+                                     :style="{
+                                        'color': event.color||'#333333',
+                                        'background-color': showCard == event.id ? (event.selectedColor||'#C7E6FD') : (event.backgroundColor||'#C7E6FD'),
+                                     }"
                                      @click="eventClick(event,$event)">
                                     <img class="avatar" v-if="event.avatar" :src="event.avatar" @error="($set(event, 'avatar', null))"/>
                                     <span v-else class="icon" :style="iconStyle(event.name)">{{event.name}}</span>
@@ -58,9 +61,13 @@
                     <div class="events-day" v-for="item in weekDate" v-if="weekDate.length"
                          :class="{today: item.isToday}">
                         <div class="event-box" v-if="item.events.length">
-                            <div class="event-item" v-for="event in item.events"
+                            <div class="event-item"
+                                 v-for="event in item.events"
                                  :class="{selected: showCard == event.id}"
-                                 :style="`background-color: ${showCard == event.id ? (event.selectedColor||'#C7E6FD') : (event.color||'#C7E6FD')}`"
+                                 :style="{
+                                    'color': event.color||'#333333',
+                                    'background-color': showCard == event.id ? (event.selectedColor||'#C7E6FD') : (event.backgroundColor||'#C7E6FD'),
+                                 }"
                                  v-if="isTheday(item.date, event.start) && isInTime(time, event.start)"
                                  @click="eventClick(event,$event)">
                                 <img class="avatar" v-if="event.avatar" :src="event.avatar" @error="($set(event, 'avatar', null))"/>
@@ -359,7 +366,8 @@
         background-color: #fff;
         display: flex;
         margin-top: 12px;
-        border: 1px solid #D0D9FF;
+        border-radius: 4px;
+        border: 1px solid #EEEEEE;
 
         .left-info {
             width: 60px;
@@ -367,10 +375,6 @@
             .time-info {
                 height: 100%;
                 position: relative;
-
-                &.first {
-                    border-top: 1px solid #EFF2FF;
-                }
 
                 &:nth-child(2) {
                     border-top: 1px solid #EFF2FF;
@@ -404,7 +408,7 @@
 
             .weeks {
                 display: flex;
-                border-bottom: 1px solid #FFCC36;
+                border-bottom: 1px solid #EEEEEE;
 
                 .week {
                     flex: 1;
@@ -413,6 +417,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    font-weight: normal;
                 }
             }
 
@@ -448,7 +453,7 @@
                             }
 
                             &.today {
-                                background-color: #FFFCF3;
+                                background-color: #F9FAFB;
                             }
 
                             &:last-child {
@@ -462,9 +467,9 @@
                                     cursor: pointer;
                                     font-size: 12px;
                                     background-color: #C7E6FD;
-                                    margin-bottom: 2px;
+                                    margin-bottom: 4px;
                                     color: rgba(0, 0, 0, .87);
-                                    padding: 8px 0 8px 4px;
+                                    padding: 6px 0 6px 4px;
                                     height: auto;
                                     line-height: 30px;
                                     display: flex;
@@ -502,6 +507,7 @@
                                         text-align: center;
                                         color: #fff;
                                         display: inline-block;
+                                        overflow: hidden;
                                     }
 
                                     .info {
@@ -661,7 +667,7 @@
                         }
 
                         &.today {
-                            background-color: #FFFCF3;
+                            background-color: #F9FAFB;
                         }
                     }
 
@@ -669,9 +675,9 @@
                         cursor: pointer;
                         font-size: 12px;
                         background-color: #C7E6FD;
-                        margin-bottom: 2px;
+                        margin-bottom: 4px;
                         color: rgba(0, 0, 0, .87);
-                        padding: 8px 0 8px 4px;
+                        padding: 6px 0 6px 4px;
                         height: auto;
                         line-height: 30px;
                         display: flex;
@@ -763,6 +769,9 @@
                     }
 
                     &:last-child {
+                        .events-day {
+                            border-bottom: 0;
+                        }
                         .single {
                             border-bottom: 0;
                         }

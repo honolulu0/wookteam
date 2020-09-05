@@ -55,6 +55,9 @@
                     <div slot="label"><em v-if="formData.id == 0" class="team-add-red-input">*</em>{{$L('登录密码')}}</div>
                     <Input type="password" v-model="formData.userpass" :placeholder="$L(formData.id > 0 ? '留空不修改' : '最少6位数')"></Input>
                 </FormItem>
+                <FormItem class="team-add-form-item-changepass" :class="{show:formData.userpass}" v-if="formData.id == 0" prop="changepass">
+                    <Checkbox v-model="formData.changepass" :true-value="1" :false-value="0">{{$L('首次登陆需修改密码')}}</Checkbox>
+                </FormItem>
             </Form>
             <div slot="footer">
                 <Button type="default" @click="addShow=false">{{$L('取消')}}</Button>
@@ -73,6 +76,16 @@
         font-family: SimSun,serif;
         font-size: 14px;
         color: #ed4014;
+    }
+    .team-add-form-item-changepass {
+        margin-top: -18px;
+        margin-bottom: 18px;
+        height: 0;
+        overflow: hidden;
+        transition: all 0.2s;
+        &.show {
+            height: 32px;
+        }
     }
 </style>
 <style lang="scss" scoped>
@@ -362,6 +375,7 @@
                             username: '',
                             nickname: '',
                             userpass: '',
+                            changepass: 1
                         }
                         break;
                     }

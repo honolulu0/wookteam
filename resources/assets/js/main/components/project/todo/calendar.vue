@@ -155,15 +155,16 @@
                 if (taskData.complete) {
                     title = '<span style="text-decoration:line-through">' + title + '</span>';
                 }
-                let color = '#D8F8F2';
+                let color = '#ffffff';
+                let backgroundColor = '#2d8cf0';
                 if (taskData.level === 1) {
-                    color = 'rgba(248, 14, 21, 0.6)';
-                }else if (taskData.level === 2) {
-                    color = 'rgba(236, 196, 2, 0.5)';
-                }else if (taskData.level === 3) {
-                    color = 'rgba(0, 159, 227, 0.7)';
-                }else if (taskData.level === 4) {
-                    color = 'rgba(121, 170, 28, 0.7)';
+                    backgroundColor = '#ed4014';
+                } else if (taskData.level === 2) {
+                    backgroundColor = '#f90';
+                } else if (taskData.level === 3) {
+                    backgroundColor = '#2db7f5';
+                } else if (taskData.level === 4) {
+                    backgroundColor = '#19be6b';
                 }
                 let data = {
                     "id": taskData.id,
@@ -171,6 +172,8 @@
                     "end": $A.formatDate('Y-m-d H:i:s', enddate),
                     "title": title,
                     "color": color,
+                    "backgroundColor": backgroundColor,
+                    "selectedColor": backgroundColor,
                     "name": taskData.nickname || taskData.username
                 };
                 if (this.isShowImg(taskData.userimg)) {

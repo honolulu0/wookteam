@@ -30,7 +30,7 @@
                     multiple
                     :format="uploadFormat"
                     :show-upload-list="false"
-                    :max-size="10240"
+                    :max-size="maxSize"
                     :on-success="handleSuccess"
                     :on-format-error="handleFormatError"
                     :on-exceeded-size="handleMaxSize"
@@ -100,7 +100,7 @@
                 lastPage: 0,
                 noDataText: "",
 
-                uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'],
+                uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz'],
                 actionUrl: $A.apiUrl('project/files/upload'),
                 params: {
                     token: $A.getToken(),
@@ -108,6 +108,7 @@
                     projectid: this.projectid
                 },
                 uploadList: [],
+                maxSize: 10240
             }
         },
 
@@ -546,7 +547,7 @@
                 //上传大小错误
                 this.$Modal.warning({
                     title: this.$L('超出文件大小限制'),
-                    content: this.$L('文件 % 太大，不能超过2M。', file.name)
+                    content: this.$L('文件 % 太大，不能超过%。', file.name, $A.bytesToSize(this.maxSize * 1024))
                 });
             },
 

@@ -31,7 +31,7 @@ export default {
 
     data() {
         return {
-            uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'],
+            uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz'],
             actionUrl: $A.apiUrl('chat/files/upload'),
             params: {
                 username: this.target,
@@ -86,7 +86,7 @@ export default {
             //上传大小错误
             this.$Modal.warning({
                 title: this.$L('超出文件大小限制'),
-                content: this.$L('文件 % 太大，不能超过%。', file.name, this.maxSize + 'KB')
+                content: this.$L('文件 % 太大，不能超过%。', file.name, $A.bytesToSize(this.maxSize * 1024))
             });
         },
 

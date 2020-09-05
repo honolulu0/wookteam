@@ -28,7 +28,7 @@
                             :action="actionUrl"
                             :data="uploadParams"
                             :show-upload-list="false"
-                            :max-size="2048"
+                            :max-size="maxSize"
                             :format="['jpg', 'jpeg', 'gif', 'png']"
                             :default-file-list="defaultList"
                             :on-success="handleSuccess"
@@ -335,6 +335,7 @@
                 maxNum: Math.min(Math.max($A.runNum(this.num), 1), 99),
                 httpValue: '',
                 httpType: '',
+                maxSize: 2048
             }
         },
         mounted () {
@@ -451,7 +452,7 @@
                 //上传大小错误
                 this.$Modal.warning({
                     title: this.$L('超出文件大小限制'),
-                    content: this.$L('文件 % 太大，不能超过2M。', file.name)
+                    content: this.$L('文件 % 太大，不能超过%。', file.name, $A.bytesToSize(this.maxSize * 1024))
                 });
             },
             handleBeforeUpload () {

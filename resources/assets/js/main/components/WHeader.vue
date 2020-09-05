@@ -125,6 +125,7 @@
                     </Form>
                 </TabPane>
                 <TabPane :label="$L('账号密码')" name="account">
+                    <Alert v-if="userInfo.changepass" type="warning" showIcon>{{$L('请先修改登录密码！')}}</Alert>
                     <Form ref="formPass" :model="formPass" :rules="rulePass" :label-width="100" @submit.native.prevent>
                         <FormItem :label="$L('旧密码')" prop="oldpass">
                             <Input v-model="formPass.oldpass" type="password"></Input>
@@ -425,6 +426,7 @@
                 this.formDatum__reset = $A.cloneData(this.formDatum);
                 this.formSetting__reset = $A.cloneData(this.formSetting);
                 this.formPass__reset = $A.cloneData(this.formPass);
+                this.changepass();
             };
             this.userInfo = $A.getUserInfo((res) => {
                 this.userInfo = res;
@@ -444,11 +446,23 @@
             '$route' () {
                 this.tabActive = this.$route.meta.tabActive;
                 this.systemDrawerShow = false;
-                this.userDrawerShow = false;
                 this.chatDrawerShow = $A.urlParameter("open") === 'chat' && $A.getToken() !== false;
+                if (!this.userInfo.changepass) {
+                    this.userDrawerShow = false;
+                }
             }
         },
         methods: {
+            changepass() {
+                if (this.userInfo.changepass) {
+                    this.userDrawerShow = true;
+                    this.userDrawerTab = 'account';
+                    setTimeout(() => {
+                        this.changepass()
+                    }, 500);
+                }
+            },
+
             getBgUrl(id, thumb) {
                 id = Math.max(1, parseInt(id));
                 return 'url(' + window.location.origin + '/images/bg/' + (thumb ? 'thumb/' : '') + id + '.jpg' + ')';

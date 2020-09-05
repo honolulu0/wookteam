@@ -77,6 +77,11 @@
             <li v-if="tools.custom_uploadImage" name="上传图片">
                 <span @click="onCustom('image-upload')" class="iconfont icon-upload-img"></span>
             </li>
+            <li v-if="tools.custom_uploadFile" name="上传文件">
+                <span @click="onCustom('file-upload')" class="icon-svg">
+                    <svg t="1599285632421" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="45640" width="16" height="16"><path d="M127.519 892.879v-763.34h655.448V514.69h63.612V81.831c0-8.783-7.12-15.903-15.903-15.903H79.81c-8.783 0-15.903 7.12-15.903 15.903v858.757c0 8.783 7.12 15.903 15.903 15.903h493.993v-63.612H127.519z" fill="#999999" p-id="45641"></path><path d="M231.608 228.388h447.269V292H231.608zM231.608 384.409h447.269v63.612H231.608zM231.608 540.43h245.141v63.612H231.608zM231.608 696.451h245.141v63.612H231.608zM923.269 762.938L745.315 584.984c-3.545-3.545-8.34-5.074-12.966-4.596a15.931 15.931 0 0 0-9.848 4.616L544.586 762.918c-6.248 6.248-6.248 16.379 0 22.627l22.353 22.353c6.248 6.248 16.379 6.248 22.627 0l112.555-112.555v245.148c0 8.837 7.163 16 16 16h31.612c8.837 0 16-7.163 16-16V695.363l112.555 112.555c6.248 6.248 16.379 6.248 22.627 0l22.353-22.353c6.249-6.248 6.249-16.378 0.001-22.627z" fill="#999999" p-id="45642"></path></svg>
+                </span>
+            </li>
             <li v-if="tools.table" name="表格">
                 <span @click="insertTable" class="iconfont icon-table"></span>
             </li>

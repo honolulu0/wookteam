@@ -1289,6 +1289,26 @@ class ProjectController extends Controller
                     $overdue ? '是' : '-',
                     date("Y-m-d H:i:s", $info['indate'])
                 ];
+                $subtask = Base::string2array($info['subtask']);
+                if ($subtask) {
+                    foreach ($subtask AS $subInfo) {
+                        $data[] = [
+                            '',
+                            $subInfo['detail'],
+                            '',
+                            '',
+                            '',
+                            $subInfo['uname'] ?: '',
+                            $subInfo['uname'] ? (DBCache::table('users')->where('username', $subInfo['uname'])->value('nickname') ?: $subInfo['uname']) : $subInfo['uname'],
+                            '',
+                            '',
+                            '',
+                            $subInfo['status'] == 'complete' ? '已完成' : '未完成',
+                            '',
+                            date("Y-m-d H:i:s", $subInfo['time'])
+                        ];
+                    }
+                }
             }
             $res = BillExport::create()->setHeadings($headings)->setData($data)->store($filePath . "/" . $fileName);
             if ($res != 1) {

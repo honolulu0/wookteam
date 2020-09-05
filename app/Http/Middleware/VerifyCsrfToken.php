@@ -15,6 +15,9 @@ class VerifyCsrfToken extends Middleware
         //上传图片
         'api/system/imgupload/',
 
+        //上传文件
+        'api/system/fileupload/',
+
         //上传项目文件
         'api/project/files/upload/',
 

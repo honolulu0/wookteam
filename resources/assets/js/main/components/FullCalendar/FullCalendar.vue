@@ -150,7 +150,7 @@
             border: 0;
             outline: none;
             box-shadow: unset;
-            background-color: #5272FF;
+            background-color: #2d8cf0;
             color: #fff;
 
             &:hover {
@@ -163,10 +163,18 @@
             display: flex;
             justify-content: flex-end;
 
+            > div {
+                display: flex;
+                align-items: center;
+                border-radius: 6px;
+                overflow: hidden;
+            }
+
             button {
-                width: 80px;
+                min-width: 48px;
                 cursor: pointer;
-                height: 26px;
+                height: 28px;
+                padding: 0 12px;
             }
         }
     }

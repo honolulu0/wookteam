@@ -1010,6 +1010,10 @@
                 if (el && el.length > 0) {
                     el[0].setFocus();
                 }
+                el = this.$refs['box_' + label.id];
+                if (el && el.length > 0) {
+                    el[0].scrollToBottom(false);
+                }
             },
 
             subtaskProgress(task) {

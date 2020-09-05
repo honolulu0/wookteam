@@ -50,14 +50,14 @@ let dateFunc = {
         let dt = new Date(date.getFullYear(), date.getMonth() + 1, 1, 0, 0) // 1st day of next month
         return new Date(dt.setDate(dt.getDate() - 1)) // last day of this month
     },
-// 获取当前周日期数组
+    // 获取当前周日期数组
     getDates(date) {
         let new_Date = date
         let timesStamp = new Date(new_Date.getFullYear(), new_Date.getMonth(), new_Date.getDate(), 0, 0, 0).getTime()
         // let timesStamp = new_Date.getTime();
         let currenDay = new_Date.getDay();
         let dates = [];
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 7; i++) {
             dates.push(new Date(timesStamp + 24 * 60 * 60 * 1000 * (i - (currenDay + 6) % 7)));
         }
         return dates

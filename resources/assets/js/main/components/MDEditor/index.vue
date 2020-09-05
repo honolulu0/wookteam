@@ -3,6 +3,23 @@
         <div class="mdeditor-box">
             <MarkdownPro ref="md1" v-model="content" :height="height" :toolbars="toolbars" :is-custom-fullscreen="transfer" @on-custom="customClick"></MarkdownPro>
             <img-upload ref="myUpload" class="teditor-upload" type="callback" @on-callback="editorImage" num="50" style="display:none;"></img-upload>
+            <Upload
+                name="files"
+                ref="fileUpload"
+                class="teditor-upload"
+                :action="actionUrl"
+                :data="params"
+                multiple
+                :format="uploadFormat"
+                :show-upload-list="false"
+                :max-size="maxSize"
+                :on-progress="handleProgress"
+                :on-success="handleSuccess"
+                :on-error="handleError"
+                :on-format-error="handleFormatError"
+                :on-exceeded-size="handleMaxSize"
+                :before-upload="handleBeforeUpload">
+            </Upload>
         </div>
         <Modal v-model="transfer" class="mdeditor-transfer" footer-hide fullscreen transfer :closable="false">
             <div class="mdeditor-transfer-body">
@@ -89,6 +106,7 @@
 
                         custom_image: true,
                         custom_uploadImage: true,
+                        custom_uploadFile: true,
                         custom_fullscreen: true,
                     };
                 }
@@ -100,6 +118,12 @@
                 transfer: false,
                 html2md: false,
                 htmlValue: '',
+
+                uploadIng: 0,
+                uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz'],
+                actionUrl: $A.apiUrl('system/fileupload'),
+                params: { token: $A.getToken() },
+                maxSize: 10240
             };
         },
         mounted() {
@@ -140,6 +164,10 @@
                     }
                     case "image-upload": {
                         this.$refs.myUpload.handleClick();
+                        break;
+                    }
+                    case "file-upload": {
+                        this.$refs.fileUpload.handleClick();
                         break;
                     }
                     case "fullscreen": {
@@ -183,7 +211,61 @@
                 }
                 script.src = url;
                 document.body.appendChild(script);
-            }
+            },
+
+            /********************文件上传部分************************/
+
+            handleProgress() {
+                //开始上传
+                this.uploadIng++;
+            },
+
+            handleSuccess(res, file) {
+                //上传完成
+                this.uploadIng--;
+                if (res.ret === 1) {
+                    let con = `[${res.data.name} (${$A.bytesToSize(res.data.size * 1024)})](${res.data.url})`;
+                    if (this.transfer) {
+                        this.$refs.md2.insertContent(con);
+                    } else {
+                        this.$refs.md1.insertContent(con);
+                    }
+                } else {
+                    this.$Modal.warning({
+                        title: this.$L('上传失败'),
+                        content: this.$L('文件 % 上传失败，%', file.name, res.msg)
+                    });
+                }
+            },
+
+            handleError() {
+                //上传错误
+                this.uploadIng--;
+            },
+
+            handleFormatError(file) {
+                //上传类型错误
+                this.$Modal.warning({
+                    title: this.$L('文件格式不正确'),
+                    content: this.$L('文件 % 格式不正确，仅支持上传：%', file.name, this.uploadFormat.join(','))
+                });
+            },
+
+            handleMaxSize(file) {
+                //上传大小错误
+                this.$Modal.warning({
+                    title: this.$L('超出文件大小限制'),
+                    content: this.$L('文件 % 太大，不能超过%。', file.name, $A.bytesToSize(this.maxSize * 1024))
+                });
+            },
+
+            handleBeforeUpload() {
+                //上传前判断
+                this.params = {
+                    token: $A.getToken(),
+                };
+                return true;
+            },
         }
     }
 </script>

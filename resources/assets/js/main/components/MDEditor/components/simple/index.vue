@@ -94,6 +94,9 @@
             <li v-if="tools.custom_uploadImage" name="上传图片">
                 <span @click="custom_chooseImage" class="iconfont icon-upload-img"></span>
             </li>
+            <li v-if="tools.custom_uploadFile" name="上传文件">
+                <span @click="custom_chooseFile" class="iconfont icon-upload-img"></span>
+            </li>
             <li v-if="tools.table" name="表格">
                 <span @click="insertTable" class="iconfont icon-table"></span>
             </li>

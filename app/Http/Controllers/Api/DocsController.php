@@ -593,6 +593,7 @@ class DocsController extends Controller
             return Base::retError(['已被会员【%】锁定！', Users::nickname($row['lockname'])]);
         }
         $content = Base::getPostValue('content');
+        $text = '';
         if ($row['type'] == 'document') {
             $data = Base::json2array($content);
             $isRep = false;
@@ -607,14 +608,17 @@ class DocsController extends Controller
                     $isRep = true;
                 }
             }
+            $text = strip_tags($data['content']);
             if ($isRep == true) {
                 $content = Base::array2json($data);
             }
         }
+        DB::table('docs_content')->where('sid', $id)->update(['text' => '']);
         DB::table('docs_content')->insert([
             'bookid' => $row['bookid'],
             'sid' => $id,
             'content' => $content,
+            'text' => $text,
             'username' => $user['username'],
             'indate' => Base::time()
         ]);

@@ -2085,7 +2085,7 @@ class Base
                     $type = ['zip'];
                     break;
                 case 'file':
-                    $type = ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp'];
+                    $type = ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz'];
                     break;
                 default:
                     return Base::retError('错误的类型参数');

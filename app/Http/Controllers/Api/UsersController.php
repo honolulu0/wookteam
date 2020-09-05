@@ -308,7 +308,8 @@ class UsersController extends Controller
         $encrypt = Base::generatePassword(6);
         DB::table('users')->where('id', $user['id'])->update([
             'encrypt' => $encrypt,
-            'userpass' => Base::md52($newpass, $encrypt)
+            'userpass' => Base::md52($newpass, $encrypt),
+            'changepass' => 0
         ]);
         return Base::retSuccess('修改成功');
     }
@@ -375,6 +376,7 @@ class UsersController extends Controller
      * @apiParam {Object} [userimg]             会员头像
      * @apiParam {String} [nickname]            昵称
      * @apiParam {String} [profession]          职位/职称
+     * @apiParam {Number} changepass            登陆是否需要修改密码
      */
     public function team__add()
     {
@@ -406,9 +408,9 @@ class UsersController extends Controller
         $profession = trim(Request::input('profession'));
         if ($profession) {
             if (mb_strlen($profession) < 2) {
-                return Base::retError('昵称不可以少于2个字！');
+                return Base::retError('职位/职称不可以少于2个字！');
             } elseif (mb_strlen($profession) > 20) {
-                return Base::retError('昵称最多只能设置20个字！');
+                return Base::retError('职位/职称最多只能设置20个字！');
             }
         }
         //
@@ -418,6 +420,7 @@ class UsersController extends Controller
             'userimg' => $userimg ?: '',
             'nickname' => $nickname ?: '',
             'profession' => $profession ?: '',
+            'changepass' => intval(Request::input('changepass')),
         ];
         if ($id > 0) {
             //开始修改
@@ -436,6 +439,11 @@ class UsersController extends Controller
             return Base::retSuccess('修改成功！');
         } else {
             //开始注册
+            if (strlen($userpass) < 6) {
+                return Base::retError('密码设置不能小于6位数！');
+            } elseif (strlen($userpass) > 32) {
+                return Base::retError('密码最多只能设置32位数！');
+            }
             $username = trim(Request::input('username'));
             $array = array_values(array_filter(array_unique(explode(",", $username))));
             if (empty($array)) {
