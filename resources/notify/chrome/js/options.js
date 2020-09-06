@@ -18,10 +18,8 @@ if (html == '') {
     $("#lists").html('没有相关的记录！');
 } else {
     $("input[class=checkbox]").on('change', function () {
-        var tempLists = $A.jsonParse($A.getStorage("configLists"), {});
-        if (typeof tempLists[$(this).attr("name")] == "object") {
-            tempLists[$(this).attr("name")]["disabled"] = $(this).is(':checked');
-            $A.setStorage("configLists", $A.jsonStringify(tempLists));
-        }
+        $A.updateConfigLists($(this).attr("name"), {
+            disabled: $(this).is(':checked')
+        });
     });
 }

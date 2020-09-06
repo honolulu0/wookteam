@@ -40,7 +40,8 @@ function showLists(lists) {
             continue;
         }
         const item = Object.assign(lists[index], {
-            nickname: tempLists[index].nickname
+            nickname: tempLists[index].nickname,
+            online: tempLists[index].online,
         });
         html+= '<li class="message_box' + (j == length ? ' last' : '') + '" data-index="' + index + '" data-token="' + item.token + '">';
         if (item.nickname) {
@@ -49,7 +50,7 @@ function showLists(lists) {
             html+= '<div class="message_username">' + item.username + '</div>';
         }
         html+= '<div class="message_host">' + index + '</div>';
-        html+= '<div class="message_unread' + (item.unread == 0 ? ' zero' : '') + '">未读: ' + item.unread + '</div>';
+        html+= '<div class="message_unread' + (item.unread == 0 ? ' zero' : '') + '' + (item.online === true ? '' : ' offline') + '">未读: ' + item.unread + '</div>';
         html+= '<div class="message_delete">删除</div>';
         html+= '</li>';
         j++;
@@ -65,15 +66,22 @@ function showLists(lists) {
             onDelete($(this).parents("li").attr("data-index"));
         }
     });
-    $("div.message_unread,div.message_host").click(function(){
+    $("div.message_unread,div.message_username,div.message_host").click(function(e){
         const index = $(this).parents("li").attr("data-index");
         const token = encodeURIComponent($(this).parents("li").attr("data-token"));
-        const opurl = 'http://' + index + '/todo?token=' + token + '&open=chat';
+        var opurl = 'http://' + index + '/todo?token=' + token;
+        if (e.target.className == 'message_unread') {
+            opurl+= '&open=chat'
+        }
         chrome.tabs.query({}, function (tabs) {
             var has = false;
             tabs.some(function (item) {
                 if ($A.getHost(item.url) == index) {
-                    var url = $A.getPathname(item.url) == '/' ? opurl : ($A.urlAddParams($A.removeURLParameter(item.url, ['open', 'rand']), {open: 'chat', rand: Math.round(new Date().getTime())}))
+                    var params = {rand: Math.round(new Date().getTime())};
+                    if (e.target.className == 'message_unread') {
+                        params.open = 'chat';
+                    }
+                    var url = $A.getPathname(item.url) == '/' ? opurl : ($A.urlAddParams($A.removeURLParameter(item.url, ['open', 'rand']), params))
                     chrome.windows.update(item.windowId, {focused: true});
                     chrome.tabs.highlight({tabs: item.index, windowId: item.windowId});
                     chrome.tabs.update({url: url});

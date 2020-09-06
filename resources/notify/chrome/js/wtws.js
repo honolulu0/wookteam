@@ -176,6 +176,9 @@ const WTWS = function (config) {
                 thas.sendTo('roger', msgDetail.contentId);
             }
             thas.triggerMsgListener(msgDetail);
+            $A.updateConfigLists(thas.__config.key, {
+                online: true
+            });
         };
 
         // 连接关闭时触发
@@ -184,6 +187,9 @@ const WTWS = function (config) {
             thas.__connected = false;
             thas.__instance = null;
             thas.__autoLine(5);
+            $A.updateConfigLists(thas.__config.key, {
+                online: false
+            });
         }
 
         // 连接出错
@@ -192,6 +198,9 @@ const WTWS = function (config) {
             thas.__connected = false;
             thas.__instance = null;
             thas.__autoLine(5);
+            $A.updateConfigLists(thas.__config.key, {
+                online: false
+            });
         }
 
         return this;

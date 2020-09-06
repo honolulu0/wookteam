@@ -218,15 +218,44 @@
                 desc = '[文件]';
                 break;
             case 'taskB':
-                desc = content.text + " [来自关注任务]";
+                desc = content.text + " [任务消息]";
                 break;
             case 'report':
-                desc = content.text + " [来自工作报告]";
+                desc = content.text + " [工作报告]";
                 break;
             default:
                 desc = '[未知类型]';
                 break;
         }
         return desc;
+    },
+
+    /**
+     * 更新参数
+     * @param key
+     * @param updateConfig
+     */
+    updateConfigLists(key, updateConfig) {
+        var configLists = $A.jsonParse($A.getStorage("configLists"), {});
+        var keyConfig = configLists[key];
+        if (keyConfig !== null
+            && typeof keyConfig == "object"
+            && updateConfig !== null
+            && typeof updateConfig == "object") {
+            var up = false;
+            for (var k in updateConfig) {
+                if (!updateConfig.hasOwnProperty(k)) {
+                    continue;
+                }
+                if (updateConfig[k] !== keyConfig[k]) {
+                    up = true;
+                    break;
+                }
+            }
+            if (up) {
+                keyConfig = Object.assign(keyConfig, updateConfig);
+                $A.setStorage("configLists", $A.jsonStringify(configLists));
+            }
+        }
     }
 }
