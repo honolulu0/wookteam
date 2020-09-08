@@ -382,6 +382,7 @@
         },
         mounted() {
             if ($A.getToken() === false) {
+                window.location.replace($A.webUrl());
                 return;
             }
             this.refreshTask();

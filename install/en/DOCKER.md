@@ -36,7 +36,7 @@ $ ./cmd php bin/wookteam --port=8080
 $ ./cmd up -d
 $ ./cmd npm install
 $ ./cmd npm run prod
-$ ./cmd supervisorctl restart all
+$ ./cmd restart
 ```
 
 Installed, project url: **`http://IP:PORT`** (`PORT` is the parameter `8080` in the build).
@@ -96,5 +96,5 @@ $ ./cmd artisan migrate
 $ ./cmd npm install
 $ ./cmd npm run prod
 
-$ ./cmd supervisorctl restart all
+$ ./cmd restart
 ```

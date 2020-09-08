@@ -36,7 +36,7 @@ $ ./cmd php bin/wookteam --port=8080
 $ ./cmd up -d
 $ ./cmd npm install
 $ ./cmd npm run prod
-$ ./cmd supervisorctl restart all
+$ ./cmd restart
 ```
 
 到此安装完毕，项目地址为：**`http://IP:PORT`**（`PORT`为构建项目中的参数`8080`）。
@@ -96,5 +96,5 @@ $ ./cmd artisan migrate
 $ ./cmd npm install
 $ ./cmd npm run prod
 
-$ ./cmd supervisorctl restart all
+$ ./cmd restart
 ```
