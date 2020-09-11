@@ -1555,15 +1555,6 @@
                 return '0 B';
             }
             return $A.runNum((bytes / Math.pow(k, i)), 2) + ' ' + sizes[i];
-        },
-
-        /**
-         * window宽度≤width参数返回true
-         * @param width
-         * @returns {boolean}
-         */
-        windowMaxWidth(width) {
-            return window.innerWidth <= width;
         }
     });
 

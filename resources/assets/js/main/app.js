@@ -4,6 +4,7 @@ import routes from './routes'
 import VueRouter from 'vue-router'
 import ViewUI from 'view-design';
 import Language from '../_modules/language'
+import Mixins from '../_modules/mixins'
 
 import '../common'
 import './main'
@@ -11,6 +12,7 @@ import './main'
 Vue.use(VueRouter);
 Vue.use(ViewUI);
 Vue.use(Language);
+Vue.use(Mixins);
 
 import Title from '../_components/Title.vue'
 import sreachTitle from '../_components/sreachTitle.vue'

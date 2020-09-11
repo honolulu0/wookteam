@@ -1,7 +1,7 @@
 <template>
     <div class="userimg-container" @click="onClick">
         <template v-if="this.isJson(info)">
-            <img v-if="isShowImg(userImg)&&!imgError" class="userimg-container-img" :src="userImg" @error="imgError=true"/>
+            <img v-if="isShowImg(userImg)&&!imgError" class="userimg-container-img" :src="userImg" @error="loadError"/>
             <div v-else class="userimg-container-box" :style="textStyle">
                 <div class="usertext-container-text">{{userName}}</div>
             </div>
@@ -56,6 +56,7 @@
         data() {
             return {
                 imgError: false,
+                againUrl: '',
             }
         },
         computed: {
@@ -93,6 +94,9 @@
                 if (!this.isJson(this.info)) {
                     return '';
                 }
+                if (this.againUrl) {
+                    return this.againUrl;
+                }
                 return this.info.send_userimg || this.info.userimg;
             },
         },
@@ -107,6 +111,19 @@
 
             isEmojiPrefix(text) {
                 return /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(text);
+            },
+
+            loadError() {
+                if (!this.againUrl) {
+                    if ($A.rightExists(this.userImg, 'images/other/system-message.png')) {
+                        this.againUrl = $A.fillUrl('images/other/system-message.png');
+                        return;
+                    } else if ($A.rightExists(this.userImg, 'images/other/group.png')) {
+                        this.againUrl = $A.fillUrl('images/other/group.png');
+                        return;
+                    }
+                }
+                this.imgError = true
             },
 
             onClick(e) {

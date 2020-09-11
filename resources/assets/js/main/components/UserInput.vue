@@ -131,14 +131,6 @@
             cursor: pointer;
         }
 
-        .ivu-table-cell {
-            padding-left: 12px;
-            padding-right: 12px;
-            &.ivu-table-cell-with-selection {
-                padding-right: 2px;
-            }
-        }
-
         .user-id-input-bottom {
             padding: 8px;
             display: flex;
@@ -183,6 +175,9 @@
                 default: ''
             },
             nobookid: {
+                default: ''
+            },
+            nogroupid: {
                 default: ''
             },
             placeholder: {
@@ -311,6 +306,9 @@
                         }
                         if (this.nobookid) {
                             where['nobookid'] = this.nobookid;
+                        }
+                        if (this.nogroupid) {
+                            where['nogroupid'] = this.nogroupid;
                         }
                         this.noDataText = this.$L("数据加载中.....");
                         $A.apiAjax({
@@ -479,6 +477,9 @@
                 if (this.nobookid) {
                     where['nobookid'] = this.nobookid;
                 }
+                if (this.nogroupid) {
+                    where['nogroupid'] = this.nogroupid;
+                }
                 this.tempName = where.username;
                 this.noDataText = this.$L("数据加载中.....");
                 $A.apiAjax({
@@ -512,7 +513,6 @@
                                     if (item.username == this.userName) {
                                         item._highlight = true;
                                     }
-
                                 }
                             });
                             this.searchShow = true;

@@ -59,7 +59,7 @@
                                     group="task"
                                     draggable=".task-draggable"
                                     :animation="150"
-                                    :disabled="taskSortDisabled || $A.windowMaxWidth(768)"
+                                    :disabled="taskSortDisabled || windowMax768"
                                     @sort="taskSortUpdate"
                                     @remove="taskSortUpdate">
                                     <div v-for="task in taskDatas[index].lists" class="content-li task-draggable" :key="task.id" :class="{complete:task.complete}" @click="openTaskModal(task)">

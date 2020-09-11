@@ -55,7 +55,7 @@
                 draggable=".label-draggable"
                 :style="{visibility: projectGanttShow ? 'hidden' : 'visible'}"
                 :animation="150"
-                :disabled="projectSortDisabled || $A.windowMaxWidth(768)"
+                :disabled="projectSortDisabled || windowMax768"
                 @sort="projectSortUpdate(true)">
                 <div
                     v-if="projectLabel.length > 0"
@@ -90,7 +90,7 @@
                                 group="task"
                                 draggable=".task-draggable"
                                 :animation="150"
-                                :disabled="projectSortDisabled || $A.windowMaxWidth(768)"
+                                :disabled="projectSortDisabled || windowMax768"
                                 @sort="projectSortUpdate(false)"
                                 @remove="projectSortUpdate(false)">
                                 <div v-for="task in label.taskLists"

@@ -78,7 +78,7 @@
                 </li>
             </ul>
             <!-- 分页 -->
-            <Page v-if="listTotal > 0" class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" :pageSize="listPageSize" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[20,40,60,100]" placement="top" transfer show-elevator show-sizer show-total :simple="$A.windowMaxWidth(768)"></Page>
+            <Page v-if="listTotal > 0" class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" :pageSize="listPageSize" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[20,40,60,100]" placement="top" transfer show-elevator show-sizer show-total :simple="windowMax768"></Page>
         </w-content>
 
         <Modal
