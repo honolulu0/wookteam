@@ -522,17 +522,12 @@
 
                 projectGanttShow: false,
 
-                userInfo: {},
-
                 filtrTask: '',
                 routeName: '',
             }
         },
         mounted() {
             this.routeName = this.$route.name;
-            this.userInfo = $A.getUserInfo((res) => {
-                this.userInfo = res;
-            }, false);
             $A.setOnTaskInfoListener('pages/project-panel',(act, detail) => {
                 if (detail.projectid != this.projectid) {
                     return;
@@ -562,7 +557,7 @@
 
                     case "labelsort":       // 调整分类排序
                     case "tasksort":        // 调整任务排序
-                        if (detail.__modifyUsername != $A.getUserName()) {
+                        if (detail.__modifyUsername != this.usrName) {
                             if (this.routeName == this.$route.name) {
                                 this.$Modal.confirm({
                                     title: this.$L("更新提示"),
@@ -1065,15 +1060,15 @@
             },
 
             isPersonsTask(task) {
-                return task.persons && !!task.persons.find(({username}) => username == this.userInfo.username);
+                return task.persons && !!task.persons.find(({username}) => username == this.usrInfo.username);
             },
 
             isFollowerTask(task) {
-                return task.follower && task.follower.indexOf(this.userInfo.username) !== -1;
+                return task.follower && task.follower.indexOf(this.usrInfo.username) !== -1;
             },
 
             isCreateTask(task) {
-                return task.createuser == this.userInfo.username;
+                return task.createuser == this.usrInfo.username;
             }
         },
     }

@@ -184,8 +184,6 @@
                 sectionLists: [],
                 sectionNoDataText: "",
 
-                userInfo: {},
-
                 routeName: '',
 
                 isBook: false,
@@ -194,9 +192,6 @@
         },
         mounted() {
             this.routeName = this.$route.name;
-            this.userInfo = $A.getUserInfo((res, isLogin) => {
-                this.userInfo = res;
-            }, false);
             //
             document.addEventListener("fullscreenchange", () => {
                 this.isFullscreen = !!document.fullscreenElement;

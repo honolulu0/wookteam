@@ -179,7 +179,7 @@
                     $A.WSOB.close();
                 } else {
                     $A.WSOB.setOnMsgListener("app", (msgDetail) => {
-                        if (msgDetail.username == $A.getUserName()) {
+                        if (msgDetail.username == this.usrName) {
                             return;
                         }
                         switch (msgDetail.messageType) {

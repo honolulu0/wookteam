@@ -234,7 +234,7 @@
                                 props: {
                                     value: this.userValue,
                                     multiple: true,
-                                    nousername: $A.getUserName(),
+                                    nousername: this.usrName,
                                     nobookid: this.id,
                                     placeholder: this.$L('请输入昵称/用户名搜索')
                                 },

@@ -356,8 +356,6 @@
                 historyLists: [],
                 historyNoDataText: "",
 
-                userInfo: {},
-
                 routeName: '',
                 synergyNum: 0,
                 synchUsers: [],
@@ -420,9 +418,6 @@
         },
         mounted() {
             this.routeName = this.$route.name;
-            this.userInfo = $A.getUserInfo((res, isLogin) => {
-                this.userInfo = res;
-            }, false);
             //
             setInterval(() => {
                 if (this.routeName === this.$route.name) {
@@ -504,7 +499,7 @@
             document.addEventListener("keydown", this.keySave);
         },
         deactivated() {
-            if (this.isLock && this.docDetail.lockname == this.userInfo.username) {
+            if (this.isLock && this.docDetail.lockname == this.usrInfo.username) {
                 this.docDetail.lockname = '';
                 this.handleClick('unlock');
             }
@@ -636,7 +631,7 @@
                     $A.WSOB.sendTo('docs', {
                         type: 'quit',
                         sid: this.sid,
-                        username: this.userInfo.username,
+                        username: this.usrInfo.username,
                     });
                 } else {
                     if (this.routeName !== this.$route.name) {
@@ -651,9 +646,9 @@
                         $A.WSOB.sendTo('docs', null, {
                             type: enter === true ? 'enter' : 'refresh',
                             sid: this.sid,
-                            nickname: this.userInfo.nickname,
-                            username: this.userInfo.username,
-                            userimg: this.userInfo.userimg,
+                            nickname: this.usrInfo.nickname,
+                            username: this.usrInfo.username,
+                            userimg: this.usrInfo.userimg,
                             indate: Math.round(new Date().getTime() / 1000),
                         }, (res) => {
                             this.synchUsers = res.status === 1 ? res.message : [];
@@ -746,7 +741,7 @@
             },
 
             handleSynch(username) {
-                if (username == this.userInfo.username) {
+                if (username == this.usrInfo.username) {
                     return;
                 }
                 if (typeof window.onChatOpenUserName === "function") {
@@ -879,7 +874,7 @@
                 if (!this.isLock) {
                     return;
                 }
-                if (this.docDetail.lockname != this.userInfo.username) {
+                if (this.docDetail.lockname != this.usrInfo.username) {
                     return;
                 }
                 this.__continueLock = $A.randomString(6);
@@ -891,7 +886,7 @@
                     if (!this.isLock) {
                         return;
                     }
-                    if (this.docDetail.lockname != this.userInfo.username) {
+                    if (this.docDetail.lockname != this.usrInfo.username) {
                         return;
                     }
                     this.handleClick('lock');

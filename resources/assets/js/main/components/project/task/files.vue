@@ -328,7 +328,7 @@
             uploadList(files) {
                 files.forEach((file) => {
                     if (typeof file.username === "undefined") {
-                        file.username = $A.getUserName();
+                        file.username = this.usrName;
                         file.indate = Math.round(new Date().getTime()/1000);
                         this.lists.unshift(file);
                         this.$emit('change', 'up');

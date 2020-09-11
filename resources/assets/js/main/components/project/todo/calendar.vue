@@ -40,7 +40,7 @@
         },
         mounted() {
             $A.setOnTaskInfoListener('components/project/todo/calendar',(act, detail) => {
-                if (detail.username != $A.getUserName()) {
+                if (detail.username != this.usrName) {
                     this.lists.some((task, i) => {
                         if (task.id == detail.id) {
                             this.lists.splice(i, 1);

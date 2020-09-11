@@ -26,8 +26,8 @@
             <div class="w-header-row-right">
                 <Dropdown class="right-info" trigger="click" @on-click="setRightSelect" placement="bottom-end" transfer>
                    <div>
-                       <UserImg class="userimg" :info="userInfo"/>
-                       <span class="username">{{$L('欢迎您')}}, {{(userInfo.nickname || userInfo.username) || $L('尊敬的会员')}}</span>
+                       <UserImg class="userimg" :info="usrInfo"/>
+                       <span class="username">{{$L('欢迎您')}}, {{(usrInfo.nickname || usrInfo.username) || $L('尊敬的会员')}}</span>
                        <Icon type="md-arrow-dropdown"/>
                    </div>
                     <Dropdown-menu slot="list">
@@ -103,7 +103,7 @@
                             <span style="color:#777">{{$L('建议尺寸：%', '200x200')}}</span>
                         </FormItem>
                         <FormItem :label="$L('账号')">
-                            <Input v-model="userInfo.username" :disabled="true"></Input>
+                            <Input v-model="usrInfo.username" :disabled="true"></Input>
                         </FormItem>
                         <FormItem :label="$L('昵称')" prop="nickname">
                             <Input v-model="formDatum.nickname"></Input>
@@ -135,7 +135,7 @@
                     </Form>
                 </TabPane>
                 <TabPane :label="$L('账号密码')" name="account">
-                    <Alert v-if="userInfo.changepass" type="warning" showIcon>{{$L('请先修改登录密码！')}}</Alert>
+                    <Alert v-if="usrInfo.changepass" type="warning" showIcon>{{$L('请先修改登录密码！')}}</Alert>
                     <Form ref="formPass" :model="formPass" :rules="rulePass" :label-width="100" @submit.native.prevent>
                         <FormItem :label="$L('旧密码')" prop="oldpass">
                             <Input v-model="formPass.oldpass" type="password"></Input>
@@ -376,7 +376,6 @@
                 tabActive: '',
 
                 loadIng: 0,
-                userInfo: {},
                 isAdmin: false,
 
                 systemDrawerShow: false,
@@ -461,23 +460,8 @@
             };
         },
         mounted() {
-            let resCall = () => {
-                this.$set(this.formDatum, 'userimg', this.userInfo.userimg)
-                this.$set(this.formDatum, 'nickname', this.userInfo.nickname)
-                this.$set(this.formDatum, 'profession', this.userInfo.profession)
-                this.$set(this.formSetting, 'bgid', this.userInfo.bgid)
-                this.formDatum__reset = $A.cloneData(this.formDatum);
-                this.formSetting__reset = $A.cloneData(this.formSetting);
-                this.formPass__reset = $A.cloneData(this.formPass);
-                this.changepass();
-            };
-            this.userInfo = $A.getUserInfo((res) => {
-                this.userInfo = res;
-                this.isAdmin = $A.identity('admin');
-                resCall();
-            }, false);
             this.isAdmin = $A.identity('admin');
-            resCall();
+            this.formatDatum();
             //
             this.tabActive = this.$route.meta.tabActive;
             //
@@ -490,14 +474,29 @@
                 this.tabActive = this.$route.meta.tabActive;
                 this.systemDrawerShow = false;
                 this.chatDrawerShow = $A.urlParameter("open") === 'chat' && $A.getToken() !== false;
-                if (!this.userInfo.changepass) {
+                if (!this.usrInfo.changepass) {
                     this.userDrawerShow = false;
                 }
+            },
+            usrName() {
+                this.isAdmin = $A.identity('admin');
+                this.formatDatum();
             }
         },
         methods: {
+            formatDatum() {
+                this.$set(this.formDatum, 'userimg', this.usrInfo.userimg)
+                this.$set(this.formDatum, 'nickname', this.usrInfo.nickname)
+                this.$set(this.formDatum, 'profession', this.usrInfo.profession)
+                this.$set(this.formSetting, 'bgid', this.usrInfo.bgid)
+                this.formDatum__reset = $A.cloneData(this.formDatum);
+                this.formSetting__reset = $A.cloneData(this.formSetting);
+                this.formPass__reset = $A.cloneData(this.formPass);
+                this.changepass();
+            },
+
             changepass() {
-                if (this.userInfo.changepass) {
+                if (this.usrInfo.changepass) {
                     this.userDrawerShow = true;
                     this.userDrawerTab = 'account';
                     setTimeout(() => {
@@ -586,7 +585,7 @@
                                     success: (res) => {
                                         if (res.ret === 1) {
                                             $A.getUserInfo(true);
-                                            $A.getUserBasic(this.userInfo.username, () => {}, 0);
+                                            $A.getUserBasic(this.usrInfo.username, () => {}, 0);
                                             this.$Message.success(this.$L('修改成功'));
                                         } else {
                                             this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });

@@ -374,8 +374,6 @@
             return {
                 loadIng: 0,
 
-                userInfo: {},
-
                 taskDatas: {
                     "1": {lists: [], hasMorePages: false},
                     "2": {lists: [], hasMorePages: false},
@@ -399,17 +397,9 @@
                 return;
             }
             this.refreshTask();
-            this.userInfo = $A.getUserInfo((res, isLogin) => {
-                if (this.userInfo.id != res.id) {
-                    this.userInfo = res;
-                    isLogin && this.refreshTask();
-                } else {
-                    this.userInfo = res;
-                }
-            }, false);
             //
             $A.setOnTaskInfoListener('pages/todo',(act, detail) => {
-                if (detail.username != $A.getUserName()) {
+                if (detail.username != this.usrName) {
                     for (let level in this.taskDatas) {
                         this.taskDatas[level].lists.some((task, i) => {
                             if (task.id == detail.id) {
@@ -504,7 +494,7 @@
 
                     case "create":          // 创建任务
                     case "username":        // 负责人
-                        addOrDelete(detail.username == $A.getUserName());
+                        addOrDelete(detail.username == this.usrName);
                         break;
 
                     case "delete":          // 删除任务
@@ -526,7 +516,9 @@
 
         },
         watch: {
-
+            usrName() {
+                this.usrLogin && this.refreshTask();
+            }
         },
         methods: {
             pTitle(p) {

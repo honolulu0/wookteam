@@ -307,8 +307,6 @@
             return {
                 loadIng: 0,
 
-                userInfo: {},
-
                 addShow: false,
                 formAdd: {
                     title: '',
@@ -353,14 +351,6 @@
         },
         mounted() {
             this.getLists(true);
-            this.userInfo = $A.getUserInfo((res, isLogin) => {
-                if (this.userInfo.id != res.id) {
-                    this.userInfo = res;
-                    isLogin && this.getLists(true);
-                } else {
-                    this.userInfo = res;
-                }
-            }, false);
             //
             $A.setOnTaskInfoListener('pages/project',(act, detail) => {
                 let item = this.lists.find((item) => { return item.id == detail.projectid });
@@ -405,6 +395,11 @@
             this.addShow = false;
             this.projectDrawerShow = false;
             this.projectListDrawerShow = false;
+        },
+        watch: {
+            usrName() {
+                this.usrLogin && this.getLists(true);
+            },
         },
         methods: {
             setPage(page) {

@@ -12,7 +12,7 @@
             </div>
             <t-editor class="add-edit" v-model="dataDetail.content" height="100%"></t-editor>
             <div class="add-input">
-                <UserInput v-model="dataDetail.ccuser" :nousername="$A.getUserName()" :placeholder="$L('输入关键词搜索')" multiple><span slot="prepend">{{$L('抄送人')}}</span></UserInput>
+                <UserInput v-model="dataDetail.ccuser" :nousername="usrName" :placeholder="$L('输入关键词搜索')" multiple><span slot="prepend">{{$L('抄送人')}}</span></UserInput>
                 <div class="add-prev-btn" @click="getPrevCc">{{$L('使用我上次抄送的人')}}</div>
             </div>
             <div class="add-footer">

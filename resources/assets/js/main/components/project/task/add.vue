@@ -220,20 +220,15 @@
                 addFocus: false,
 
                 nameTipDisabled: false,
-
-                userInfo: {},
             }
         },
         mounted() {
-            this.userInfo = $A.getUserInfo((res, isLogin) => {
-                this.userInfo = res;
-            }, false);
-            this.addUserInfo = $A.cloneData(this.userInfo);
+            this.addUserInfo = $A.cloneData(this.usrInfo);
         },
         methods: {
             changeUser(user) {
                 if (typeof user.username === "undefined") {
-                    this.addUserInfo = $A.cloneData(this.userInfo);
+                    this.addUserInfo = $A.cloneData(this.usrInfo);
                 } else {
                     this.addUserInfo = user;
                 }

@@ -48,7 +48,7 @@
                                 <Button :loading="!!loadData.claim" class="uname-button" type="primary" size="small" @click="handleTask('claimb')">{{$L('认领任务')}}</Button>
                             </em>
                             <em v-if="detail.type=='assign' && !detail.reassign">
-                                <Button v-if="detail.username==$A.getUserName()" class="uname-button" type="success" size="small" @click="handleTask('reassign')">{{$L('确认接收')}}</Button>
+                                <Button v-if="detail.username==usrName" class="uname-button" type="success" size="small" @click="handleTask('reassign')">{{$L('确认接收')}}</Button>
                                 <div v-else class="uname-text">[{{$L('等待确认')}}]</div>
                             </em>
                         </template>
@@ -339,11 +339,11 @@
                 }, 0)
             });
             this.bakData = cloneDeep(this.detail);
-            this.myUsername = $A.getUserName();
+            this.myUsername = this.usrName;
             this.getTaskDetail();
             //
             $A.setOnUserInfoListener("components/project/task/detail", () => {
-                this.myUsername = $A.getUserName();
+                this.myUsername = this.usrName;
             });
             $A.setOnTaskInfoListener('components/project/task/detail',(act, detail) => {
                 if (detail.id != this.taskid) {

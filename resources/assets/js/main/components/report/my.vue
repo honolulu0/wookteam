@@ -281,11 +281,10 @@
                                     }
                                 }, 350);
                                 //
-                                let userInfo = $A.getUserInfo();
                                 let msgData = {
                                     type: 'report',
-                                    username: userInfo.username,
-                                    userimg: userInfo.userimg,
+                                    username: this.usrInfo.username,
+                                    userimg: this.usrInfo.userimg,
                                     indate: Math.round(new Date().getTime() / 1000),
                                     text: res.data.ccuserAgain ? this.$L('修改了工作报告') : this.$L('发送了工作报告'),
                                     other: {

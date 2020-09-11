@@ -28,16 +28,18 @@
         data() {
             return {
                 bgid: -1,
-
-                userInfo: {}
             }
         },
         mounted() {
-            this.userInfo = $A.getUserInfo((res) => {
-                this.userInfo = res;
-                this.bgid = $A.runNum(this.userInfo.bgid);
-            }, false);
-            this.bgid = $A.runNum(this.userInfo.bgid);
+            this.bgid = $A.runNum(this.usrInfo.bgid);
+        },
+        watch: {
+            usrInfo: {
+                handler(info) {
+                    this.bgid = $A.runNum(info.bgid);
+                },
+                deep: true
+            }
         },
         methods: {
             getBgUrl(id, thumb) {

@@ -130,7 +130,6 @@
             return {
                 loadIng: 0,
 
-                userInfo: {},
                 isAdmin: false,
 
                 columns: [],
@@ -180,7 +179,7 @@
                 "ellipsis": true,
                 render: (h, params) => {
                     let arr = [];
-                    if (params.row.username == $A.getUserName()) {
+                    if (params.row.username == this.usrName) {
                         arr.push(h('span', {
                             style: {
                                 color: '#ff0000',
@@ -292,17 +291,14 @@
         },
         mounted() {
             this.getLists(true);
-            this.userInfo = $A.getUserInfo((res, isLogin) => {
-                if (this.userInfo.id != res.id) {
-                    this.userInfo = res;
-                    isLogin && this.getLists(true);
-                } else {
-                    this.userInfo = res;
-                }
-            }, false);
         },
         deactivated() {
             this.addShow = false;
+        },
+        watch: {
+            usrName() {
+                this.usrLogin && this.getLists(true);
+            }
         },
         methods: {
             setPage(page) {
@@ -445,8 +441,8 @@
                                             if (res.data.up === 1) {
                                                 let data = {
                                                     type: 'text',
-                                                    username: this.userInfo.username,
-                                                    userimg: this.userInfo.userimg,
+                                                    username: this.usrInfo.username,
+                                                    userimg: this.usrInfo.userimg,
                                                     indate: Math.round(new Date().getTime() / 1000),
                                                     text: this.$L(act=='deladmin' ? '您的管理员身份已被撤销。' : '恭喜您成为管理员。')
                                                 };

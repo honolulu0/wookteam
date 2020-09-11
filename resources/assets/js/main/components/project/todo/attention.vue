@@ -108,7 +108,7 @@
                 this.getLists(true);
             }
             $A.setOnTaskInfoListener('components/project/todo/attention', (act, detail) => {
-                if (detail.follower.indexOf($A.getUserName()) === -1) {
+                if (detail.follower.indexOf(this.usrName) === -1) {
                     this.lists.some((task, i) => {
                         if (task.id == detail.id) {
                             this.lists.splice(i, 1);
@@ -137,7 +137,7 @@
                         break;
 
                     case "attention":       // 添加关注
-                        let username = $A.getUserName();
+                        let username = this.usrName;
                         if (detail.follower.filter((uname) => { return uname == username }).length == 0) {
                             return;
                         }

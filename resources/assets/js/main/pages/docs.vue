@@ -238,8 +238,6 @@
             return {
                 loadIng: 0,
 
-                userInfo: {},
-
                 bookLists: [],
                 bookListPage: 1,
                 bookListTotal: 0,
@@ -303,14 +301,6 @@
 
         mounted() {
             this.getBookLists(true);
-            this.userInfo = $A.getUserInfo((res, isLogin) => {
-                if (this.userInfo.id != res.id) {
-                    this.userInfo = res;
-                    isLogin && this.getBookLists(true);
-                } else {
-                    this.userInfo = res;
-                }
-            }, false);
         },
 
         deactivated() {
@@ -323,6 +313,10 @@
         },
 
         watch: {
+            usrName() {
+                this.usrLogin && this.getBookLists(true);
+            },
+
             addBookShow(val) {
                 if (val && this.addBookId > 0) {
                     let tempLists = this.bookLists.filter((res) => { return res.id == this.addBookId });

@@ -946,29 +946,7 @@
         },
 
         mounted() {
-            let resCall = () => {
-                if ($A.getToken() === false) {
-                    return;
-                }
-                $A.WSOB.sendTo('unread', (res) => {
-                    if (res.status === 1) {
-                        this.unreadTotal = $A.runNum(res.message);
-                    } else {
-                        this.unreadTotal = 0;
-                    }
-                });
-                this.getDialogLists();
-                this.messageBottomAuto();
-            };
-            this.userInfo = $A.getUserInfo((res, isLogin) => {
-                if (this.userInfo.id != res.id) {
-                    this.userInfo = res;
-                    resCall();
-                } else {
-                    this.userInfo = res;
-                }
-            }, false);
-            resCall();
+            this.formatCall();
             this.getSetting();
             //
             window.onChatOpenUserName = (username) => {
@@ -985,7 +963,7 @@
             }
             //
             $A.WSOB.setOnMsgListener("chat/index", (msgDetail) => {
-                if (msgDetail.username == $A.getUserName()) {
+                if (msgDetail.username == this.usrName) {
                     return;
                 }
                 switch (msgDetail.messageType) {
@@ -1068,6 +1046,10 @@
         },
 
         watch: {
+            usrName() {
+                this.formatCall();
+            },
+
             chatTap(val) {
                 if (val === 'team' && this.teamReady == false) {
                     this.teamReady = true;
@@ -1142,6 +1124,21 @@
         },
 
         methods: {
+            formatCall() {
+                if ($A.getToken() === false) {
+                    return;
+                }
+                $A.WSOB.sendTo('unread', (res) => {
+                    if (res.status === 1) {
+                        this.unreadTotal = $A.runNum(res.message);
+                    } else {
+                        this.unreadTotal = 0;
+                    }
+                });
+                this.getDialogLists();
+                this.messageBottomAuto();
+            },
+
             getSetting() {
                 $A.apiAjax({
                     url: 'system/setting',

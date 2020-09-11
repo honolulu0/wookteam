@@ -97,7 +97,7 @@
                 this.getLists(true);
             }
             $A.setOnTaskInfoListener('components/project/header/create',(act, detail) => {
-                if (detail.createuser != $A.getUserName()) {
+                if (detail.createuser != this.usrName) {
                     return;
                 }
                 //
