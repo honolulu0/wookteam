@@ -95,7 +95,7 @@
             </div>
             <div class="manage-quick">
                 <emoji-picker @emoji="messageInsertText" :search="messageEmojiSearch">
-                    <div slot="emoji-invoker" slot-scope="{ events: { click: clickEvent } }" @click.stop="clickEvent">
+                    <div slot="emoji-invoker" slot-scope="{ events: { click: clickEvent } }" @click.stop="(event)=>{clickEvent(event)}">
                         <Tooltip :content="$L('表情')" placement="top">
                             <Icon class="quick-item" type="ios-happy-outline"  />
                         </Tooltip>

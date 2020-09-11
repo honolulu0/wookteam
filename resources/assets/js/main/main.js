@@ -159,20 +159,10 @@ import '../../sass/main.scss';
         /**
          * 获取用户信息（并保存）
          * @param callback                  网络请求获取到用户信息回调（监听用户信息发生变化）
-         * @param continueListenerName      持续监听标识（字符串或boolean，true:自动生成监听标识，false:自动生成监听标识但首次不请求网络）
          * @returns Object
          */
-        getUserInfo(callback, continueListenerName) {
-            if (typeof callback === 'function' || (typeof callback === "boolean" && callback === true)) {
-                if (typeof continueListenerName === "boolean") {
-                    if (continueListenerName === true) {
-                        continueListenerName = "auto-" + $A.randomString(6);
-                    } else {
-                        $A.setOnUserInfoListener("auto-" + $A.randomString(6), callback);
-                        return $A.jsonParse($A.storage("userInfo"));
-                    }
-                }
-                //
+        getUserInfo(callback) {
+            if (typeof callback === 'function' || callback === true) {
                 $A.apiAjax({
                     url: 'users/info',
                     error: () => {
@@ -184,11 +174,6 @@ import '../../sass/main.scss';
                             $A.setToken(res.data.token);
                             $A.triggerUserInfoListener(res.data);
                             typeof callback === "function" && callback(res.data, $A.getToken() !== false);
-                        }
-                    },
-                    afterComplete: () => {
-                        if (typeof continueListenerName == "string" && continueListenerName) {
-                            $A.setOnUserInfoListener(continueListenerName, callback);
                         }
                     },
                 });

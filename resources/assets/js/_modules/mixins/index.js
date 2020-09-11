@@ -5,21 +5,22 @@ export default {
                 return {
                     //用户信息
                     usrLogin: false,
-                    usrName: '',
                     usrInfo: {},
+                    usrName: '',
                     //浏览器宽度≤768返回true
                     windowMax768: window.innerWidth <= 768,
                 }
             },
 
             mounted() {
-                this.usrInfo = $A.getUserInfo((data, isLogin) => {
+                this.usrLogin = $A.getToken() !== false;
+                this.usrInfo = $A.getUserInfo();
+                this.usrName = this.usrInfo.username || '';
+                $A.setOnUserInfoListener('mixins', (data, isLogin) => {
                     this.usrLogin = isLogin;
                     this.usrInfo = data;
                     this.usrName = this.usrInfo.username || '';
-                }, false);
-                this.usrLogin = $A.getToken() !== false;
-                this.usrName = this.usrInfo.username || '';
+                });
                 //
                 window.addEventListener('resize', this.windowMax768Listener);
             },

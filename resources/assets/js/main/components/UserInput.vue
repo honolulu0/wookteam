@@ -45,6 +45,7 @@
                            @on-selection-change="userSelect"
                            :no-data-text="noDataText"></Table>
                     <div v-if="isConfirm&&searchShow" class="user-id-input-bottom">
+                        <Button type="default" size="small" @click="visible=false">{{$L('取消')}}</Button>
                         <Button type="primary" size="small" @click="onConfirm">{{$L('确定')}}</Button>
                     </div>
                 </div>
@@ -138,6 +139,7 @@
             justify-content: flex-end;
             > button {
                 font-size: 13px;
+                margin-left: 10px;
             }
         }
     }
@@ -239,11 +241,11 @@
                                 info: params.row,
                             },
                             style: {
-                                width: "28px",
-                                height: "28px",
-                                fontSize: "14px",
-                                lineHeight: "28px",
-                                borderRadius: "14px",
+                                width: "26px",
+                                height: "26px",
+                                fontSize: "13px",
+                                lineHeight: "26px",
+                                borderRadius: "50%",
                                 verticalAlign: "middle"
                             },
                         });

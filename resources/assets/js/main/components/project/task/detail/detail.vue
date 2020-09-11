@@ -200,7 +200,7 @@
                     </div>
                 </Poptip>
                 <Button icon="md-attach" class="btn" @click="handleTask('fileupload')">{{$L('添加附件')}}</Button>
-                <Poptip ref="attentionRef" v-if="detail.username == myUsername" placement="bottom" class="block" @on-popper-show="[handleAttentionShow(),handleSubwinToggle(true)]" @on-popper-hide="handleSubwinToggle(false)" transfer>
+                <Poptip ref="attentionRef" v-if="detail.username == usrName" placement="bottom" class="block" @on-popper-show="[handleAttentionShow(),handleSubwinToggle(true)]" @on-popper-hide="handleSubwinToggle(false)" transfer>
                     <Button :loading="!!loadData.attention" icon="md-at" class="btn">{{$L('关注人')}}</Button>
                     <div slot="content">
                         <div style="width:280px">
@@ -209,7 +209,7 @@
                         </div>
                     </div>
                 </Poptip>
-                <Button v-else-if="haveAttention(detail.follower)" :loading="!!loadData.unattention" icon="md-at" class="btn" @click="handleTask('unattention', {username:myUsername})">{{$L('取消关注')}}</Button>
+                <Button v-else-if="haveAttention(detail.follower)" :loading="!!loadData.unattention" icon="md-at" class="btn" @click="handleTask('unattention', {username:usrName})">{{$L('取消关注')}}</Button>
                 <Button v-else :loading="!!loadData.attention" icon="md-at" class="btn" @click="handleTask('attentiona')">{{$L('关注任务')}}</Button>
                 <Button v-if="!detail.archived" :loading="!!loadData.archived" icon="md-filing" class="btn" @click="handleTask('archived')">{{$L('归档')}}</Button>
                 <Button v-else :loading="!!loadData.unarchived" icon="md-filing" class="btn" @click="handleTask('unarchived')">{{$L('取消归档')}}</Button>
@@ -254,8 +254,6 @@
 
                 timeValue: [],
                 timeOptions: {},
-
-                myUsername: '',
 
                 openMenu: false,
             }
@@ -339,17 +337,13 @@
                 }, 0)
             });
             this.bakData = cloneDeep(this.detail);
-            this.myUsername = this.usrName;
             this.getTaskDetail();
             //
-            $A.setOnUserInfoListener("components/project/task/detail", () => {
-                this.myUsername = this.usrName;
-            });
             $A.setOnTaskInfoListener('components/project/task/detail',(act, detail) => {
                 if (detail.id != this.taskid) {
                     return;
                 }
-                if (detail.__modifyUsername == this.myUsername) {
+                if (detail.__modifyUsername == this.usrName) {
                     return;
                 }
                 this.getTaskDetail();
@@ -465,7 +459,7 @@
 
             haveAttention(follower) {
                 if (follower instanceof Array) {
-                    return follower.filter((uname) => { return uname == this.myUsername }).length > 0
+                    return follower.filter((uname) => { return uname == this.usrName }).length > 0
                 } else {
                     return 0;
                 }
@@ -786,7 +780,7 @@
 
                     case 'attentiona':
                         ajaxData.act = "attention";
-                        ajaxData.content = this.myUsername;
+                        ajaxData.content = this.usrName;
                         break;
 
                     case 'attention':
