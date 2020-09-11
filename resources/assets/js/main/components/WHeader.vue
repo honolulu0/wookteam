@@ -2,7 +2,16 @@
     <div class="w-header">
         <div v-if="tabActive" class="w-header-row">
             <div class="w-header-row-left">
-                <ul>
+                <Dropdown class="m768-show" @on-click="tabPage" trigger="click" transfer>
+                    <Icon type="md-menu" class="dropdown-menu"/>
+                    <DropdownMenu slot="list">
+                        <DropdownItem name="todo">{{$L('待办')}}</DropdownItem>
+                        <DropdownItem name="project">{{$L('项目')}}</DropdownItem>
+                        <DropdownItem name="docs">{{$L('知识库')}}</DropdownItem>
+                        <DropdownItem name="team">{{$L('团队')}}</DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
+                <ul class="m768-hide">
                     <li :class="tabActive==='todo'?'active':''">
                         <a href="javascript:void(0)" @click="tabPage('todo')"><i class="ft icon">&#xe89e;</i>{{$L('待办')}}</a>
                     </li><li :class="tabActive==='project'?'active':''">
@@ -17,6 +26,7 @@
             <div class="w-header-row-right">
                 <Dropdown class="right-info" trigger="click" @on-click="setRightSelect" placement="bottom-end" transfer>
                    <div>
+                       <UserImg class="userimg" :info="userInfo"/>
                        <span class="username">{{$L('欢迎您')}}, {{(userInfo.nickname || userInfo.username) || $L('尊敬的会员')}}</span>
                        <Icon type="md-arrow-dropdown"/>
                    </div>
@@ -279,6 +289,39 @@
                         font-size: 12px;
                         transform: scale(0.9);
                         z-index: 1;
+                    }
+                    .userimg {
+                        display: none;
+                        width: 26px;
+                        height: 26px;
+                        margin-top: 7px;
+                        vertical-align: top;
+                        border-radius: 50%;
+                    }
+                    .username {
+                        display: inline-block;
+                    }
+                }
+            }
+            @media (max-width: 768px) {
+                margin: 0 16px;
+                .w-header-row-left {
+                    .dropdown-menu {
+                        font-size: 28px;
+                        vertical-align: top;
+                        margin-top: 6px;
+                    }
+                }
+                .w-header-row-right {
+                    .right-info {
+                        padding-left: 8px;
+                        padding-right: 8px;
+                        .userimg {
+                            display: inline-block;
+                        }
+                        .username {
+                            display: none;
+                        }
                     }
                 }
             }

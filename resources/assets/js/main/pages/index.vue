@@ -358,6 +358,75 @@
                 margin-left: 10px;
             }
         }
+
+        @media (max-width: 768px) {
+            .header {
+                .z-row {
+                    .header-col-sub {
+                        h2 {
+                            padding: 12px 0 0 12px;
+                            span {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+            }
+            .welcome {
+                height: auto;
+                .banner {
+                    height: auto;
+                    .z-row {
+                        flex-direction: column;
+                        padding-bottom: 52px;
+                        > div {
+                            width: 90%;
+                            margin: 0 auto;
+                        }
+                    }
+                    h3 {
+                        font-size: 24px;
+                        width: auto;
+                    }
+                    img {
+                        max-width: 100%;
+                        height: auto;
+                    }
+                }
+                .second {
+                    height: 120px;
+                    display: flex;
+                    align-items: center;
+                    .z-row {
+                        height: auto;
+                        line-height: 36px;
+                        font-size: 16px;
+                        display: block;
+                        .z-6 {
+                            width: 30%;
+                            margin: 0 5%;
+                            white-space: nowrap;
+                        }
+                    }
+                }
+            }
+            .block {
+                flex-direction: column;
+                margin: 24px auto;
+                padding-top: 24px;
+                max-width: 90%;
+                border: 0;
+                > div {
+                    width: 96%;
+                    margin: 0 auto;
+                }
+                .wrap-left,
+                .wrap-right {
+                    margin: 6px 0;
+                    line-height: 28px;
+                }
+            }
+        }
     }
 </style>
 <script>

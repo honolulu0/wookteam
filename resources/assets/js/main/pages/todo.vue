@@ -13,7 +13,18 @@
                     </div>
                 </div>
                 <div class="w-nav-flex"></div>
-                <div class="w-nav-right">
+                <div class="w-nav-right m768-show">
+                    <Dropdown @on-click="handleTodo" trigger="click" transfer>
+                        <Icon type="md-menu" size="18"/>
+                        <DropdownMenu slot="list">
+                            <DropdownItem name="calendar">{{$L('待办日程')}}</DropdownItem>
+                            <DropdownItem name="complete">{{$L('已完成的任务')}}</DropdownItem>
+                            <DropdownItem name="attention">{{$L('我关注的任务')}}</DropdownItem>
+                            <DropdownItem name="report">{{$L('周报/日报')}}</DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
+                <div class="w-nav-right m768-hide">
                     <span class="ft hover" @click="handleTodo('calendar')"><i class="ft icon">&#xE706;</i> {{$L('待办日程')}}</span>
                     <span class="ft hover" @click="handleTodo('complete')"><i class="ft icon">&#xE73D;</i> {{$L('已完成的任务')}}</span>
                     <span class="ft hover" @click="handleTodo('attention')"><i class="ft icon">&#xE748;</i> {{$L('我关注的任务')}}</span>
@@ -48,7 +59,7 @@
                                     group="task"
                                     draggable=".task-draggable"
                                     :animation="150"
-                                    :disabled="taskSortDisabled"
+                                    :disabled="taskSortDisabled || $A.windowMaxWidth(768)"
                                     @sort="taskSortUpdate"
                                     @remove="taskSortUpdate">
                                     <div v-for="task in taskDatas[index].lists" class="content-li task-draggable" :key="task.id" :class="{complete:task.complete}" @click="openTaskModal(task)">
@@ -136,6 +147,8 @@
                         display: flex;
                         flex-direction: column;
                         .todo-card-head {
+                            flex-grow:0;
+                            flex-shrink:0;
                             display: flex;
                             align-items: center;
                             padding: 0 10px;
@@ -311,7 +324,7 @@
                 }
             }
         }
-        @media (max-width: 780px) {
+        @media (max-width: 768px) {
             .todo-main {
                 height: auto;
                 .todo-ul {
@@ -324,7 +337,7 @@
                             right: 0;
                             left: 0;
                             bottom: 0;
-                            margin: 10px;
+                            margin: 6px;
                             display: flex;
                             flex-direction: column;
                             min-height: 320px;

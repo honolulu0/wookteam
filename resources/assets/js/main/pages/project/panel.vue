@@ -25,11 +25,25 @@
                             </DropdownMenu>
                         </Dropdown>
                     </span>
-                    <span class="ft hover" @click="openProjectDrawer('lists')"><i class="ft icon">&#xE89E;</i> {{$L('列表')}}</span>
-                    <span class="ft hover" :class="{active:projectGanttShow}" @click="projectGanttShow=!projectGanttShow"><i class="ft icon">&#59141;</i> {{$L('甘特图')}}</span>
-                    <span class="ft hover" @click="openProjectDrawer('files')"><i class="ft icon">&#xE701;</i> {{$L('文件')}}</span>
-                    <span class="ft hover" @click="openProjectDrawer('logs')"><i class="ft icon">&#xE753;</i> {{$L('动态')}}</span>
-                    <span class="ft hover" @click="openProjectSettingDrawer('setting')"><i class="ft icon">&#xE7A7;</i> {{$L('设置')}}</span>
+                    <span class="m768-show-i">
+                        <Dropdown @on-click="openProjectDrawer" trigger="click" transfer>
+                            <Icon type="md-menu" size="18"/>
+                            <DropdownMenu slot="list">
+                                <DropdownItem name="lists">{{$L('列表')}}</DropdownItem>
+                                <DropdownItem name="projectGanttShow">{{$L('甘特图')}}</DropdownItem>
+                                <DropdownItem name="files">{{$L('文件')}}</DropdownItem>
+                                <DropdownItem  name="logs">{{$L('动态')}}</DropdownItem>
+                                <DropdownItem name="openProjectSettingDrawer">{{$L('设置')}}</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </span>
+                    <span class="m768-hide-i">
+                        <span class="ft hover" @click="openProjectDrawer('lists')"><i class="ft icon">&#xE89E;</i> {{$L('列表')}}</span>
+                        <span class="ft hover" :class="{active:projectGanttShow}" @click="projectGanttShow=!projectGanttShow"><i class="ft icon">&#59141;</i> {{$L('甘特图')}}</span>
+                        <span class="ft hover" @click="openProjectDrawer('files')"><i class="ft icon">&#xE701;</i> {{$L('文件')}}</span>
+                        <span class="ft hover" @click="openProjectDrawer('logs')"><i class="ft icon">&#xE753;</i> {{$L('动态')}}</span>
+                        <span class="ft hover" @click="openProjectSettingDrawer('setting')"><i class="ft icon">&#xE7A7;</i> {{$L('设置')}}</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -41,7 +55,7 @@
                 draggable=".label-draggable"
                 :style="{visibility: projectGanttShow ? 'hidden' : 'visible'}"
                 :animation="150"
-                :disabled="projectSortDisabled"
+                :disabled="projectSortDisabled || $A.windowMaxWidth(768)"
                 @sort="projectSortUpdate(true)">
                 <div
                     v-if="projectLabel.length > 0"
@@ -76,7 +90,7 @@
                                 group="task"
                                 draggable=".task-draggable"
                                 :animation="150"
-                                :disabled="projectSortDisabled"
+                                :disabled="projectSortDisabled || $A.windowMaxWidth(768)"
                                 @sort="projectSortUpdate(false)"
                                 @remove="projectSortUpdate(false)">
                                 <div v-for="task in label.taskLists"
@@ -937,6 +951,13 @@
             },
 
             openProjectDrawer(tab) {
+                if (tab == 'projectGanttShow') {
+                    this.projectGanttShow = !this.projectGanttShow;
+                    return;
+                } else if (tab == 'openProjectSettingDrawer') {
+                    this.openProjectSettingDrawer('setting')
+                    return;
+                }
                 this.projectDrawerTab = tab;
                 this.projectDrawerShow = true;
             },

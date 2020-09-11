@@ -242,9 +242,9 @@ class UsersController extends Controller
         $profession = trim(Request::input('profession'));
         if ($profession) {
             if (mb_strlen($profession) < 2) {
-                return Base::retError('昵称不可以少于2个字！');
+                return Base::retError('职位/职称不可以少于2个字！');
             } elseif (mb_strlen($profession) > 20) {
-                return Base::retError('昵称最多只能设置20个字！');
+                return Base::retError('职位/职称最多只能设置20个字！');
             } else {
                 $array['profession'] = $profession;
             }

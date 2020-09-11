@@ -13,7 +13,17 @@
                     </div>
                 </div>
                 <div class="w-nav-flex"></div>
-                <div class="w-nav-right">
+                <div class="w-nav-right m768-show">
+                    <Dropdown @on-click="handleProject" trigger="click" transfer>
+                        <Icon type="md-menu" size="18"/>
+                        <DropdownMenu slot="list">
+                            <DropdownItem name="myjoin">{{$L('参与的项目')}}</DropdownItem>
+                            <DropdownItem name="myfavor">{{$L('收藏的项目')}}</DropdownItem>
+                            <DropdownItem name="mycreate">{{$L('我管理的项目')}}</DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
+                <div class="w-nav-right m768-hide">
                     <span class="ft hover" @click="handleProject('myjoin', null)"><i class="ft icon">&#xE75E;</i> {{$L('参与的项目')}}</span>
                     <span class="ft hover" @click="handleProject('myfavor', null)"><i class="ft icon">&#xE720;</i> {{$L('收藏的项目')}}</span>
                     <span class="ft hover" @click="handleProject('mycreate', null)"><i class="ft icon">&#xE764;</i> {{$L('我管理的项目')}}</span>
@@ -68,7 +78,7 @@
                 </li>
             </ul>
             <!-- 分页 -->
-            <Page v-if="listTotal > 0" class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" :pageSize="listPageSize" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[20,40,60,100]" placement="top" transfer show-elevator show-sizer show-total></Page>
+            <Page v-if="listTotal > 0" class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" :pageSize="listPageSize" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[20,40,60,100]" placement="top" transfer show-elevator show-sizer show-total :simple="$A.windowMaxWidth(768)"></Page>
         </w-content>
 
         <Modal

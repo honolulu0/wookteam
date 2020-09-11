@@ -799,6 +799,9 @@
                             },
                             success: (res) => {
                                 if (res.ret === 1) {
+                                    if (this.getSid() == res.data.sid) {
+                                        this.docContent = Object.assign({}, this.docContent, res.data.content);
+                                    }
                                     this.$Message.success(res.msg);
                                     this.historyNoDataText = '';
                                     if (this.hid != 0) {

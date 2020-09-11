@@ -14,8 +14,18 @@
                 :placeholder="placeholder"
                 v-html="content"
                 @blur="handleBlur"></div>
-            <ImgUpload ref="myUpload" class="desc-editor-upload" type="callback" @on-callback="editorImage" num="50" style="margin-top:5px;height:26px;"></ImgUpload>
+            <ImgUpload
+                ref="myUpload"
+                class="desc-editor-upload"
+                type="callback"
+                :uploadIng.sync="uploadIng"
+                @on-callback="editorImage"
+                num="50"></ImgUpload>
         </div>
+        <Spin fix v-if="uploadIng > 0">
+            <Icon type="ios-loading" class="upload-control-spin-icon-load"></Icon>
+            <div>{{$L('正在上传文件...')}}</div>
+        </Spin>
         <Modal v-model="transfer" class="desc-editor-transfer" @on-visible-change="transferChange" footer-hide fullscreen transfer>
             <div slot="close">
                 <Button type="primary" size="small">{{$L('完成')}}</Button>
@@ -23,6 +33,10 @@
             <div class="desc-editor-transfer-body">
                 <textarea :id="'T_' + id" :placeholder="placeholder">{{content}}</textarea>
             </div>
+            <Spin fix v-if="uploadIng > 0">
+                <Icon type="ios-loading" class="upload-control-spin-icon-load"></Icon>
+                <div>{{$L('正在上传文件...')}}</div>
+            </Spin>
         </Modal>
     </div>
 </template>
@@ -42,6 +56,13 @@
 }
 .desc-editor-transfer {
     background-color: #ffffff;
+    .tox-toolbar {
+        > div:last-child {
+            > button:last-child {
+                margin-right: 64px;
+            }
+        }
+    }
     .ivu-modal-header {
         display: none;
     }
@@ -78,11 +99,16 @@
     position: relative;
     &:hover {
         .desc-editor-tool {
-            display: flex;
+            .tool-button {
+                opacity: 0.9;
+                &:hover {
+                    opacity: 1;
+                }
+            }
         }
     }
     .desc-editor-tool {
-        display: none;
+        display: flex;
         flex-direction: row;
         align-items: center;
         position: absolute;
@@ -91,13 +117,10 @@
         z-index: 2;
         .tool-button {
             font-size: 12px;
-            opacity: 0.9;
-            transition: all 0.3s;
+            opacity: 0;
+            transition: all 0.2s;
             margin-left: 5px;
             background-color: #ffffff;
-            &:hover {
-                opacity: 1;
-            }
         }
     }
     .desc-editor-load {
@@ -155,6 +178,7 @@ export default {
     data() {
         return {
             loadIng: 0,
+            uploadIng: 0,
 
             id: "tinymce_" + Math.round(Math.random() * 10000),
             content: '',
@@ -245,6 +269,9 @@ export default {
                     'insertdatetime media nonbreaking save table contextmenu directionality',
                     'emoticons paste textcolor colorpicker imagetools codesample'
                 ],
+                save_onsavecallback: (e) => {
+                    this.handleBlur(e);
+                },
                 menubar: isFull,
                 inline: !isFull,
                 inline_boundaries: false,

@@ -9,7 +9,14 @@
 
         <!--输入框区域-->
         <div class="user-id-input" ref="reference">
-            <Input v-model="nickName" :placeholder="placeholder" :disabled="disabled" icon="md-search" @on-click="searchEnter" @on-enter="searchEnter" @on-blur="searchEnter(true)">
+            <Input v-model="nickName"
+                   :placeholder="placeholder"
+                   :disabled="disabled"
+                   icon="md-search"
+                   @on-click="searchEnter"
+                   @on-enter="searchEnter"
+                   @on-blur="searchEnter(true)"
+                   @on-change="inputChange">
                 <div v-if="$slots.prepend !== undefined" slot="prepend"><slot name="prepend"></slot></div>
                 <div v-if="$slots.append !== undefined" slot="append"><slot name="append"></slot></div>
             </Input>
@@ -25,17 +32,22 @@
                 class="user-id-input-body"
                 :data-transfer="transfer"
                 v-transfer-dom>
-                <Table highlight-row
-                       v-if="searchShow"
-                       ref="myTable"
-                       size="small"
-                       class="user-id-input-table"
-                       :style="tableStyle"
-                       :columns="columns"
-                       :data="userLists"
-                       @on-row-click="userChange"
-                       @on-selection-change="userSelect"
-                       :no-data-text="noDataText"></Table>
+                <div class="user-id-input-table">
+                    <Table highlight-row
+                           v-if="searchShow"
+                           ref="myTable"
+                           size="small"
+                           class="tableSelection"
+                           :style="tableStyle"
+                           :columns="columns"
+                           :data="userLists"
+                           @on-row-click="userChange"
+                           @on-selection-change="userSelect"
+                           :no-data-text="noDataText"></Table>
+                    <div v-if="isConfirm&&searchShow" class="user-id-input-bottom">
+                        <Button type="primary" size="small" @click="onConfirm">{{$L('确定')}}</Button>
+                    </div>
+                </div>
             </div>
         </transition>
     </div>
@@ -75,20 +87,17 @@
         }
 
         .user-id-spin {
+            width: 14px;
+            height: 14px;
             position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.26);
+            top: 50%;
+            right: 34px;
+            transform: translate(0, -50%);
+            display: flex;
+            align-items: center;
             > div {
-                width: 18px;
-                height: 18px;
-                position: absolute;
-                top: 50%;
-                left: 6px;
-                transform: translate(0, -50%);
+                width: 100%;
+                height: 100%;
             }
         }
     }
@@ -98,9 +107,12 @@
         z-index: 99999
     }
     .user-id-input-table {
+        display: flex;
+        flex-direction: column;
         border-radius: 4px;
         overflow: hidden;
         box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
 
         .ivu-table table {
             width: 100% !important;
@@ -124,6 +136,16 @@
             padding-right: 12px;
             &.ivu-table-cell-with-selection {
                 padding-right: 2px;
+            }
+        }
+
+        .user-id-input-bottom {
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            > button {
+                font-size: 13px;
             }
         }
     }
@@ -199,6 +221,10 @@
                 spinShow: false,
                 skipSearch: false,
 
+                isConfirm: false,
+
+                tempName: '',
+
                 winStyle: {},
 
                 columns: [],
@@ -250,6 +276,7 @@
                 });
             }
             this.noDataText = this.$L("数据加载中.....");
+            this.isConfirm = this.$listeners['on-confirm'];
         },
         watch: {
             value (val) {
@@ -365,6 +392,23 @@
             }
         },
         methods: {
+            inputChange() {
+                const val = this.nickName;
+                this.spinShow = false;
+                this.tempName = '';
+                if (val != '') {
+                    setTimeout(() => {
+                        if (val == this.nickName && val != this.tempName) {
+                            this.searchEnter(false, (res) => {
+                                return val == this.nickName;
+                            });
+                        }
+                    }, 500)
+                } else {
+                    this.searchShow = false;
+                }
+            },
+
             handleShowPopper() {
                 if (this.timeout) clearTimeout(this.timeout);
                 this.timeout = setTimeout(() => {
@@ -398,7 +442,7 @@
                 this.spinShow = false;
             },
 
-            searchEnter(verify) {
+            searchEnter(verify, callback) {
                 if (this.disabled === true) {
                     return;
                 }
@@ -435,6 +479,7 @@
                 if (this.nobookid) {
                     where['nobookid'] = this.nobookid;
                 }
+                this.tempName = where.username;
                 this.noDataText = this.$L("数据加载中.....");
                 $A.apiAjax({
                     url: 'users/searchinfo',
@@ -453,6 +498,9 @@
                         this.noDataText = this.$L("数据加载失败！");
                     },
                     success: (res) => {
+                        if (typeof callback === "function" && callback(res) === false) {
+                            return;
+                        }
                         if (res.ret === 1) {
                             this.userLists = res.data;
                             this.userLists.forEach((item) => {
@@ -579,6 +627,11 @@
                     }
                 });
                 return narr;
+            },
+
+            onConfirm(e) {
+                this.searchShow = false;
+                this.$emit('on-confirm', e);
             }
         },
         mounted() {

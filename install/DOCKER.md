@@ -32,7 +32,7 @@ $ ./cmd build php
 $ ./cmd composer install
 $ ./cmd artisan key:generate
 $ ./cmd artisan migrate --seed
-$ ./cmd php bin/wookteam --port=8080
+$ ./cmd php bin/wookteam --port=8080 --ssl=4433
 $ ./cmd up -d
 $ ./cmd npm install
 $ ./cmd npm run prod
@@ -44,7 +44,7 @@ $ ./cmd restart
 ### 更换端口
 
 ```bash
-$ ./cmd php bin/wookteam --port=8080
+$ ./cmd php bin/wookteam --port=8080 --ssl=4433
 $ ./cmd up -d
 ```
 

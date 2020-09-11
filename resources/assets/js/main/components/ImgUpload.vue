@@ -31,7 +31,9 @@
                             :max-size="maxSize"
                             :format="['jpg', 'jpeg', 'gif', 'png']"
                             :default-file-list="defaultList"
+                            :on-progress="handleProgress"
                             :on-success="handleSuccess"
+                            :on-error="handleError"
                             :on-format-error="handleFormatError"
                             :on-exceeded-size="handleMaxSize"
                             :before-upload="handleBeforeUpload"
@@ -314,6 +316,10 @@
                     return {};
                 }
             },
+            uploadIng: {
+                type: Number,
+                default: 0
+            }
         },
         data () {
             return {
@@ -425,8 +431,13 @@
                 this.$refs.upload.fileList.splice(fileList.indexOf(item), 1);
                 this.$emit('input', this.$refs.upload.fileList);
             },
+            handleProgress() {
+                //开始上传
+                this.$emit('update:uploadIng', this.uploadIng + 1);
+            },
             handleSuccess (res, file) {
                 //上传完成
+                this.$emit('update:uploadIng', this.uploadIng - 1);
                 if (res.ret === 1) {
                     file.url = res.data.url;
                     file.path = res.data.path;
@@ -440,6 +451,10 @@
                     this.$refs.upload.fileList.pop();
                 }
                 this.$emit('input', this.$refs.upload.fileList);
+            },
+            handleError() {
+                //上传错误
+                this.$emit('update:uploadIng', this.uploadIng - 1);
             },
             handleFormatError (file) {
                 //上传类型错误
@@ -479,6 +494,12 @@
                 //手动上传
                 if (this.handleBeforeUpload()) {
                     this.$refs.upload.handleClick()
+                }
+            },
+            handleManual(file) {
+                //手动传file
+                if (this.handleBeforeUpload()) {
+                    this.$refs.upload.upload(file);
                 }
             },
             browsePicture(path) {

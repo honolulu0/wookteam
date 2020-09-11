@@ -1619,6 +1619,7 @@ class ProjectController extends Controller
      * - attention: 添加关注
      * - subtask: 修改子任务
      * @apiParam {String} [content]         内容数据
+     * @apiParam {String} [mode]            【act=attention】时可选参数，clean表示不在提交的列表中则删除
      *
      * @throws \Throwable
      */
@@ -2031,8 +2032,9 @@ class ProjectController extends Controller
              * 添加关注
              */
             case 'attention': {
+                $mode = trim(Base::getPostValue('mode'));
                 $userArray  = explode(",", $content);
-                DB::transaction(function () use ($user, $task, $userArray) {
+                DB::transaction(function () use ($mode, $user, $task, $userArray) {
                     foreach ($userArray AS $uname) {
                         $uid = Users::username2id($uname);
                         if (empty($uid)) {
@@ -2067,6 +2069,37 @@ class ProjectController extends Controller
                                     'action' => 'attention',
                                 ])
                             ]);
+                        }
+                    }
+                    if ($mode == 'clean') {
+                        $tempLists = Base::DBC2A(DB::table('project_users')
+                            ->select(['id', 'username'])
+                            ->where([
+                                'type' => '关注',
+                                'taskid' => $task['id'],
+                            ])
+                            ->whereNotIn('username', $userArray)
+                            ->lockForUpdate()
+                            ->get());
+                        foreach ($tempLists AS $tempItem) {
+                            if (DB::table('project_users')->where('id', $tempItem['id'])->delete()) {
+                                $uname = $tempItem['username'];
+                                DB::table('project_log')->insert([
+                                    'type' => '日志',
+                                    'projectid' => $task['projectid'],
+                                    'taskid' => $task['id'],
+                                    'username' => $uname,
+                                    'detail' => $uname == $user['username'] ? '取消关注' : '移出关注',
+                                    'indate' => Base::time(),
+                                    'other' => Base::array2string([
+                                        'type' => 'task',
+                                        'id' => $task['id'],
+                                        'title' => $task['title'],
+                                        'operator' => $user['username'],
+                                        'action' => 'unattention',
+                                    ])
+                                ]);
+                            }
                         }
                     }
                 });

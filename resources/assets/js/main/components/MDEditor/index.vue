@@ -1,12 +1,18 @@
 <template>
     <div>
         <div class="mdeditor-box">
-            <MarkdownPro ref="md1" v-model="content" :height="height" :toolbars="toolbars" :is-custom-fullscreen="transfer" @on-custom="customClick"></MarkdownPro>
-            <img-upload ref="myUpload" class="teditor-upload" type="callback" @on-callback="editorImage" num="50" style="display:none;"></img-upload>
+            <MarkdownPro ref="md1" v-model="content" :height="height" :toolbars="toolbars" :is-custom-fullscreen="transfer" @on-custom="customClick" @on-upload-image="handleUploadImageUpload"></MarkdownPro>
+            <ImgUpload
+                ref="myUpload"
+                class="upload-control"
+                type="callback"
+                :uploadIng.sync="uploadIng"
+                @on-callback="editorImage"
+                num="50"/>
             <Upload
                 name="files"
                 ref="fileUpload"
-                class="teditor-upload"
+                class="upload-control"
                 :action="actionUrl"
                 :data="params"
                 multiple
@@ -18,13 +24,20 @@
                 :on-error="handleError"
                 :on-format-error="handleFormatError"
                 :on-exceeded-size="handleMaxSize"
-                :before-upload="handleBeforeUpload">
-            </Upload>
+                :before-upload="handleBeforeUpload"/>
         </div>
+        <Spin fix v-if="uploadIng > 0">
+            <Icon type="ios-loading" class="upload-control-spin-icon-load"></Icon>
+            <div>{{$L('正在上传文件...')}}</div>
+        </Spin>
         <Modal v-model="transfer" class="mdeditor-transfer" footer-hide fullscreen transfer :closable="false">
             <div class="mdeditor-transfer-body">
                 <MarkdownPro ref="md2" v-if="transfer" v-model="content" :toolbars="toolbars" :is-custom-fullscreen="transfer" height="100%" @on-custom="customClick"></MarkdownPro>
             </div>
+            <Spin fix v-if="uploadIng > 0">
+                <Icon type="ios-loading" class="upload-control-spin-icon-load"></Icon>
+                <div>{{$L('正在上传文件...')}}</div>
+            </Spin>
         </Modal>
         <Modal v-model="html2md" title="html转markdown" okText="转换成markdown" width="680" class-name="simple-modal" @on-ok="htmlOk" transfer>
             <Input type="textarea" v-model="htmlValue" :rows="14" placeholder="请输入html代码..." />
@@ -55,6 +68,12 @@
 <style lang="scss" scoped>
     .mdeditor-box {
         position: relative;
+    }
+    .upload-control {
+        display: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
     }
 </style>
 <script>
@@ -211,6 +230,11 @@
                 }
                 script.src = url;
                 document.body.appendChild(script);
+            },
+
+            handleUploadImageUpload(file) {
+                //手动传图片
+                this.$refs.myUpload.handleManual(file);
             },
 
             /********************文件上传部分************************/

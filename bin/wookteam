@@ -24,11 +24,16 @@ class wookteamLoader
     }
 }
 
-$array = getopt('', ['port:']);
+$array = getopt('', ['port:', 'ssl:']);
+$data = [];
 if (isset($array['port'])) {
+    $data['APP_PORT'] = $array['port'] ?: '8080';
+}
+if (isset($array['ssl'])) {
+    $data['APP_PORT_SSL'] = $array['ssl'] ?: '4433';
+}
+if ($data) {
     $loader = new wookteamLoader();
-    $loader->modifyEnv([
-        'APP_PORT' => $array['port']
-    ]);
+    $loader->modifyEnv($data);
 }
 

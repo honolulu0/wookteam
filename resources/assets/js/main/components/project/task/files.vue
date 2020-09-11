@@ -43,7 +43,7 @@
             <Table class="tableFill" ref="tableRef" :size="!simple?'default':'small'" :columns="columns" :data="lists" :loading="loadIng > 0" :no-data-text="noDataText" @on-sort-change="sortChange" stripe></Table>
 
             <!-- 分页 -->
-            <Page v-if="lastPage > 1 || !simple" :simple="simple" class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[10,20,30,50,100]" placement="top" show-elevator show-sizer show-total transfer></Page>
+            <Page v-if="lastPage > 1 || !simple" :simple="simple || $A.windowMaxWidth(768)" class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[10,20,30,50,100]" placement="top" show-elevator show-sizer show-total transfer></Page>
 
         </div>
     </drawer-tabs-container>

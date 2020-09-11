@@ -624,7 +624,10 @@ class DocsController extends Controller
         ]);
         Docs::notice($id, [ 'type' => 'update' ]);
         //
-        return Base::retSuccess('保存成功！');
+        return Base::retSuccess('保存成功！', [
+            'sid' => $id,
+            'content' => Base::json2array($content),
+        ]);
     }
 
     /**

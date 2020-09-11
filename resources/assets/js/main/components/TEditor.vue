@@ -3,14 +3,20 @@
         <div class="teditor-box" :class="[spinShow?'teditor-loadstyle':'teditor-loadedstyle']">
             <textarea ref="myTextarea" :id="id">{{ content }}</textarea>
             <Spin fix v-if="spinShow">
-                <Icon type="ios-loading" size=18 class="teditor-spin-icon-load"></Icon>
+                <Icon type="ios-loading" size=18 class="upload-control-spin-icon-load"></Icon>
                 <div>{{$L('加载组件中...')}}</div>
             </Spin>
-            <img-upload ref="myUpload" class="teditor-upload" type="callback" @on-callback="editorImage" num="50" style="margin-top:5px;height:26px;"></img-upload>
+            <ImgUpload
+                ref="myUpload"
+                class="upload-control"
+                type="callback"
+                :uploadIng.sync="uploadIng"
+                @on-callback="editorImage"
+                num="50"/>
             <Upload
                 name="files"
                 ref="fileUpload"
-                class="teditor-upload"
+                class="upload-control"
                 :action="actionUrl"
                 :data="params"
                 multiple
@@ -22,11 +28,10 @@
                 :on-error="handleError"
                 :on-format-error="handleFormatError"
                 :on-exceeded-size="handleMaxSize"
-                :before-upload="handleBeforeUpload">
-            </Upload>
+                :before-upload="handleBeforeUpload"/>
         </div>
         <Spin fix v-if="uploadIng > 0">
-            <Icon type="ios-loading" size=18 class="teditor-spin-icon-load"></Icon>
+            <Icon type="ios-loading" class="upload-control-spin-icon-load"></Icon>
             <div>{{$L('正在上传文件...')}}</div>
         </Spin>
         <Modal v-model="transfer" class="teditor-transfer" @on-visible-change="transferChange" footer-hide fullscreen transfer>
@@ -36,6 +41,10 @@
             <div class="teditor-transfer-body">
                 <textarea :id="'T_' + id">{{ content }}</textarea>
             </div>
+            <Spin fix v-if="uploadIng > 0">
+                <Icon type="ios-loading" class="upload-control-spin-icon-load"></Icon>
+                <div>{{$L('正在上传文件...')}}</div>
+            </Spin>
         </Modal>
     </div>
 </template>
@@ -62,6 +71,13 @@
     }
     .teditor-transfer {
         background-color: #ffffff;
+        .tox-toolbar {
+            > div:last-child {
+                > button:last-child {
+                    margin-right: 64px;
+                }
+            }
+        }
         .ivu-modal-header {
             display: none;
         }
@@ -111,15 +127,7 @@
         overflow: inherit;
         position: relative;
     }
-    .teditor-spin-icon-load {
-        animation: ani-teditor-spin 1s linear infinite;
-    }
-    @keyframes ani-teditor-spin {
-        from { transform: rotate(0deg);}
-        50%  { transform: rotate(180deg);}
-        to   { transform: rotate(360deg);}
-    }
-    .teditor-upload {
+    .upload-control {
         display: none;
         width: 0;
         height: 0;
@@ -158,7 +166,7 @@
                         'advlist autolink lists link image charmap print preview hr anchor pagebreak imagetools',
                         'searchreplace visualblocks visualchars code',
                         'insertdatetime media nonbreaking save table contextmenu directionality',
-                        'emoticons paste textcolor colorpicker imagetools codesample save'
+                        'emoticons paste textcolor colorpicker imagetools codesample'
                     ];
                 }
             },

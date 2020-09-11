@@ -1,7 +1,6 @@
 <template>
-    <div class="project-task-detail-window" :class="{'task-detail-show': visible}">
-        <div class="task-detail-bg"
-             @click="$nextTick(()=>{visible=false})"></div>
+    <div v-if="detail.isassign!==true" class="project-task-detail-window" :class="{'task-detail-show': visible}">
+        <div class="task-detail-bg" @click="handleBgClose"></div>
         <div class="task-detail-main"
              @drop.prevent="commentPasteDrag($event, 'drag')"
              @dragover.prevent="commentDragOver(true)"
@@ -35,12 +34,24 @@
                 <ul class="detail-text-box">
                     <li v-if="detail.startdate > 0 && detail.enddate > 0" class="text-time detail-icon">
                         <span>{{$L('计划时间：')}}</span>
-                        <em>{{$A.formatDate("Y-m-d H:i", detail.startdate)}} {{$L('至')}} {{$A.formatDate("Y-m-d H:i", detail.enddate)}}</em>
-                        <em v-if="detail.overdue" class="overdue">[{{$L('已超期')}}]</em>
+                        <em>
+                            {{$A.formatDate("Y-m-d H:i", detail.startdate)}} {{$L('至')}} {{$A.formatDate("Y-m-d H:i", detail.enddate)}}
+                            <em v-if="detail.overdue" class="overdue">[{{$L('已超期')}}]</em>
+                        </em>
                     </li>
                     <li class="text-username detail-icon">
                         <span>{{$L('负责人：')}}</span>
-                        <em><UserView :username="detail.username"/></em>
+                        <template v-if="typeof detail.username!=='undefined'">
+                            <em v-if="detail.username"><UserView :username="detail.username" showimg/></em>
+                            <em v-else>
+                                <div class="uname-no">{{$L('暂无负责人')}}</div>
+                                <Button :loading="!!loadData.claim" class="uname-button" type="primary" size="small" @click="handleTask('claimb')">{{$L('认领任务')}}</Button>
+                            </em>
+                            <em v-if="detail.type=='assign' && !detail.reassign">
+                                <Button v-if="detail.username==$A.getUserName()" class="uname-button" type="success" size="small" @click="handleTask('reassign')">{{$L('确认接收')}}</Button>
+                                <div v-else class="uname-text">[{{$L('等待确认')}}]</div>
+                            </em>
+                        </template>
                     </li>
                     <li v-if="followerLength(detail.follower) > 0" class="text-follower detail-icon">
                         <span>{{$L('关注者：')}}</span>
@@ -152,32 +163,25 @@
                     <Button :loading="!!loadData.comment" :disabled="!commentText" type="primary" @click="handleTask('comment')">评 论</Button>
                 </div>
             </div>
-            <div class="detail-right">
-                <div class="cancel"><em @click="visible=false"></em></div>
-                <Dropdown trigger="click" class="block" @on-click="handleTask">
-                    <Button :loading="!!loadData.unfinished || !!loadData.complete" :icon="detail.complete?'md-checkmark-circle-outline':'md-radio-button-off'" class="btn">{{$L('标记')}}{{$L(detail.complete?'未完成':'已完成')}}</Button>
-                    <DropdownMenu slot="list">
-                        <DropdownItem name="unfinished">{{$L('标记未完成')}}<Icon v-if="!detail.complete" type="md-checkmark" class="checkmark"/></DropdownItem>
-                        <DropdownItem name="complete">{{$L('标记已完成')}}<Icon v-if="detail.complete" type="md-checkmark" class="checkmark"/></DropdownItem>
-                        <DropdownItem name="archived2">{{$L('完成并归档')}}<Icon v-if="detail.complete && detail.archived" type="md-checkmark" class="checkmark"/></DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
-                <Dropdown trigger="click" class="block" @on-click="handleTask">
+            <div v-if="detail.username" class="detail-right" :class="{'open-menu':openMenu}">
+                <Button v-if="detail.complete" :loading="!!loadData.unfinished" icon="md-checkmark-circle-outline" class="btn" @click="handleTask('unfinished')">{{$L('标记未完成')}}</Button>
+                <Button v-else :loading="!!loadData.complete" icon="md-radio-button-off" class="btn" @click="handleTask('complete')">{{$L('标记已完成')}}</Button>
+                <Dropdown trigger="click" class="block" @on-click="handleTask" @on-visible-change="handleSubwinToggle">
                     <Button :loading="!!loadData.level" icon="md-funnel" class="btn">{{$L('优先级')}}</Button>
                     <DropdownMenu slot="list">
                         <DropdownItem v-for="level in [1,2,3,4]" :key="level" :name="`level-${level}`" :class="`p${level}`">{{levelFormt(level)}}<Icon v-if="detail.level==level" type="md-checkmark" class="checkmark"/></DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
-                <Poptip placement="bottom" class="block">
+                <Poptip placement="bottom" class="block" @on-popper-show="[handleUsernameShow(),handleSubwinToggle(true)]" @on-popper-hide="handleSubwinToggle(false)" transfer>
                     <Button :loading="!!loadData.username" icon="md-person" class="btn">{{$L('负责人')}}</Button>
                     <div slot="content">
                         <div style="width:280px">
                             {{$L('选择负责人')}}
-                            <UserInput :projectid="detail.projectid" :nousername="detail.username" :transfer="false" @change="handleTask('usernameb', $event)" :placeholder="$L('输入关键词搜索')" style="margin:5px 0 3px"></UserInput>
+                            <UserInput v-model="detail.newusername" :projectid="detail.projectid" :nousername="detail.username" :transfer="false" @change="handleTask('usernameb', $event)" :placeholder="$L('输入关键词搜索')" style="margin:5px 0 3px"></UserInput>
                         </div>
                     </div>
                 </Poptip>
-                <Poptip ref="timeRef" placement="bottom" class="block" @on-popper-show="handleTask('inittime')">
+                <Poptip ref="timeRef" placement="bottom" class="block" @on-popper-show="[handleTask('inittime'),handleSubwinToggle(true)]" @on-popper-hide="handleSubwinToggle(false)" transfer>
                     <Button :loading="!!loadData.plannedtime || !!loadData.unplannedtime" icon="md-calendar" class="btn">{{$L('计划时间')}}</Button>
                     <div slot="content">
                         <div style="width:280px">
@@ -196,13 +200,12 @@
                     </div>
                 </Poptip>
                 <Button icon="md-attach" class="btn" @click="handleTask('fileupload')">{{$L('添加附件')}}</Button>
-                <Poptip ref="attentionRef" v-if="detail.username == myUsername" placement="bottom" class="block" @on-popper-show="() => {$set(detail, 'attentionLists', followerToStr(detail.follower))}">
+                <Poptip ref="attentionRef" v-if="detail.username == myUsername" placement="bottom" class="block" @on-popper-show="[handleAttentionShow(),handleSubwinToggle(true)]" @on-popper-hide="handleSubwinToggle(false)" transfer>
                     <Button :loading="!!loadData.attention" icon="md-at" class="btn">{{$L('关注人')}}</Button>
                     <div slot="content">
                         <div style="width:280px">
                             {{$L('选择关注人')}}
-                            <UserInput :projectid="detail.projectid" :multiple="true" :transfer="false" v-model="detail.attentionLists" :placeholder="$L('输入关键词搜索')" style="margin:5px 0 3px"></UserInput>
-                            <Button :loading="!!loadData.attention" :disabled="!detail.attentionLists" class="btn" type="primary" style="text-align:center;width:72px;height:28px;font-size:13px" @click="handleTask('attention')">确 定</Button>
+                            <UserInput :projectid="detail.projectid" :multiple="true" :transfer="false" v-model="detail.attentionLists" :placeholder="$L('输入关键词搜索')" style="margin:5px 0 3px" @on-confirm="handleTask('attention', true)"></UserInput>
                         </div>
                     </div>
                 </Poptip>
@@ -212,9 +215,10 @@
                 <Button v-else :loading="!!loadData.unarchived" icon="md-filing" class="btn" @click="handleTask('unarchived')">{{$L('取消归档')}}</Button>
                 <Button :loading="!!loadData.delete" icon="md-trash" class="btn" type="error" ghost @click="handleTask('deleteb')">{{$L('删除')}}</Button>
             </div>
-            <div v-if="detailDragOver" class="detail-drag-over">
-                <div class="detail-drag-text">{{$L('拖动到这里添加附件至 %', detail.title)}}</div>
-            </div>
+            <div v-if="detail.complete" class="detail-complete"><Icon type="md-checkmark-circle-outline" /></div>
+            <div class="detail-menu" @click="openMenu=!openMenu"><Icon type="md-menu" size="24"/></div>
+            <div class="detail-cancel"><em @click="visible=false"></em></div>
+            <div v-if="detailDragOver" class="detail-drag-over"><div class="detail-drag-text">{{$L('拖动到这里添加附件至 %', detail.title)}}</div></div>
         </div>
     </div>
 </template>
@@ -237,6 +241,8 @@
 
                 visible: false,
 
+                subwinVisible: 0,
+
                 urlProjectid: 0,
 
                 bakData: {},
@@ -250,6 +256,8 @@
                 timeOptions: {},
 
                 myUsername: '',
+
+                openMenu: false,
             }
         },
         beforeCreate() {
@@ -550,6 +558,29 @@
                 });
             },
 
+            handleUsernameShow() {
+                this.$set(this.detail, 'newusername', '')
+            },
+
+            handleAttentionShow() {
+                this.$set(this.detail, 'attentionLists', this.followerToStr(this.detail.follower))
+            },
+
+            handleBgClose() {
+                if (this.subwinVisible > 0) {
+                    return;
+                }
+                this.visible = false;
+            },
+
+            handleSubwinToggle(visible) {
+                if (visible) {
+                    this.subwinVisible++;
+                } else {
+                    this.subwinVisible--;
+                }
+            },
+
             handleTask(act, eve) {
                 let ajaxData = {
                     act: act,
@@ -658,6 +689,18 @@
                         }
                         return;
 
+                    case 'claimb':
+                        this.$Modal.confirm({
+                            title: this.$L('认领任务'),
+                            content: this.$L('你确定认领任务“%”吗？', this.detail.title),
+                            onOk: () => {
+                                this.handleTask('claim', eve);
+                            }
+                        });
+                        return;
+
+                    case 'claim':
+                    case 'reassign':
                     case 'complete':
                     case 'unfinished':
                     case 'archived':
@@ -750,6 +793,7 @@
                         if (!this.detail.attentionLists) {
                             return;
                         }
+                        ajaxData.mode = eve ? 'clean' : '';
                         ajaxData.content = this.detail.attentionLists;
                         this.$refs.attentionRef.handleClose();
                         break;
@@ -975,8 +1019,7 @@
             transform: translateZ(0);
             .detail-left {
                 flex: 1;
-                padding-left: 8px;
-                padding-right: 20px;
+                padding: 0 8px;
                 overflow: auto;
                 .detail-h2 {
                     color: #172b4d;
@@ -1093,6 +1136,20 @@
                             &:before {
                                 content: "\E903";
                             }
+                            .uname-no {
+                                display: inline-block;
+                                color: #888888;
+                            }
+                            .uname-button {
+                                font-size: 12px;
+                                margin-left: 6px;
+                            }
+                            .uname-text {
+                                line-height: 24px;
+                                color: #666666;
+                                font-size: 12px;
+                                margin-left: 6px;
+                            }
                         }
                         &.text-follower {
                             &:before {
@@ -1144,7 +1201,8 @@
                                     opacity: 0.6;
                                 }
                             }
-                            &.overdue {
+                            &.overdue,
+                            > em.overdue{
                                 color: #ff0000;
                             }
                             &.unfinished {
@@ -1235,46 +1293,10 @@
                 }
             }
             .detail-right {
-                .cancel {
-                    text-align: right;
-                    width: auto;
-                    height: 38px;
-                    em {
-                        display: inline-block;
-                        width: 38px;
-                        height: 38px;
-                        cursor: pointer;
-                        border-radius: 50%;
-                        transform: scale(0.92);
-                        &:after,
-                        &:before {
-                            position: absolute;
-                            content: "";
-                            top: 50%;
-                            left: 50%;
-                            width: 2px;
-                            height: 20px;
-                            background-color: #EE2321;
-                            transform: translate(-50%, -50%) rotate(45deg) scale(0.6, 1);
-                            transition: all .2s;
-                        }
-                        &:before {
-                            position: absolute;
-                            transform: translate(-50%, -50%) rotate(-45deg) scale(0.6, 1);
-                        }
-                        &:hover {
-                            &:after,
-                            &:before {
-                                background-color: #ff0000;
-                                transform: translate(-50%, -50%) rotate(135deg) scale(0.6, 1);
-                            }
-                            &:before {
-                                background-color: #ff0000;
-                                transform: translate(-50%, -50%) rotate(45deg) scale(0.6, 1);
-                            }
-                        }
-                    }
-                }
+                margin: 38px 0 6px;
+                padding-left: 12px;
+                overflow-x: hidden;
+                overflow-y: auto;
                 .block {
                     display: block;
                     .p1 {
@@ -1306,13 +1328,79 @@
                     text-overflow: ellipsis;
                 }
             }
+            .detail-complete {
+                display: inline-block;
+                pointer-events: none;
+                position: absolute;
+                top: 6px;
+                right: 23%;
+                font-size: 72px;
+                color: #19be6b;
+                opacity: 0.2;
+                z-index: 1;
+            }
+            .detail-menu {
+                display: none;
+                position: absolute;
+                top: 10px;
+                right: 64px;
+                text-align: right;
+                width: auto;
+                height: 38px;
+                z-index: 5;
+                align-items: center;
+            }
+            .detail-cancel {
+                position: absolute;
+                top: 10px;
+                right: 20px;
+                text-align: right;
+                width: auto;
+                height: 38px;
+                z-index: 5;
+                em {
+                    display: inline-block;
+                    width: 38px;
+                    height: 38px;
+                    cursor: pointer;
+                    border-radius: 50%;
+                    transform: scale(0.92);
+                    &:after,
+                    &:before {
+                        position: absolute;
+                        content: "";
+                        top: 50%;
+                        left: 50%;
+                        width: 2px;
+                        height: 20px;
+                        background-color: #EE2321;
+                        transform: translate(-50%, -50%) rotate(45deg) scale(0.6, 1);
+                        transition: all .2s;
+                    }
+                    &:before {
+                        position: absolute;
+                        transform: translate(-50%, -50%) rotate(-45deg) scale(0.6, 1);
+                    }
+                    &:hover {
+                        &:after,
+                        &:before {
+                            background-color: #ff0000;
+                            transform: translate(-50%, -50%) rotate(135deg) scale(0.6, 1);
+                        }
+                        &:before {
+                            background-color: #ff0000;
+                            transform: translate(-50%, -50%) rotate(45deg) scale(0.6, 1);
+                        }
+                    }
+                }
+            }
             .detail-drag-over {
                 position: absolute;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
-                z-index: 3;
+                z-index: 6;
                 background-color: rgba(255, 255, 255, 0.78);
                 display: flex;
                 align-items: center;
@@ -1332,6 +1420,38 @@
                     padding: 12px;
                     font-size: 18px;
                     color: #666666;
+                }
+            }
+        }
+        @media (max-width: 768px) {
+            .task-detail-main {
+                padding: 10px 12px 2px;
+                .detail-left {
+                    margin-top: 32px;
+                    .detail-icon {
+                        padding-left: 22px;
+                    }
+                }
+                .detail-right {
+                    transform: translate(200%, 0);
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    margin: 0;
+                    padding: 48px 18px;
+                    background: #ffffff;
+                    box-shadow: 0 1px 6px 0 rgba(32, 33, 36, 0.28);
+                    z-index: 4;
+                    transition: all 0.3s;
+                    border-top-right-radius: 4px;
+                    border-bottom-right-radius: 4px;
+                    &.open-menu {
+                        transform: translate(0, 0);
+                    }
+                }
+                .detail-menu {
+                    display: flex;
                 }
             }
         }

@@ -13,7 +13,15 @@
                     </div>
                 </div>
                 <div class="w-nav-flex"></div>
-                <div class="w-nav-right">
+                <div class="m768-show w-nav-right">
+                    <Dropdown @on-click="handleUser" trigger="click" transfer>
+                        <Icon type="md-menu" size="18"/>
+                        <DropdownMenu slot="list">
+                            <DropdownItem name="add">{{$L('添加团队成员')}}</DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
+                <div class="m768-hide w-nav-right">
                     <span class="ft hover" @click="handleUser('add')"><i class="ft icon">&#xE740;</i> {{$L('添加团队成员')}}</span>
                 </div>
             </div>
@@ -25,7 +33,7 @@
                     <!-- 列表 -->
                     <Table class="tableFill" ref="tableRef" :columns="columns" :data="lists" :loading="loadIng > 0" :no-data-text="noDataText" stripe></Table>
                     <!-- 分页 -->
-                    <Page class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[10,20,30,50,100]" placement="top" show-elevator show-sizer show-total></Page>
+                    <Page class="pageBox" :total="listTotal" :current="listPage" :disabled="loadIng > 0" @on-change="setPage" @on-page-size-change="setPageSize" :page-size-opts="[10,20,30,50,100]" placement="top" show-elevator show-sizer show-total :simple="$A.windowMaxWidth(768)"></Page>
                 </div>
             </div>
         </w-content>

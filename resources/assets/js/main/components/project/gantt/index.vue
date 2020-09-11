@@ -1,7 +1,7 @@
 <template>
     <div class="project-gstc-gantt">
-        <GanttView :lists="lists" :menuWidth="260" :itemWidth="80" @on-change="updateTime" @on-click="clickItem"/>
-        <Dropdown class="project-gstc-dropdown-filtr" @on-click="tapProject">
+        <GanttView :lists="lists" :menuWidth="$A.windowMaxWidth(768) ? 180 : 260" :itemWidth="80" @on-change="updateTime" @on-click="clickItem"/>
+        <Dropdown class="project-gstc-dropdown-filtr" :style="$A.windowMaxWidth(768)?{left:'142px'}:{}" @on-click="tapProject">
             <Icon class="project-gstc-dropdown-icon" :class="{filtr:filtrProjectId>0}" type="md-funnel" />
             <DropdownMenu slot="list">
                 <DropdownItem :name="0" :class="{'dropdown-active':filtrProjectId==0}">{{$L('全部')}}</DropdownItem>
