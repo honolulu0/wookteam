@@ -14,15 +14,15 @@
 
 ```bash
 // 使用ssh
-$ git clone git@github.com:kuaifan/wookteam.git
+git clone git@github.com:kuaifan/wookteam.git
 // 或者你也可以使用https
-$ git clone https://github.com/kuaifan/wookteam.git
+git clone https://github.com/kuaifan/wookteam.git
 
 // 进入目录
-$ cd wookteam
+cd wookteam
 
 // 拷贝 .env
-$ cp .env.example .env
+cp .env.example .env
 ```
 
 #### 2、修改`.env`
@@ -44,15 +44,15 @@ LARAVELS_LISTEN_PORT=5200
 #### 3、设置项目
 
 ```bash
-$ git checkout master # 如果使用dev分支进行本地开发
-$ git pull origin master # 如果使用dev分支进行本地开发
+git checkout master # 如果使用dev分支进行本地开发
+git pull origin master # 如果使用dev分支进行本地开发
 
-$ composer install
-$ php artisan key:generate
-$ php artisan migrate --seed
+composer install
+php artisan key:generate
+php artisan migrate --seed
 
-$ npm install
-$ npm run production
+npm install
+npm run production
 ```
 
 #### 4、运行 Laravels (WebSocket)
@@ -60,7 +60,7 @@ $ npm run production
 > 请确认您的环境以及安装[Swoole](https://www.swoole.com/)。
 
 ```bash
-$ php bin/laravels start
+php bin/laravels start
 ```
 
 > 建议通过[Supervisord](http://supervisord.org/)监管主进程，前提是不能加`-d`选项并且设置`swoole.daemonize`为`false`。
@@ -153,15 +153,15 @@ server {
 - 进入目录，依次运行以下命令：
 
 ```bash
-$ git fetch --all
-$ git reset --hard origin/master
-$ git pull
-$ composer update
-$ php artisan migrate
+git fetch --all
+git reset --hard origin/master
+git pull
+composer update
+php artisan migrate
 
-$ npm install
-$ npm run production
+npm install
+npm run production
 
-$ php bin/laravels start # 如果使用Supervisord则重启Supervisord
+php bin/laravels start # 如果使用Supervisord则重启Supervisord
 ```
 

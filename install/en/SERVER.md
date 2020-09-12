@@ -14,15 +14,15 @@
 
 ```bash
 // using ssh
-$ git clone git@github.com:kuaifan/wookteam.git
+git clone git@github.com:kuaifan/wookteam.git
 // or you can use https
-$ git clone https://github.com/kuaifan/wookteam.git
+git clone https://github.com/kuaifan/wookteam.git
 
 // enter directory
-$ cd wookteam
+cd wookteam
 
 // copy .env
-$ cp .env.example .env
+cp .env.example .env
 ```
 
 #### 2. Modify`.env`
@@ -44,15 +44,15 @@ LARAVELS_LISTEN_PORT=5200
 #### 3. Setup application
 
 ```bash
-$ git checkout master # use dev branch for local development
-$ git pull origin master # use dev branch for local development
+git checkout master # use dev branch for local development
+git pull origin master # use dev branch for local development
 
-$ composer install
-$ php artisan key:generate
-$ php artisan migrate --seed
+composer install
+php artisan key:generate
+php artisan migrate --seed
 
-$ npm install
-$ npm run production
+npm install
+npm run production
 ```
 
 #### 4. Run Laravels (WebSocket)
@@ -60,7 +60,7 @@ $ npm run production
 > Please confirm your environment and installation[Swoole](https://www.swoole.com/)。
 
 ```bash
-$ php bin/laravels start
+php bin/laravels start
 ```
 
 > It is recommended to supervise the main process through [Supervisord](http://supervisord.org/), the premise is without option `-d` and to set `swoole.daemonize` to `false`.
@@ -153,14 +153,14 @@ server {
 - Go to the directory and run the following commands in turn:
 
 ```bash
-$ git fetch --all
-$ git reset --hard origin/master
-$ git pull
-$ composer update
-$ php artisan migrate
+git fetch --all
+git reset --hard origin/master
+git pull
+composer update
+php artisan migrate
 
-$ npm install
-$ npm run production
+npm install
+npm run production
 
-$ php bin/laravels start # If use Supervisord restart Supervisord
+php bin/laravels start # If use Supervisord restart Supervisord
 ```

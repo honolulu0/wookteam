@@ -105,13 +105,13 @@ location @laravels {
 - 进入服务器，依次运行一下命令：
 
 ```bash
-$ cd /www/wwwroot/wookteam.com
-$ composer install
-$ php artisan key:generate
-$ php artisan migrate --seed
+cd /www/wwwroot/wookteam.com
+composer install
+php artisan key:generate
+php artisan migrate --seed
 
-$ npm install
-$ npm run production
+npm install
+npm run production
 ```
 
 > 如果提示`npm: command not found`请重启服务器或者运行`source ~/.bash_profile`后再试
@@ -121,9 +121,9 @@ $ npm run production
 - 进入服务器，依次运行一下命令：
 
 ```bash
-$ yum install -y supervisor
-$ systemctl enable supervisord
-$ systemctl start supervisord
+yum install -y supervisor
+systemctl enable supervisord
+systemctl start supervisord
 ```
 
 - 新建文件`/etc/supervisord.d/wookteam.ini`，内容如下：
@@ -144,7 +144,7 @@ stdout_logfile=/www/wwwroot/wookteam.com/%(program_name)s.log
 - 运行以下命令：
 
 ```bash
-$ systemctl restart supervisord
+systemctl restart supervisord
 ```
 
 到此安装完毕，希望你使用愉快！
@@ -162,11 +162,11 @@ $ systemctl restart supervisord
 - 进入服务器，切换至站点目录，然后依次运行以下命令：
 
 ```bash
-$ composer update
-$ php artisan migrate
+composer update
+php artisan migrate
 
-$ npm install
-$ npm run production
+npm install
+npm run production
 
-$ systemctl restart supervisord
+systemctl restart supervisord
 ```

@@ -14,29 +14,29 @@
 
 ```bash
 // 使用ssh
-$ git clone git@github.com:kuaifan/wookteam.git
+git clone git@github.com:kuaifan/wookteam.git
 // 或者你也可以使用https
-$ git clone https://github.com/kuaifan/wookteam.git
+git clone https://github.com/kuaifan/wookteam.git
 
 // 进入目录
-$ cd wookteam
+cd wookteam
 
 // 拷贝 .env
-$ cp .env.docker .env
+cp .env.docker .env
 ```
 
 #### 2、构建项目
 
 ```bash
-$ ./cmd build php
-$ ./cmd composer install
-$ ./cmd artisan key:generate
-$ ./cmd artisan migrate --seed
-$ ./cmd php bin/wookteam --port=8080 --ssl=4433
-$ ./cmd up -d
-$ ./cmd npm install
-$ ./cmd npm run prod
-$ ./cmd restart
+./cmd build php
+./cmd composer install
+./cmd artisan key:generate
+./cmd artisan migrate --seed
+./cmd php bin/wookteam --port=8080 --ssl=4433
+./cmd up -d
+./cmd npm install
+./cmd npm run prod
+./cmd restart
 ```
 
 到此安装完毕，项目地址为：**`http://IP:PORT`**（`PORT`为构建项目中的参数`8080`）。
@@ -44,20 +44,20 @@ $ ./cmd restart
 ### 更换端口
 
 ```bash
-$ ./cmd php bin/wookteam --port=8080 --ssl=4433
-$ ./cmd up -d
+./cmd php bin/wookteam --port=8080 --ssl=4433
+./cmd up -d
 ```
 
 ### 停止服务
 
 ```bash
-$ ./cmd stop
+./cmd stop
 ```
 
 > 一旦应用程序被设置，无论何时你想要启动服务器(如果它被停止)运行以下命令
 
 ```bash
-$ ./cmd start
+./cmd start
 ```
 
 ### 运行命令的快捷方式
@@ -65,14 +65,14 @@ $ ./cmd start
 > 你可以使用以下命令来执行
 
 ```bash
-$ ./cmd artisan "your command"          // 运行 artisan 命令
-$ ./cmd php "your command"              // 运行 php 命令
-$ ./cmd composer "your command"         // 运行 composer 命令
-$ ./cmd supervisorctl "your command"    // 运行 supervisorctl 命令
-$ ./cmd test "your command"             // 运行 phpunit 命令
-$ ./cmd npm "your command"              // 运行 npm 命令
-$ ./cmd yarn "your command"             // 运行 yarn 命令
-$ ./cmd mysql "your command"            // 运行 mysql 命令
+./cmd artisan "your command"          // 运行 artisan 命令
+./cmd php "your command"              // 运行 php 命令
+./cmd composer "your command"         // 运行 composer 命令
+./cmd supervisorctl "your command"    // 运行 supervisorctl 命令
+./cmd test "your command"             // 运行 phpunit 命令
+./cmd npm "your command"              // 运行 npm 命令
+./cmd yarn "your command"             // 运行 yarn 命令
+./cmd mysql "your command"            // 运行 mysql 命令
 ```
 
 ## 默认账号
@@ -87,14 +87,14 @@ $ ./cmd mysql "your command"            // 运行 mysql 命令
 - 进入目录，依次运行以下命令：
 
 ```bash
-$ git fetch --all
-$ git reset --hard origin/master
-$ git pull
-$ ./cmd composer update
-$ ./cmd artisan migrate
+git fetch --all
+git reset --hard origin/master
+git pull
+./cmd composer update
+./cmd artisan migrate
 
-$ ./cmd npm install
-$ ./cmd npm run prod
+./cmd npm install
+./cmd npm run prod
 
-$ ./cmd restart
+./cmd restart
 ```
