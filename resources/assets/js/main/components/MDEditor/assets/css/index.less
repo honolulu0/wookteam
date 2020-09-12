@@ -648,6 +648,10 @@ ul.shift {
         display: none;
     }
 
+    em {
+        font-style: oblique;
+    }
+
     ul {
         list-style: none;
         padding: 0 20px;
@@ -664,7 +668,7 @@ ul.shift {
                 position: absolute;
                 z-index: 99;
                 top: 12px;
-                left: -8px;
+                left: -16px;
                 background: @content;
             }
         }
@@ -720,6 +724,9 @@ ul.shift {
     ol {
         list-style-type: decimal;
         padding-left: 20px;
+        li {
+            list-style: decimal;
+        }
     }
 
     hr {
