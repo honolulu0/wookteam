@@ -26,13 +26,13 @@
                         <li class="title">{{$L('正在协作会员')}}:</li>
                         <li v-for="(item, key) in synchUsersS" :key="key" @click="handleSynch(item.username)">
                             <UserView class="synch-username" placement="right" :username="item.username" showimg/>
-                            <span v-if="item.username==userInfo.username" class="synch-self">{{$L('自己')}}</span>
+                            <span v-if="item.username==usrInfo.username" class="synch-self">{{$L('自己')}}</span>
                         </li>
                     </ul>
                 </Poptip>
                 <Tooltip class="header-menu" :class="{lock:isLock}" max-width="500">
                     <div slot="content" style="white-space:nowrap">
-                        <span v-if="isLock&&docDetail.lockname!=userInfo.username">【<UserView :username="docDetail.lockname"/>】{{$L('已锁定')}}</span>
+                        <span v-if="isLock&&docDetail.lockname!=usrInfo.username">【<UserView :username="docDetail.lockname"/>】{{$L('已锁定')}}</span>
                         <span v-else>{{$L('锁定后其他会员将无法修改保存文档。')}}</span>
                     </div>
                     <div class="menu-container" @click="handleClick(isLock?'unlock':'lock')"><Icon :type="isLock?'md-lock':'md-unlock'" /></div>

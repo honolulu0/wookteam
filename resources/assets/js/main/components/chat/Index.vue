@@ -3,7 +3,7 @@
         <!--左边选项-->
         <ul class="chat-menu">
             <li class="self">
-                <UserImg :info="userInfo" class="avatar"/>
+                <UserImg :info="usrInfo" class="avatar"/>
             </li>
             <li :class="{active:chatTap=='dialog'}" @click="[chatTap='dialog',chatTam='dialog']">
                 <Icon type="md-text" />
@@ -894,8 +894,6 @@
 
                 openAlready: false,
 
-                userInfo: {},
-
                 chatTap: 'dialog',
                 chatTam: 'dialog',
 
@@ -1496,8 +1494,8 @@
                         filename: item.name,
                         filesize: item.size,
                         filethumb: item.thumb,
-                        username: this.userInfo.username,
-                        userimg: this.userInfo.userimg,
+                        username: this.usrInfo.username,
+                        userimg: this.usrInfo.userimg,
                         indate: Math.round(new Date().getTime() / 1000),
                         url: item.url,
                         width: $A.getObject(item, 'response.data.width'),
@@ -1518,7 +1516,7 @@
             },
 
             addMessageData(data, animation = false, isUnshift = false) {
-                data.self = data.username === this.userInfo.username;
+                data.self = data.username === this.usrInfo.username;
                 let sikp = false;
                 if (data.id || data.replaceId) {
                     this.messageLists.some((item, index) => {
@@ -1585,8 +1583,8 @@
                         this.addMessageData({
                             id: file.tempId,
                             type: 'image',
-                            username: this.userInfo.username,
-                            userimg: this.userInfo.userimg,
+                            username: this.usrInfo.username,
+                            userimg: this.usrInfo.userimg,
                             indate: Math.round(new Date().getTime() / 1000),
                             url: 'loading',
                         }, true);
@@ -1621,8 +1619,8 @@
                 if ($A.count(text) > 0) {
                     let data = {
                         type: 'text',
-                        username: this.userInfo.username,
-                        userimg: this.userInfo.userimg,
+                        username: this.usrInfo.username,
+                        userimg: this.usrInfo.userimg,
                         indate: Math.round(new Date().getTime() / 1000),
                         text: text
                     };
@@ -1706,8 +1704,8 @@
                 $A.WSOB.sendTo('info', this.videoUserName, {
                     'type': 'video',
                     'subtype': 'call',
-                    'username': this.userInfo.username,
-                    'userimg': this.userInfo.userimg,
+                    'username': this.usrInfo.username,
+                    'userimg': this.usrInfo.userimg,
                     'video': this.videoChat,
                 }, (res) => {
                     if (res.status !== 1) {
@@ -1755,8 +1753,8 @@
                         if (second >= 2) {
                             $A.WSOB.sendTo('user', this.videoUserName, {
                                 type: this.videoChat ? 'video' : 'voice',
-                                username: this.userInfo.username,
-                                userimg: this.userInfo.userimg,
+                                username: this.usrInfo.username,
+                                userimg: this.usrInfo.userimg,
                                 indate: Math.round(new Date().getTime() / 1000),
                                 text: this.videoChat ? '视频通话' : '语音通话',
                                 other: {

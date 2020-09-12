@@ -198,11 +198,10 @@
                             this.$emit("on-success", res.data);
                             //
                             if (this.dataDetail.status === '已发送') {
-                                let userInfo = $A.getUserInfo();
                                 let msgData = {
                                     type: 'report',
-                                    username: userInfo.username,
-                                    userimg: userInfo.userimg,
+                                    username: this.usrInfo.username,
+                                    userimg: this.usrInfo.userimg,
                                     indate: Math.round(new Date().getTime() / 1000),
                                     text: this.dataDetail.ccuserAgain ? this.$L('修改了工作报告') : this.$L('发送了工作报告'),
                                     other: {
