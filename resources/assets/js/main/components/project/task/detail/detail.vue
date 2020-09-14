@@ -749,6 +749,10 @@
 
                     case 'plannedtimeb':
                         let temp = $A.date2string(this.timeValue, "Y-m-d H:i");
+                        if (!temp[0] || !temp[1]) {
+                            this.$Modal.error({title: this.$L('温馨提示'), content: this.$L('请选择一个有效时间！')});
+                            return;
+                        }
                         this.$Modal.confirm({
                             title: this.$L('修改计划时间'),
                             content: this.$L('你确定将任务计划时间设置为“%”吗？', temp[0] + "~" + temp[1]),
