@@ -2238,7 +2238,7 @@ class ProjectController extends Controller
             DB::table('project_log')->insert($logArray);
         }
         //
-        if (in_array($act, ['complete', 'unfinished'])) {
+        if (in_array($act, ['complete', 'unfinished', 'delete'])) {
             Project::updateNum($task['projectid']);
         }
         //
