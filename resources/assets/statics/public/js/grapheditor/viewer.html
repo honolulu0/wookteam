@@ -84,6 +84,14 @@
 
                     }
                     break;
+
+                case 'zoom':
+                    try {
+                        graph.zoomTo(data.params.zoom);
+                    } catch (e) {
+
+                    }
+                    break;
             }
         });
 
