@@ -32,7 +32,7 @@
         name: "Sheet",
         props: {
             value: {
-                type: Object,
+                type: [Object, Array],
                 default: function () {
                     return {}
                 }
@@ -47,6 +47,8 @@
                 sheet: null,
                 clientHeight: 0,
                 clientWidth: 0,
+
+                bakValue: '',
             }
         },
         mounted() {
@@ -75,13 +77,27 @@
                 options.showToolbar = false
                 options.showContextmenu = false;
             }
+            this.bakValue = JSON.stringify(this.value);
             this.sheet = new Spreadsheet(this.$refs.xspreadsheet, options).loadData(this.value).change(data => {
                 if (!this.readOnly) {
-                    this.$emit('input', data);
+                    this.bakValue = JSON.stringify(this.sheet.getData());
+                    this.$emit('input', this.sheet.getData());
                 }
             });
             //
             this.sheet.validate()
+        },
+        watch: {
+            value: {
+                handler(value) {
+                    if (this.bakValue == JSON.stringify(value)) {
+                        return;
+                    }
+                    this.bakValue = JSON.stringify(value);
+                    this.sheet.loadData(value);
+                },
+                deep: true
+            }
         },
         methods: {
             exportExcel(name, bookType){

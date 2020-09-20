@@ -75,7 +75,7 @@
                 </template>
                 <minder v-else-if="docDetail.type=='mind'" ref="myMind" class="body-mind" v-model="docContent" @saveData="handleClick('saveBefore')"></minder>
                 <sheet v-else-if="docDetail.type=='sheet'" ref="mySheet" class="body-sheet" v-model="docContent.content"></sheet>
-                <flow v-else-if="docDetail.type=='flow'" ref="myFlow" class="body-flow" v-model="docContent.content" @saveData="handleClick('saveBefore')"></flow>
+                <flow v-else-if="docDetail.type=='flow'" ref="myFlow" class="body-flow" v-model="docContent" @saveData="handleClick('saveBefore')"></flow>
             </div>
         </div>
 
@@ -446,13 +446,17 @@
                         break;
 
                     case 'update':
-                        this.$Modal.confirm({
-                            title: this.$L("更新提示"),
-                            content: this.$L('团队成员（%）更新了内容，<br/>更新时间：%。<br/><br/>点击【确定】加载最新内容。', body.nickname, $A.formatDate("Y-m-d H:i:s", body.time)),
-                            onOk: () => {
-                                this.refreshDetail();
-                            }
-                        });
+                        if (this.isLock) {
+                            this.getDetail();
+                        } else {
+                            this.$Modal.confirm({
+                                title: this.$L("更新提示"),
+                                content: this.$L('团队成员（%）更新了内容，<br/>更新时间：%。<br/><br/>点击【确定】加载最新内容。', body.nickname, $A.formatDate("Y-m-d H:i:s", body.time)),
+                                onOk: () => {
+                                    this.getDetail();
+                                }
+                            });
+                        }
                         break;
 
                     case 'lock':
@@ -794,7 +798,7 @@
                             },
                             success: (res) => {
                                 if (res.ret === 1) {
-                                    if (this.getSid() == res.data.sid) {
+                                    if (this.getSid() == res.data.sid && this.docDetail.type == 'document') {
                                         this.docContent = Object.assign({}, this.docContent, res.data.content);
                                     }
                                     this.$Message.success(res.msg);

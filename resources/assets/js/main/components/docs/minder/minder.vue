@@ -216,6 +216,7 @@
             return {
                 minder: null,
                 isHand: false,
+                bakValue: '',
             };
         },
         methods: {
@@ -259,11 +260,17 @@
                 this.$nextTick(() => {
                     setTimeout(() => {
                         if (this.minder !== null) {
+                            if (this.bakValue == JSON.stringify(this.value)) {
+                                return;
+                            }
+                            this.bakValue = JSON.stringify(this.value);
+                            this.minder.importJson(this.value);
                             return;
                         }
                         window.__minderReadOnly = this.readOnly;
                         const Editor = require('./editor');
                         this.minder = window.editor = new Editor(document.getElementById(this.id)).minder;
+                        this.bakValue = JSON.stringify(this.value);
                         this.minder.importJson(this.value);
                         if (this.readOnly === true) {
                             this.minder.disable();
@@ -271,8 +278,13 @@
                             this.isHand = true;
                         }
                         this.$emit('minderHandle', this.minder);
-                        this.minder.on('contentchange', val => {
-                            this.$emit('input', this.minder.exportJson());
+                        this.minder.on('contentchange', e => {
+                            const newJson = this.minder.exportJson();
+                            if (this.bakValue == JSON.stringify(newJson)) {
+                                return;
+                            }
+                            this.bakValue = JSON.stringify(newJson);
+                            this.$emit('input', newJson);
                         });
                     }, 300)
                 });

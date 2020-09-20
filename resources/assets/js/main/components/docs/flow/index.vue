@@ -41,7 +41,10 @@
         name: "Flow",
         props: {
             value: {
-                type: ''
+                type: Object,
+                default: function () {
+                    return {}
+                }
             },
             readOnly: {
                 type: Boolean,
@@ -64,22 +67,33 @@
             window.addEventListener('message', this.handleMessage)
             this.flow = this.$refs.myFlow.contentWindow;
         },
+        watch: {
+            value: {
+                handler() {
+                    this.updateContent();
+                },
+                deep: true
+            }
+        },
         methods: {
+            updateContent() {
+                this.flow.postMessage({
+                    act: 'setXml',
+                    params: Object.assign(this.value, typeof this.value.xml === "undefined" ? {
+                        xml: this.value.content
+                    } : {})
+                }, '*')
+            },
             handleMessage (event) {
                 const data = event.data;
                 switch (data.act) {
                     case 'ready':
                         this.loadIng = false;
-                        this.flow.postMessage({
-                            act: 'setXml',
-                            params: {
-                                xml: this.value,
-                            }
-                        }, '*')
+                        this.updateContent();
                         break
 
                     case 'change':
-                        this.$emit('input', data.params.xml);
+                        this.$emit('input', data.params);
                         break
 
                     case 'save':

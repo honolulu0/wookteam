@@ -26,7 +26,7 @@
                         </template>
                         <minder v-else-if="docDetail.type=='mind'" ref="myMind" class="body-mind" v-model="docContent" :readOnly="true"></minder>
                         <sheet v-else-if="docDetail.type=='sheet'" ref="mySheet" class="body-sheet" v-model="docContent.content" :readOnly="true"></sheet>
-                        <flow v-else-if="docDetail.type=='flow'" ref="myFlow" class="body-flow" v-model="docContent.content" :readOnly="true"></flow>
+                        <flow v-else-if="docDetail.type=='flow'" ref="myFlow" class="body-flow" v-model="docContent" :readOnly="true"></flow>
                     </div>
                 </div>
             </div>

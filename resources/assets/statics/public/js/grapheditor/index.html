@@ -83,31 +83,98 @@
             var editorUi = new EditorUi(new Editor(urlParams['chrome'] == '0', themes));
             var graph = editorUi.editor.graph;
 
-            var backupXml;
-            var newXml;
+            var getPos = function () {
+                var svg = null;
+                var childNodes = graph.container.childNodes;
+                for (var i = 0; i < childNodes.length; i++) {
+                    if (childNodes[i].nodeName.toLocaleLowerCase() == 'svg') {
+                        svg = childNodes[i];
+                        break;
+                    }
+                }
+                var data = {
+                    p1: {left: 0, top: 0},
+                    p2: {left: 0, top: 0},
+                };
+                if (svg != null) {
+                    data = {
+                        p1: {
+                            left: svg.clientWidth / 2,
+                            top: svg.clientHeight / 2,
+                        },
+                        p2: {
+                            left: graph.container.clientWidth / 2 + graph.container.scrollLeft,
+                            top: graph.container.clientHeight / 2 + graph.container.scrollTop,
+                        }
+                    };
+                }
+                return {
+                    left: data.p2.left - data.p1.left,
+                    top: data.p2.top - data.p1.top,
+                };
+            }
 
-            graph.getModel().addListener(mxEvent.CHANGE, mxUtils.bind(editorUi, function() {
-                newXml = mxUtils.getPrettyXml(editorUi.editor.getGraphXml());
-                if (backupXml && backupXml.replace(/^<mxGraphModel(.*?)>/, '') == newXml.replace(/^<mxGraphModel(.*?)>/, '')) {
+            var setPos = function (diff) {
+                var svg = null;
+                var childNodes = graph.container.childNodes;
+                for (var i = 0; i < childNodes.length; i++) {
+                    if (childNodes[i].nodeName.toLocaleLowerCase() == 'svg') {
+                        svg = childNodes[i];
+                        break;
+                    }
+                }
+                if (svg == null) {
                     return;
                 }
-                backupXml = newXml;
-                window.parent.postMessage({
-                    act: 'change',
-                    params: {
-                        xml: newXml
+                graph.container.scrollLeft = svg.clientWidth / 2 + diff.left - graph.container.clientWidth / 2;
+                graph.container.scrollTop = svg.clientHeight / 2 + diff.top - graph.container.clientHeight / 2;
+            }
+
+            var newXml;
+            var newPos;
+            var randXml;
+            var backupParams;
+
+            var changePost = function (immediately) {
+                var randTmp = (randXml = Math.random());
+                setTimeout(() => {
+                    if (randTmp != randXml) {
+                        return;
                     }
-                }, '*');
-            }));
+                    newPos = getPos();
+                    newXml = mxUtils.getPrettyXml(editorUi.editor.getGraphXml());
+                    if (backupParams.xml && backupParams.xml.replace(/^<mxGraphModel(.*?)>/, '') == newXml.replace(/^<mxGraphModel(.*?)>/, '')) {
+                        if (backupParams.scale && backupParams.scale == graph.getView().scale) {
+                            if (typeof backupParams.diffpos === "object" && Math.abs(backupParams.diffpos.left - newPos.left) < 10 && Math.abs(backupParams.diffpos.top - newPos.top) < 10) {
+                                return;
+                            }
+                        }
+                    }
+                    backupParams.xml = newXml;
+                    window.parent.postMessage({
+                        act: 'change',
+                        params: {
+                            xml: newXml,
+                            scale: graph.getView().scale,
+                            diffpos: newPos,
+                        }
+                    }, '*');
+                }, immediately === true ? 0 : 200)
+            }
+
+            graph.getModel().addListener(mxEvent.CHANGE, mxUtils.bind(editorUi, function() { changePost(true) }));
+            graph.getView().addListener(mxEvent.SCALE, mxUtils.bind(editorUi, function() {changePost(true) }));
+            graph.container.addEventListener("scroll", changePost);
 
             window.addEventListener("message", function(event){
                 var data = event.data;
                 switch (data.act) {
                     case 'setXml':
                         try {
-                            backupXml = data.params.xml;
-                            var defaultXml = mxUtils.parseXml(data.params.xml);
-                            editorUi.editor.setGraphXml(defaultXml.documentElement);
+                            backupParams = data.params;
+                            editorUi.editor.setGraphXml(mxUtils.parseXml(data.params.xml).documentElement);
+                            typeof data.params.scale === "number" && graph.zoomTo(data.params.scale);
+                            typeof data.params.diffpos === "object" && setPos(data.params.diffpos);
                         } catch (e) {
 
                         }
