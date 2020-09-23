@@ -103,19 +103,24 @@
 
                 zoom: -1,
                 zoomIng: false,
+
+                bakData: '',
             }
         },
         mounted() {
             window.addEventListener('message', this.handleMessage)
             this.flow = this.$refs.myFlow.contentWindow;
         },
-        activated() {
-            window.addEventListener('message', this.handleMessage)
-            this.flow = this.$refs.myFlow.contentWindow;
+        beforeDestroy() {
+            window.removeEventListener('message', this.handleMessage)
         },
         watch: {
             value: {
-                handler() {
+                handler(val) {
+                    if (this.bakData == $A.jsonStringify(val)) {
+                        return;
+                    }
+                    this.bakData = $A.jsonStringify(val);
                     this.updateContent();
                 },
                 deep: true
@@ -153,6 +158,7 @@
                         break
 
                     case 'change':
+                        this.bakData = $A.jsonStringify(data.params);
                         this.$emit('input', data.params);
                         break
 
