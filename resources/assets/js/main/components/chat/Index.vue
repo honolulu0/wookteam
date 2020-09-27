@@ -361,6 +361,8 @@
                                 }
                             }
                             .avatar {
+                                flex-grow: 0;
+                                flex-shrink: 0;
                                 width: 42px;
                                 height: 42px;
                                 font-size: 20px;
@@ -474,6 +476,8 @@
                                     height: 52px;
                                     cursor: pointer;
                                     .avatar {
+                                        flex-grow: 0;
+                                        flex-shrink: 0;
                                         width: 30px;
                                         height: 30px;
                                         font-size: 16px;

@@ -3,6 +3,7 @@ export default {
         Vue.mixin({
             data() {
                 return {
+                    mixinId: 0,
                     //用户信息
                     usrLogin: false,
                     usrInfo: {},
@@ -13,10 +14,13 @@ export default {
             },
 
             mounted() {
+                if (typeof window.__mixinId != "number") window.__mixinId = 0;
+                this.mixinId = window.__mixinId++;
+                //
                 this.usrLogin = $A.getToken() !== false;
                 this.usrInfo = $A.getUserInfo();
                 this.usrName = this.usrInfo.username || '';
-                $A.setOnUserInfoListener('mixins', (data, isLogin) => {
+                $A.setOnUserInfoListener('mixins_' + this.mixinId, (data, isLogin) => {
                     this.usrLogin = isLogin;
                     this.usrInfo = data;
                     this.usrName = this.usrInfo.username || '';
@@ -26,6 +30,7 @@ export default {
             },
 
             beforeDestroy() {
+                $A.removeUserInfoListener('mixins_' + this.mixinId);
                 window.removeEventListener('resize', this.windowMax768Listener);
             },
 

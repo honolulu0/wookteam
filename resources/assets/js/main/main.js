@@ -347,6 +347,14 @@ import '../../sass/main.scss';
                 }
             }
         },
+        removeUserInfoListener(listenerName) {
+            if (typeof listenerName != "string") {
+                return;
+            }
+            if (typeof $A.__userInfoListenerObject[listenerName] != "undefined") {
+                delete $A.__userInfoListenerObject[listenerName];
+            }
+        },
         triggerUserInfoListener(userInfo) {
             let key, item;
             for (key in $A.__userInfoListenerObject) {
