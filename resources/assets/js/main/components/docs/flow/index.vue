@@ -98,7 +98,6 @@
             return {
                 loadIng: true,
 
-                flow: null,
                 url: window.location.origin + '/js/grapheditor/' + (this.readOnly ? 'viewer' : 'index') + '.html',
 
                 zoom: -1,
@@ -109,7 +108,6 @@
         },
         mounted() {
             window.addEventListener('message', this.handleMessage)
-            this.flow = this.$refs.myFlow.contentWindow;
         },
         beforeDestroy() {
             window.removeEventListener('message', this.handleMessage)
@@ -126,7 +124,7 @@
                 deep: true
             },
             zoom(val) {
-                this.flow.postMessage({
+                this.$refs.myFlow.contentWindow.postMessage({
                     act: 'zoom',
                     params: {
                         zoom: val / 100
@@ -141,7 +139,7 @@
 
             updateContent() {
                 this.zoom = Math.max(1, (typeof this.value.scale === "number" ? this.value.scale : 1) * 100)
-                this.flow.postMessage({
+                this.$refs.myFlow.contentWindow.postMessage({
                     act: 'setXml',
                     params: Object.assign(this.value, typeof this.value.xml === "undefined" ? {
                         xml: this.value.content
@@ -177,7 +175,7 @@
             },
 
             exportPNG(name, scale = 10) {
-                this.flow.postMessage({
+                this.$refs.myFlow.contentWindow.postMessage({
                     act: 'exportPNG',
                     params: {
                         name: name || this.$L('无标题'),
@@ -188,7 +186,7 @@
             },
 
             exportPDF(name, scale = 10) {
-                this.flow.postMessage({
+                this.$refs.myFlow.contentWindow.postMessage({
                     act: 'exportPNG',
                     params: {
                         name: name || this.$L('无标题'),

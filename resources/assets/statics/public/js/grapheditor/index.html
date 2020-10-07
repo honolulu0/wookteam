@@ -141,6 +141,9 @@
                     if (randTmp != randXml) {
                         return;
                     }
+                    if (!backupParams) {
+                        return;
+                    }
                     newPos = getPos();
                     newXml = mxUtils.getPrettyXml(editorUi.editor.getGraphXml());
                     if (backupParams.xml && backupParams.xml.replace(/^<mxGraphModel(.*?)>/, '') == newXml.replace(/^<mxGraphModel(.*?)>/, '')) {
