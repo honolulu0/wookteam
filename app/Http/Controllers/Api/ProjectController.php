@@ -106,7 +106,12 @@ class ProjectController extends Controller
         $label = Base::DBC2A(DB::table('project_label')->where('projectid', $projectid)->orderBy('inorder')->orderBy('id')->get());
         $simpleLabel = [];
         //任务
-        $whereArray = [ 'projectid' => $projectid, 'delete' => 0, 'complete' => 0 ];
+        $whereArray = [
+            'projectid' => $projectid,
+            'delete' => 0,
+            'archived' => 0,
+            'complete' => 0
+        ];
         if ($projectSetting['complete_show'] == 'show') {
             unset($whereArray['complete']);
         }
