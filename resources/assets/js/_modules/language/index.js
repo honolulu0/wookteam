@@ -5,10 +5,21 @@ export default {
         Vue.mixin({
             data() {
                 return {
-                    privateLanguageInit: false,
-                    privateLanguageData: {},
-                    privateLanguageType: '',
+                    languageInit: false,
+                    languageData: {},
+                    languageType: window.localStorage['__language:type__'] || 'zh',
                 }
+            },
+
+            watch: {
+                languageType: {
+                    handler(type) {
+                        if (type && typeof this.initLanguage === "function") {
+                            this.initLanguage();
+                        }
+                    },
+                    immediate: true
+                },
             },
 
             methods: {
@@ -17,17 +28,16 @@ export default {
                  * @private
                  */
                 __initLanguageData() {
-                    if (this.privateLanguageInit === false) {
-                        this.privateLanguageInit = true;
+                    if (this.languageInit === false) {
+                        this.languageInit = true;
                         //
                         this.addLanguageData({
                             en: require("../../../../lang/en/general.js").default,
                             zh: require("../../../../lang/zh/general.js").default
                         });
-                        this.privateLanguageType = window.localStorage['__language:type__'] || 'zh';
                         //
                         languageListenerObjects.push((lang) => {
-                            this.privateLanguageType = lang;
+                            this.languageType = lang;
                         });
                     }
                 },
@@ -60,33 +70,33 @@ export default {
                         return;
                     }
                     this.__initLanguageData();
-                    if (typeof this.privateLanguageData[language] === "undefined") {
-                        this.privateLanguageData[language] = {};
+                    if (typeof this.languageData[language] === "undefined") {
+                        this.languageData[language] = {};
                     }
-                    Object.assign(this.privateLanguageData[language], data);
+                    Object.assign(this.languageData[language], data);
                     //
                     if (language === 'en') {
-                        if (typeof this.privateLanguageData['zh'] === "undefined") {
-                            this.privateLanguageData['zh'] = {};
+                        if (typeof this.languageData['zh'] === "undefined") {
+                            this.languageData['zh'] = {};
                         }
                         let cnData = {};
                         for(let key in data) {
-                            if (data.hasOwnProperty(key) && typeof this.privateLanguageData['zh'][data[key]] === 'undefined') {
+                            if (data.hasOwnProperty(key) && typeof this.languageData['zh'][data[key]] === 'undefined') {
                                 cnData[data[key]] = key;
                             }
                         }
-                        Object.assign(this.privateLanguageData['zh'], cnData);
+                        Object.assign(this.languageData['zh'], cnData);
                     }else if (language === 'zh') {
-                        if (typeof this.privateLanguageData['en'] === "undefined") {
-                            this.privateLanguageData['en'] = {};
+                        if (typeof this.languageData['en'] === "undefined") {
+                            this.languageData['en'] = {};
                         }
                         let enData = {};
                         for(let key in data) {
-                            if (data.hasOwnProperty(key) && typeof this.privateLanguageData['en'][data[key]] === 'undefined') {
+                            if (data.hasOwnProperty(key) && typeof this.languageData['en'][data[key]] === 'undefined') {
                                 enData[data[key]] = key;
                             }
                         }
-                        Object.assign(this.privateLanguageData['en'], enData);
+                        Object.assign(this.languageData['en'], enData);
                     }
                 },
 
@@ -110,7 +120,7 @@ export default {
                  */
                 getLanguage() {
                     this.__initLanguageData();
-                    return this.privateLanguageType;
+                    return this.languageType;
                 },
 
                 /**
@@ -139,8 +149,8 @@ export default {
                     if (text) {
                         this.__initLanguageData();
                         //
-                        if (typeof this.privateLanguageData[this.privateLanguageType] === "object") {
-                            let temp = this.privateLanguageData[this.privateLanguageType][text];
+                        if (typeof this.languageData[this.languageType] === "object") {
+                            let temp = this.languageData[this.languageType][text];
                             if (temp === null) {
                                 return this.replaceArgumentsLanguage(text, arguments);
                             }
@@ -152,10 +162,10 @@ export default {
                         try {
                             let key = '__language:Undefined__';
                             let tmpData = JSON.parse(window.localStorage[key] || '{}');
-                            if (typeof tmpData[this.privateLanguageType] !== "object") {
-                                tmpData[this.privateLanguageType] = {};
+                            if (typeof tmpData[this.languageType] !== "object") {
+                                tmpData[this.languageType] = {};
                             }
-                            tmpData[this.privateLanguageType][text] = "";
+                            tmpData[this.languageType][text] = "";
                             window.localStorage[key] = JSON.stringify(tmpData);
                         }catch (e) {
                             //

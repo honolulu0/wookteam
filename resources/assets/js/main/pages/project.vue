@@ -149,11 +149,15 @@
     .project {
         ul.project-list {
             padding: 5px;
-            max-width: 2000px;
+            max-width: 2200px;
+            margin: 0 auto;
             li {
                 float: left;
-                width: 25%;
+                width: 20%;
                 display: flex;
+                @media (max-width: 2000px) {
+                    width: 25%;
+                }
                 @media (max-width: 1400px) {
                     width: 33.33%;
                 }
