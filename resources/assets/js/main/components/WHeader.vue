@@ -413,52 +413,6 @@
                 chatUnreadTotal: 0,
             }
         },
-        created() {
-            this.ruleDatum = {
-                nickname: [
-                    { required: true, message: this.$L('请输入昵称！'), trigger: 'change' },
-                    { type: 'string', min: 2, message: this.$L('昵称长度至少2位！'), trigger: 'change' }
-                ]
-            };
-            this.rulePass = {
-                oldpass: [
-                    { required: true, message: this.$L('请输入旧密码！'), trigger: 'change' },
-                    { type: 'string', min: 6, message: this.$L('密码长度至少6位！'), trigger: 'change' }
-                ],
-                newpass: [
-                    {
-                        validator: (rule, value, callback) => {
-                            if (value === '') {
-                                callback(new Error(this.$L('请输入新密码！')));
-                            } else {
-                                if (this.formPass.checkpass !== '') {
-                                    this.$refs.formPass.validateField('checkpass');
-                                }
-                                callback();
-                            }
-                        },
-                        required: true,
-                        trigger: 'change'
-                    },
-                    { type: 'string', min: 6, message: this.$L('密码长度至少6位！'), trigger: 'change' }
-                ],
-                checkpass: [
-                    {
-                        validator: (rule, value, callback) => {
-                            if (value === '') {
-                                callback(new Error(this.$L('请输入确认新密码！')));
-                            } else if (value !== this.formPass.newpass) {
-                                callback(new Error(this.$L('两次密码输入不一致！')));
-                            } else {
-                                callback();
-                            }
-                        },
-                        required: true,
-                        trigger: 'change'
-                    }
-                ],
-            };
-        },
         mounted() {
             this.isAdmin = $A.identity('admin');
             this.formatDatum();
@@ -484,6 +438,53 @@
             }
         },
         methods: {
+            initLanguage() {
+                this.ruleDatum = {
+                    nickname: [
+                        { required: true, message: this.$L('请输入昵称！'), trigger: 'change' },
+                        { type: 'string', min: 2, message: this.$L('昵称长度至少2位！'), trigger: 'change' }
+                    ]
+                };
+                this.rulePass = {
+                    oldpass: [
+                        { required: true, message: this.$L('请输入旧密码！'), trigger: 'change' },
+                        { type: 'string', min: 6, message: this.$L('密码长度至少6位！'), trigger: 'change' }
+                    ],
+                    newpass: [
+                        {
+                            validator: (rule, value, callback) => {
+                                if (value === '') {
+                                    callback(new Error(this.$L('请输入新密码！')));
+                                } else {
+                                    if (this.formPass.checkpass !== '') {
+                                        this.$refs.formPass.validateField('checkpass');
+                                    }
+                                    callback();
+                                }
+                            },
+                            required: true,
+                            trigger: 'change'
+                        },
+                        { type: 'string', min: 6, message: this.$L('密码长度至少6位！'), trigger: 'change' }
+                    ],
+                    checkpass: [
+                        {
+                            validator: (rule, value, callback) => {
+                                if (value === '') {
+                                    callback(new Error(this.$L('请输入确认新密码！')));
+                                } else if (value !== this.formPass.newpass) {
+                                    callback(new Error(this.$L('两次密码输入不一致！')));
+                                } else {
+                                    callback();
+                                }
+                            },
+                            required: true,
+                            trigger: 'change'
+                        }
+                    ],
+                };
+            },
+
             formatDatum() {
                 this.$set(this.formDatum, 'userimg', this.usrInfo.userimg)
                 this.$set(this.formDatum, 'nickname', this.usrInfo.nickname)

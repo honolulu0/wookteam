@@ -105,10 +105,6 @@
             }
         },
 
-        created() {
-            this.dataDetail.content = this.$L('数据加载中.....')
-        },
-
         mounted() {
             if (this.canload) {
                 this.loadYet = true;
@@ -137,6 +133,10 @@
         },
 
         methods: {
+            initLanguage() {
+                this.dataDetail.content = this.$L('数据加载中.....')
+            },
+
             getData() {
                 this.loadIng++;
                 $A.apiAjax({

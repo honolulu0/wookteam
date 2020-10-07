@@ -153,10 +153,6 @@
             }
         },
 
-        created() {
-
-        },
-
         mounted() {
             if (this.canload) {
                 this.loadYet = true;

@@ -47,104 +47,7 @@
                 noDataText: "",
             }
         },
-        created() {
-            this.noDataText = this.$L("数据加载中.....");
-            this.columns = [{
-                "title": this.$L("头像"),
-                "minWidth": 60,
-                "maxWidth": 100,
-                render: (h, params) => {
-                    return h('UserImg', {
-                        props: {
-                            info: params.row,
-                        },
-                        style: {
-                            width: "30px",
-                            height: "30px",
-                            fontSize: "16px",
-                            lineHeight: "30px",
-                            borderRadius: "15px",
-                            verticalAlign: "middle"
-                        },
-                    });
-                }
-            }, {
-                "title": this.$L("用户名"),
-                "key": 'username',
-                "minWidth": 80,
-                "ellipsis": true,
-            }, {
-                "title": this.$L("昵称"),
-                "minWidth": 80,
-                "ellipsis": true,
-                render: (h, params) => {
-                    return h('span', params.row.nickname || '-');
-                }
-            }, {
-                "title": this.$L("职位/职称"),
-                "minWidth": 100,
-                "ellipsis": true,
-                render: (h, params) => {
-                    return h('span', params.row.profession || '-');
-                }
-            }, {
-                "title": this.$L("加入时间"),
-                "width": 160,
-                render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
-                }
-            }, {
-                "title": this.$L("操作"),
-                "key": 'action',
-                "width": 80,
-                "align": 'center',
-                render: (h, params) => {
-                    return h('Button', {
-                        props: {
-                            type: 'primary',
-                            size: 'small'
-                        },
-                        style: {
-                            fontSize: '12px'
-                        },
-                        on: {
-                            click: () => {
-                                this.$Modal.confirm({
-                                    title: this.$L('移出成员'),
-                                    content: this.$L('你确定要将此成员移出项目吗？'),
-                                    loading: true,
-                                    onOk: () => {
-                                        $A.apiAjax({
-                                            url: 'docs/users/join',
-                                            data: {
-                                                act: 'delete',
-                                                id: params.row.bookid,
-                                                username: params.row.username,
-                                            },
-                                            error: () => {
-                                                this.$Modal.remove();
-                                                alert(this.$L('网络繁忙，请稍后再试！'));
-                                            },
-                                            success: (res) => {
-                                                this.$Modal.remove();
-                                                this.getLists();
-                                                setTimeout(() => {
-                                                    if (res.ret === 1) {
-                                                        this.$Message.success(res.msg);
-                                                    }else{
-                                                        this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });
-                                                    }
-                                                }, 350);
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        }
-                    }, this.$L('删除'));
-                }
-            }];
-        },
+
         mounted() {
             if (this.canload) {
                 this.loadYet = true;
@@ -167,6 +70,105 @@
         },
 
         methods: {
+            initLanguage() {
+                this.noDataText = this.$L("数据加载中.....");
+                this.columns = [{
+                    "title": this.$L("头像"),
+                    "minWidth": 60,
+                    "maxWidth": 100,
+                    render: (h, params) => {
+                        return h('UserImg', {
+                            props: {
+                                info: params.row,
+                            },
+                            style: {
+                                width: "30px",
+                                height: "30px",
+                                fontSize: "16px",
+                                lineHeight: "30px",
+                                borderRadius: "15px",
+                                verticalAlign: "middle"
+                            },
+                        });
+                    }
+                }, {
+                    "title": this.$L("用户名"),
+                    "key": 'username',
+                    "minWidth": 80,
+                    "ellipsis": true,
+                }, {
+                    "title": this.$L("昵称"),
+                    "minWidth": 80,
+                    "ellipsis": true,
+                    render: (h, params) => {
+                        return h('span', params.row.nickname || '-');
+                    }
+                }, {
+                    "title": this.$L("职位/职称"),
+                    "minWidth": 100,
+                    "ellipsis": true,
+                    render: (h, params) => {
+                        return h('span', params.row.profession || '-');
+                    }
+                }, {
+                    "title": this.$L("加入时间"),
+                    "width": 160,
+                    render: (h, params) => {
+                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
+                    }
+                }, {
+                    "title": this.$L("操作"),
+                    "key": 'action',
+                    "width": 80,
+                    "align": 'center',
+                    render: (h, params) => {
+                        return h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                fontSize: '12px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.$Modal.confirm({
+                                        title: this.$L('移出成员'),
+                                        content: this.$L('你确定要将此成员移出项目吗？'),
+                                        loading: true,
+                                        onOk: () => {
+                                            $A.apiAjax({
+                                                url: 'docs/users/join',
+                                                data: {
+                                                    act: 'delete',
+                                                    id: params.row.bookid,
+                                                    username: params.row.username,
+                                                },
+                                                error: () => {
+                                                    this.$Modal.remove();
+                                                    alert(this.$L('网络繁忙，请稍后再试！'));
+                                                },
+                                                success: (res) => {
+                                                    this.$Modal.remove();
+                                                    this.getLists();
+                                                    setTimeout(() => {
+                                                        if (res.ret === 1) {
+                                                            this.$Message.success(res.msg);
+                                                        }else{
+                                                            this.$Modal.error({title: this.$L('温馨提示'), content: res.msg });
+                                                        }
+                                                    }, 350);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }, this.$L('删除'));
+                    }
+                }];
+            },
+
             setPage(page) {
                 this.listPage = page;
                 this.getLists();

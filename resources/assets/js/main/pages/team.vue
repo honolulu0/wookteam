@@ -150,145 +150,6 @@
                 },
             }
         },
-        created() {
-            this.isAdmin = $A.identity('admin');
-            this.noDataText = this.$L("数据加载中.....");
-            this.columns = [{
-                "title": this.$L("头像"),
-                "minWidth": 60,
-                "maxWidth": 100,
-                render: (h, params) => {
-                    return h('UserImg', {
-                        props: {
-                            info: params.row,
-                        },
-                        style: {
-                            width: "30px",
-                            height: "30px",
-                            fontSize: "16px",
-                            lineHeight: "30px",
-                            borderRadius: "15px",
-                            verticalAlign: "middle"
-                        },
-                    });
-                }
-            }, {
-                "title": this.$L("用户名"),
-                "key": 'username',
-                "minWidth": 80,
-                "ellipsis": true,
-                render: (h, params) => {
-                    let arr = [];
-                    if (params.row.username == this.usrName) {
-                        arr.push(h('span', {
-                            style: {
-                                color: '#ff0000',
-                                paddingRight: '4px'
-                            }
-                        }, '[自己]'))
-                    }
-                    if ($A.identityRaw('admin', params.row.identity)) {
-                        arr.push(h('span', {
-                            style: {
-                                color: '#ff0000',
-                                paddingRight: '4px'
-                            }
-                        }, '[管理员]'))
-                    }
-                    arr.push(h('span', params.row.username))
-                    return h('span', arr);
-                }
-            }, {
-                "title": this.$L("昵称"),
-                "minWidth": 80,
-                "ellipsis": true,
-                render: (h, params) => {
-                    return h('span', params.row.nickname || '-');
-                }
-            }, {
-                "title": this.$L("职位/职称"),
-                "minWidth": 100,
-                "ellipsis": true,
-                render: (h, params) => {
-                    return h('span', params.row.profession || '-');
-                }
-            }, {
-                "title": this.$L("加入时间"),
-                "width": 160,
-                render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.regdate));
-                }
-            }, {
-                "title": this.$L("操作"),
-                "key": 'action',
-                "width": this.isAdmin ? 160 : 80,
-                "align": 'center',
-                render: (h, params) => {
-                    let array = [];
-                    array.push(h('Button', {
-                        props: {
-                            type: 'primary',
-                            size: 'small'
-                        },
-                        style: {
-                            fontSize: '12px'
-                        },
-                        on: {
-                            click: () => {
-                                this.$Modal.info({
-                                    title: this.$L('会员信息'),
-                                    content: `<p>${this.$L('昵称')}: ${params.row.nickname || '-'}</p><p>${this.$L('职位/职称')}: ${params.row.profession || '-'}</p>`
-                                });
-                            }
-                        }
-                    }, this.$L('查看')));
-                    if (this.isAdmin) {
-                        array.push(h('Dropdown', {
-                            props: {
-                                trigger: 'click',
-                                transfer: true
-                            },
-                            on: {
-                                'on-click': (name) => {
-                                    this.handleUser(name, params.row)
-                                }
-                            }
-                        }, [
-                            h('Button', {
-                                props: {
-                                    type: 'warning',
-                                    size: 'small'
-                                },
-                                style: {
-                                    fontSize: '12px',
-                                    marginLeft: '5px'
-                                },
-                            }, this.$L('操作')),
-                            h('DropdownMenu', {
-                                slot: 'list',
-                            }, [
-                                h('DropdownItem', {
-                                    props: {
-                                        name: 'edit',
-                                    },
-                                }, this.$L('修改成员信息')),
-                                h('DropdownItem', {
-                                    props: {
-                                        name: $A.identityRaw('admin', params.row.identity) ? 'deladmin' : 'setadmin',
-                                    },
-                                }, this.$L($A.identityRaw('admin', params.row.identity) ? '取消管理员' : '设为管理员')),
-                                h('DropdownItem', {
-                                    props: {
-                                        name: 'delete',
-                                    },
-                                }, this.$L('删除'))
-                            ])
-                        ]))
-                    }
-                    return h('div', array);
-                }
-            }];
-        },
         mounted() {
             this.getLists(true);
         },
@@ -301,6 +162,146 @@
             }
         },
         methods: {
+            initLanguage() {
+                this.isAdmin = $A.identity('admin');
+                this.noDataText = this.$L("数据加载中.....");
+                this.columns = [{
+                    "title": this.$L("头像"),
+                    "minWidth": 60,
+                    "maxWidth": 100,
+                    render: (h, params) => {
+                        return h('UserImg', {
+                            props: {
+                                info: params.row,
+                            },
+                            style: {
+                                width: "30px",
+                                height: "30px",
+                                fontSize: "16px",
+                                lineHeight: "30px",
+                                borderRadius: "15px",
+                                verticalAlign: "middle"
+                            },
+                        });
+                    }
+                }, {
+                    "title": this.$L("用户名"),
+                    "key": 'username',
+                    "minWidth": 80,
+                    "ellipsis": true,
+                    render: (h, params) => {
+                        let arr = [];
+                        if (params.row.username == this.usrName) {
+                            arr.push(h('span', {
+                                style: {
+                                    color: '#ff0000',
+                                    paddingRight: '4px'
+                                }
+                            }, '[自己]'))
+                        }
+                        if ($A.identityRaw('admin', params.row.identity)) {
+                            arr.push(h('span', {
+                                style: {
+                                    color: '#ff0000',
+                                    paddingRight: '4px'
+                                }
+                            }, '[管理员]'))
+                        }
+                        arr.push(h('span', params.row.username))
+                        return h('span', arr);
+                    }
+                }, {
+                    "title": this.$L("昵称"),
+                    "minWidth": 80,
+                    "ellipsis": true,
+                    render: (h, params) => {
+                        return h('span', params.row.nickname || '-');
+                    }
+                }, {
+                    "title": this.$L("职位/职称"),
+                    "minWidth": 100,
+                    "ellipsis": true,
+                    render: (h, params) => {
+                        return h('span', params.row.profession || '-');
+                    }
+                }, {
+                    "title": this.$L("加入时间"),
+                    "width": 160,
+                    render: (h, params) => {
+                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.regdate));
+                    }
+                }, {
+                    "title": this.$L("操作"),
+                    "key": 'action',
+                    "width": this.isAdmin ? 160 : 80,
+                    "align": 'center',
+                    render: (h, params) => {
+                        let array = [];
+                        array.push(h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                fontSize: '12px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.$Modal.info({
+                                        title: this.$L('会员信息'),
+                                        content: `<p>${this.$L('昵称')}: ${params.row.nickname || '-'}</p><p>${this.$L('职位/职称')}: ${params.row.profession || '-'}</p>`
+                                    });
+                                }
+                            }
+                        }, this.$L('查看')));
+                        if (this.isAdmin) {
+                            array.push(h('Dropdown', {
+                                props: {
+                                    trigger: 'click',
+                                    transfer: true
+                                },
+                                on: {
+                                    'on-click': (name) => {
+                                        this.handleUser(name, params.row)
+                                    }
+                                }
+                            }, [
+                                h('Button', {
+                                    props: {
+                                        type: 'warning',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        fontSize: '12px',
+                                        marginLeft: '5px'
+                                    },
+                                }, this.$L('操作')),
+                                h('DropdownMenu', {
+                                    slot: 'list',
+                                }, [
+                                    h('DropdownItem', {
+                                        props: {
+                                            name: 'edit',
+                                        },
+                                    }, this.$L('修改成员信息')),
+                                    h('DropdownItem', {
+                                        props: {
+                                            name: $A.identityRaw('admin', params.row.identity) ? 'deladmin' : 'setadmin',
+                                        },
+                                    }, this.$L($A.identityRaw('admin', params.row.identity) ? '取消管理员' : '设为管理员')),
+                                    h('DropdownItem', {
+                                        props: {
+                                            name: 'delete',
+                                        },
+                                    }, this.$L('删除'))
+                                ])
+                            ]))
+                        }
+                        return h('div', array);
+                    }
+                }];
+            },
+
             setPage(page) {
                 this.listPage = page;
                 this.getLists();

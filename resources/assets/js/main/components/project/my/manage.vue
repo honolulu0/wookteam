@@ -46,55 +46,7 @@
                 noDataText: "",
             }
         },
-        created() {
-            this.noDataText = this.$L("数据加载中.....");
-            this.columns = [{
-                "title": this.$L("项目名称"),
-                "key": 'title',
-                "minWidth": 100,
-                render: (h, params) => {
-                    return h('a', {
-                        attrs: {
-                            href: 'javascript:void(0)',
-                        },
-                        on: {
-                            click: () => {
-                                this.openProject(params.row.id);
-                            }
-                        }
-                    }, params.row.title);
-                },
-            }, {
-                "title": this.$L("创建时间"),
-                "minWidth": 160,
-                render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
-                }
-            }, {
-                "title": this.$L("操作"),
-                "key": 'action',
-                "width": 80,
-                "align": 'center',
-                render: (h, params) => {
-                    return h('Button', {
-                        props: {
-                            type: 'primary',
-                            size: 'small'
-                        },
-                        style: {
-                            fontSize: '12px'
-                        },
-                        on: {
-                            click: () => {
-                                this.deleteProject(params.row.id, () => {
-                                    this.getLists();
-                                });
-                            }
-                        }
-                    }, this.$L('删除'));
-                }
-            }];
-        },
+
         mounted() {
             if (this.canload) {
                 this.loadYet = true;
@@ -112,6 +64,56 @@
         },
 
         methods: {
+            initLanguage() {
+                this.noDataText = this.$L("数据加载中.....");
+                this.columns = [{
+                    "title": this.$L("项目名称"),
+                    "key": 'title',
+                    "minWidth": 100,
+                    render: (h, params) => {
+                        return h('a', {
+                            attrs: {
+                                href: 'javascript:void(0)',
+                            },
+                            on: {
+                                click: () => {
+                                    this.openProject(params.row.id);
+                                }
+                            }
+                        }, params.row.title);
+                    },
+                }, {
+                    "title": this.$L("创建时间"),
+                    "minWidth": 160,
+                    render: (h, params) => {
+                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
+                    }
+                }, {
+                    "title": this.$L("操作"),
+                    "key": 'action',
+                    "width": 80,
+                    "align": 'center',
+                    render: (h, params) => {
+                        return h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                fontSize: '12px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.deleteProject(params.row.id, () => {
+                                        this.getLists();
+                                    });
+                                }
+                            }
+                        }, this.$L('删除'));
+                    }
+                }];
+            },
+
             setPage(page) {
                 this.listPage = page;
                 this.getLists();

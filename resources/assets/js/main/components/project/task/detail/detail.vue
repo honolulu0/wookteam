@@ -264,57 +264,7 @@
                 if (doms[i].parentNode != null) doms[i].parentNode.removeChild(doms[i]);
             }
         },
-        created() {
-            let lastSecond = (e) => {
-                return new Date($A.formatDate("Y-m-d 23:59:29", Math.round(e / 1000)))
-            };
-            this.timeOptions = {
-                shortcuts: [{
-                    text: this.$L('今天'),
-                    value() {
-                        return [new Date(), lastSecond(new Date().getTime())];
-                    }
-                }, {
-                    text: this.$L('明天'),
-                    value() {
-                        let e = new Date();
-                        e.setDate(e.getDate() + 1);
-                        return [new Date(), lastSecond(e.getTime())];
-                    }
-                }, {
-                    text: this.$L('本周'),
-                    value() {
-                        return [$A.getData('今天', true), lastSecond($A.getData('本周结束2', true))];
-                    }
-                }, {
-                    text: this.$L('本月'),
-                    value() {
-                        return [$A.getData('今天', true), lastSecond($A.getData('本月结束', true))];
-                    }
-                }, {
-                    text: this.$L('3天'),
-                    value() {
-                        let e = new Date();
-                        e.setDate(e.getDate() + 3);
-                        return [new Date(), lastSecond(e.getTime())];
-                    }
-                }, {
-                    text: this.$L('5天'),
-                    value() {
-                        let e = new Date();
-                        e.setDate(e.getDate() + 5);
-                        return [new Date(), lastSecond(e.getTime())];
-                    }
-                }, {
-                    text: this.$L('7天'),
-                    value() {
-                        let e = new Date();
-                        e.setDate(e.getDate() + 7);
-                        return [new Date(), lastSecond(e.getTime())];
-                    }
-                }]
-            };
-        },
+
         mounted() {
             let match = (window.location.pathname + "").match(/\/project\/panel\/(\d+)$/i);
             this.urlProjectid = match ? match[1] : 0;
@@ -366,6 +316,58 @@
             }
         },
         methods: {
+            initLanguage() {
+                let lastSecond = (e) => {
+                    return new Date($A.formatDate("Y-m-d 23:59:29", Math.round(e / 1000)))
+                };
+                this.timeOptions = {
+                    shortcuts: [{
+                        text: this.$L('今天'),
+                        value() {
+                            return [new Date(), lastSecond(new Date().getTime())];
+                        }
+                    }, {
+                        text: this.$L('明天'),
+                        value() {
+                            let e = new Date();
+                            e.setDate(e.getDate() + 1);
+                            return [new Date(), lastSecond(e.getTime())];
+                        }
+                    }, {
+                        text: this.$L('本周'),
+                        value() {
+                            return [$A.getData('今天', true), lastSecond($A.getData('本周结束2', true))];
+                        }
+                    }, {
+                        text: this.$L('本月'),
+                        value() {
+                            return [$A.getData('今天', true), lastSecond($A.getData('本月结束', true))];
+                        }
+                    }, {
+                        text: this.$L('3天'),
+                        value() {
+                            let e = new Date();
+                            e.setDate(e.getDate() + 3);
+                            return [new Date(), lastSecond(e.getTime())];
+                        }
+                    }, {
+                        text: this.$L('5天'),
+                        value() {
+                            let e = new Date();
+                            e.setDate(e.getDate() + 5);
+                            return [new Date(), lastSecond(e.getTime())];
+                        }
+                    }, {
+                        text: this.$L('7天'),
+                        value() {
+                            let e = new Date();
+                            e.setDate(e.getDate() + 7);
+                            return [new Date(), lastSecond(e.getTime())];
+                        }
+                    }]
+                };
+            },
+
             levelFormt(p) {
                 switch (parseInt(p)) {
                     case 1:

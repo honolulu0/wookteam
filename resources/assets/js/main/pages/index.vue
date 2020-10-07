@@ -453,33 +453,6 @@
                 fromUrl: '',
             }
         },
-        created() {
-            this.ruleLogin = {
-                username: [
-                    { required: true, message: this.$L('请填写用户名！'), trigger: 'change' },
-                    { type: 'string', min: 2, message: this.$L('用户名长度至少2位！'), trigger: 'change' }
-                ],
-                userpass: [
-                    { required: true, message: this.$L('请填写登录密码！'), trigger: 'change' },
-                    { type: 'string', min: 6, message: this.$L('密码错长度至少6位！'), trigger: 'change' }
-                ],
-                userpass2: [
-                    { required: true, message: this.$L('请填写确认密码！'), trigger: 'change' },
-                    { type: 'string', min: 6, message: this.$L('确认密码错长度至少6位！'), trigger: 'change' },
-                    {
-                        validator: (rule, value, callback) => {
-                            if (value !== this.formLogin.userpass) {
-                                callback(new Error(this.$L('两次密码输入不一致！')));
-                            } else {
-                                callback();
-                            }
-                        },
-                        required: true,
-                        trigger: 'change'
-                    },
-                ]
-            };
-        },
         mounted() {
             this.getSetting();
             this.fromUrl = decodeURIComponent($A.getObject(this.$route.query, 'from'));
@@ -500,6 +473,34 @@
             }
         },
         methods: {
+            initLanguage() {
+                this.ruleLogin = {
+                    username: [
+                        { required: true, message: this.$L('请填写用户名！'), trigger: 'change' },
+                        { type: 'string', min: 2, message: this.$L('用户名长度至少2位！'), trigger: 'change' }
+                    ],
+                    userpass: [
+                        { required: true, message: this.$L('请填写登录密码！'), trigger: 'change' },
+                        { type: 'string', min: 6, message: this.$L('密码错长度至少6位！'), trigger: 'change' }
+                    ],
+                    userpass2: [
+                        { required: true, message: this.$L('请填写确认密码！'), trigger: 'change' },
+                        { type: 'string', min: 6, message: this.$L('确认密码错长度至少6位！'), trigger: 'change' },
+                        {
+                            validator: (rule, value, callback) => {
+                                if (value !== this.formLogin.userpass) {
+                                    callback(new Error(this.$L('两次密码输入不一致！')));
+                                } else {
+                                    callback();
+                                }
+                            },
+                            required: true,
+                            trigger: 'change'
+                        },
+                    ]
+                };
+            },
+
             getSetting() {
                 $A.apiAjax({
                     url: 'system/setting',

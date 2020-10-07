@@ -112,192 +112,6 @@
             }
         },
 
-        created() {
-            this.noDataText = this.$L("数据加载中.....");
-            let columns = [];
-            columns.push({
-                "title": "",
-                "width": 60,
-                render: (h, params) => {
-                    if (!params.row.thumb) {
-                        return h('WLoading', {
-                            style: {
-                                width: "24px",
-                                height: "24px",
-                                verticalAlign: "middle",
-                            },
-                        });
-                    }
-                    let imgRender = h('img', {
-                        style: {
-                            width: "28px",
-                            height: "28px",
-                            display: "table"
-                        },
-                        attrs: {
-                            src: params.row.thumb
-                        },
-                    });
-                    if (['jpg', 'jpeg', 'png', 'gif'].indexOf(params.row.ext) !== -1) {
-                        return h('Tooltip', {
-                            props: {
-                                transfer: true,
-                                delay: 600,
-                                maxWidth: 600
-                            },
-                        }, [imgRender, h('div', {slot: 'content'}, [h('img', {
-                            style: {
-                                maxWidth: "360px",
-                                maxHeight: "360px",
-                                display: "table",
-                                margin: "3px 0"
-                            },
-                            attrs: {
-                                src: params.row.path
-                            },
-                        })])]);
-                    } else {
-                        return imgRender;
-                    }
-                }
-            });
-            columns.push({
-                "title": this.$L("文件名"),
-                "key": 'name',
-                "minWidth": 100,
-                "tooltip": true,
-                "sortable": true,
-                render: (h, params) => {
-                    let arr = [h('span', params.row.name)];
-                    if (params.row.showProgress === true) {
-                        arr.push(h('Progress', {
-                            style: {
-                                display: 'block',
-                                marginTop: '-3px'
-                            },
-                            props: {
-                                percent: params.row.percentage || 100,
-                            },
-                        }));
-                    }
-                    return h('div', arr);
-                },
-            });
-            columns.push({
-                "title": this.$L("大小"),
-                "key": 'size',
-                "minWidth": 90,
-                "maxWidth": 120,
-                "align": "right",
-                "sortable": true,
-                render: (h, params) => {
-                    return h('span', $A.bytesToSize(params.row.size));
-                },
-            });
-            if (!this.simple) {
-                columns.push({
-                    "title": this.$L("下载次数"),
-                    "key": 'download',
-                    "align": "center",
-                    "sortable": true,
-                    "width": 100,
-                });
-                columns.push({
-                    "title": this.$L("上传者"),
-                    "key": 'username',
-                    "minWidth": 90,
-                    "maxWidth": 130,
-                    "sortable": true,
-                    render: (h, params) => {
-                        return h('UserView', {
-                            props: {
-                                username: params.row.username
-                            }
-                        });
-                    }
-                });
-                columns.push({
-                    "title": this.$L("上传时间"),
-                    "key": 'indate',
-                    "width": 160,
-                    "sortable": true,
-                    render: (h, params) => {
-                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
-                    }
-                });
-            }
-            columns.push({
-                "title": " ",
-                "key": 'action',
-                "align": 'right',
-                "width": 120,
-                render: (h, params) => {
-                    if (!params.row.id) {
-                        return null;
-                    }
-                    return h('div', [
-                        h('Tooltip', {
-                            props: { content: this.$L('下载'), transfer: true, delay: 600 },
-                            style: { position: 'relative' },
-                        }, [h('Icon', {
-                            props: { type: 'md-arrow-down', size: 16 },
-                            style: { margin: '0 3px', cursor: 'pointer' },
-                        }), h('a', {
-                            style: { position: 'absolute', top: '0', left: '0', right: '0', bottom: '0', 'zIndex': 1 },
-                            attrs: { href: $A.apiUrl('project/files/download?fileid=' + params.row.id), target: '_blank' },
-                            on: {
-                                click: () => {
-                                    if (params.row.yetdown) {
-                                        return;
-                                    }
-                                    params.row.yetdown = 1;
-                                    this.$set(params.row, 'download', params.row.download + 1);
-                                }
-                            }
-                        })]),
-                        h('Tooltip', {
-                            props: { content: this.$L('重命名'), transfer: true, delay: 600 }
-                        }, [h('Icon', {
-                            props: { type: 'md-create', size: 16 },
-                            style: { margin: '0 3px', cursor: 'pointer' },
-                            on: {
-                                click: () => {
-                                    this.renameFile(params.row);
-                                }
-                            }
-                        })]),
-                        h('Tooltip', {
-                            props: { content: this.$L('复制链接'), transfer: true, delay: 600 }
-                        }, [h('Icon', {
-                            props: { type: 'md-link', size: 16 },
-                            style: { margin: '0 3px', cursor: 'pointer', transform: 'rotate(-45deg)' },
-                            on: {
-                                click: () => {
-                                    this.$copyText($A.apiUrl('project/files/download?fileid=' + params.row.id)).then(() => {
-                                        this.$Message.success(this.$L('复制成功！'));
-                                    }, () => {
-                                        this.$Message.error(this.$L('复制失败！'));
-                                    });
-                                }
-                            }
-                        })]),
-                        h('Tooltip', {
-                            props: { content: this.$L('删除'), transfer: true, delay: 600 }
-                        }, [h('Icon', {
-                            props: { type: 'md-trash', size: 16 },
-                            style: { margin: '0 3px', cursor: 'pointer' },
-                            on: {
-                                click: () => {
-                                    this.deleteFile(params.row);
-                                }
-                            }
-                        })]),
-                    ]);
-                }
-            });
-            this.columns = columns;
-        },
-
         mounted() {
             if (this.canload) {
                 this.loadYet = true;
@@ -338,6 +152,192 @@
         },
 
         methods: {
+            initLanguage() {
+                this.noDataText = this.$L("数据加载中.....");
+                let columns = [];
+                columns.push({
+                    "title": "",
+                    "width": 60,
+                    render: (h, params) => {
+                        if (!params.row.thumb) {
+                            return h('WLoading', {
+                                style: {
+                                    width: "24px",
+                                    height: "24px",
+                                    verticalAlign: "middle",
+                                },
+                            });
+                        }
+                        let imgRender = h('img', {
+                            style: {
+                                width: "28px",
+                                height: "28px",
+                                display: "table"
+                            },
+                            attrs: {
+                                src: params.row.thumb
+                            },
+                        });
+                        if (['jpg', 'jpeg', 'png', 'gif'].indexOf(params.row.ext) !== -1) {
+                            return h('Tooltip', {
+                                props: {
+                                    transfer: true,
+                                    delay: 600,
+                                    maxWidth: 600
+                                },
+                            }, [imgRender, h('div', {slot: 'content'}, [h('img', {
+                                style: {
+                                    maxWidth: "360px",
+                                    maxHeight: "360px",
+                                    display: "table",
+                                    margin: "3px 0"
+                                },
+                                attrs: {
+                                    src: params.row.path
+                                },
+                            })])]);
+                        } else {
+                            return imgRender;
+                        }
+                    }
+                });
+                columns.push({
+                    "title": this.$L("文件名"),
+                    "key": 'name',
+                    "minWidth": 100,
+                    "tooltip": true,
+                    "sortable": true,
+                    render: (h, params) => {
+                        let arr = [h('span', params.row.name)];
+                        if (params.row.showProgress === true) {
+                            arr.push(h('Progress', {
+                                style: {
+                                    display: 'block',
+                                    marginTop: '-3px'
+                                },
+                                props: {
+                                    percent: params.row.percentage || 100,
+                                },
+                            }));
+                        }
+                        return h('div', arr);
+                    },
+                });
+                columns.push({
+                    "title": this.$L("大小"),
+                    "key": 'size',
+                    "minWidth": 90,
+                    "maxWidth": 120,
+                    "align": "right",
+                    "sortable": true,
+                    render: (h, params) => {
+                        return h('span', $A.bytesToSize(params.row.size));
+                    },
+                });
+                if (!this.simple) {
+                    columns.push({
+                        "title": this.$L("下载次数"),
+                        "key": 'download',
+                        "align": "center",
+                        "sortable": true,
+                        "width": 100,
+                    });
+                    columns.push({
+                        "title": this.$L("上传者"),
+                        "key": 'username',
+                        "minWidth": 90,
+                        "maxWidth": 130,
+                        "sortable": true,
+                        render: (h, params) => {
+                            return h('UserView', {
+                                props: {
+                                    username: params.row.username
+                                }
+                            });
+                        }
+                    });
+                    columns.push({
+                        "title": this.$L("上传时间"),
+                        "key": 'indate',
+                        "width": 160,
+                        "sortable": true,
+                        render: (h, params) => {
+                            return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
+                        }
+                    });
+                }
+                columns.push({
+                    "title": " ",
+                    "key": 'action',
+                    "align": 'right',
+                    "width": 120,
+                    render: (h, params) => {
+                        if (!params.row.id) {
+                            return null;
+                        }
+                        return h('div', [
+                            h('Tooltip', {
+                                props: { content: this.$L('下载'), transfer: true, delay: 600 },
+                                style: { position: 'relative' },
+                            }, [h('Icon', {
+                                props: { type: 'md-arrow-down', size: 16 },
+                                style: { margin: '0 3px', cursor: 'pointer' },
+                            }), h('a', {
+                                style: { position: 'absolute', top: '0', left: '0', right: '0', bottom: '0', 'zIndex': 1 },
+                                attrs: { href: $A.apiUrl('project/files/download?fileid=' + params.row.id), target: '_blank' },
+                                on: {
+                                    click: () => {
+                                        if (params.row.yetdown) {
+                                            return;
+                                        }
+                                        params.row.yetdown = 1;
+                                        this.$set(params.row, 'download', params.row.download + 1);
+                                    }
+                                }
+                            })]),
+                            h('Tooltip', {
+                                props: { content: this.$L('重命名'), transfer: true, delay: 600 }
+                            }, [h('Icon', {
+                                props: { type: 'md-create', size: 16 },
+                                style: { margin: '0 3px', cursor: 'pointer' },
+                                on: {
+                                    click: () => {
+                                        this.renameFile(params.row);
+                                    }
+                                }
+                            })]),
+                            h('Tooltip', {
+                                props: { content: this.$L('复制链接'), transfer: true, delay: 600 }
+                            }, [h('Icon', {
+                                props: { type: 'md-link', size: 16 },
+                                style: { margin: '0 3px', cursor: 'pointer', transform: 'rotate(-45deg)' },
+                                on: {
+                                    click: () => {
+                                        this.$copyText($A.apiUrl('project/files/download?fileid=' + params.row.id)).then(() => {
+                                            this.$Message.success(this.$L('复制成功！'));
+                                        }, () => {
+                                            this.$Message.error(this.$L('复制失败！'));
+                                        });
+                                    }
+                                }
+                            })]),
+                            h('Tooltip', {
+                                props: { content: this.$L('删除'), transfer: true, delay: 600 }
+                            }, [h('Icon', {
+                                props: { type: 'md-trash', size: 16 },
+                                style: { margin: '0 3px', cursor: 'pointer' },
+                                on: {
+                                    click: () => {
+                                        this.deleteFile(params.row);
+                                    }
+                                }
+                            })]),
+                        ]);
+                    }
+                });
+                this.columns = columns;
+            },
+
             sreachTab(clear) {
                 if (clear === true) {
                     this.keys = {};

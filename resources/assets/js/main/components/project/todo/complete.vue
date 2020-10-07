@@ -49,45 +49,7 @@
                 noDataText: "",
             }
         },
-        created() {
-            this.noDataText = this.$L("数据加载中.....");
-            this.columns = [{
-                "title": this.$L("任务名称"),
-                "key": 'title',
-                "minWidth": 120,
-                render: (h, params) => {
-                    return this.renderTaskTitle(h, params);
-                }
-            }, {
-                "title": this.$L("创建人"),
-                "key": 'createuser',
-                "minWidth": 80,
-                render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.createuser
-                        }
-                    });
-                }
-            }, {
-                "title": this.$L("负责人"),
-                "key": 'username',
-                "minWidth": 80,
-                render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.username
-                        }
-                    });
-                }
-            }, {
-                "title": this.$L("完成时间"),
-                "width": 160,
-                render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.completedate));
-                }
-            }];
-        },
+
         mounted() {
             if (this.canload) {
                 this.loadYet = true;
@@ -148,6 +110,46 @@
         },
 
         methods: {
+            initLanguage() {
+                this.noDataText = this.$L("数据加载中.....");
+                this.columns = [{
+                    "title": this.$L("任务名称"),
+                    "key": 'title',
+                    "minWidth": 120,
+                    render: (h, params) => {
+                        return this.renderTaskTitle(h, params);
+                    }
+                }, {
+                    "title": this.$L("创建人"),
+                    "key": 'createuser',
+                    "minWidth": 80,
+                    render: (h, params) => {
+                        return h('UserView', {
+                            props: {
+                                username: params.row.createuser
+                            }
+                        });
+                    }
+                }, {
+                    "title": this.$L("负责人"),
+                    "key": 'username',
+                    "minWidth": 80,
+                    render: (h, params) => {
+                        return h('UserView', {
+                            props: {
+                                username: params.row.username
+                            }
+                        });
+                    }
+                }, {
+                    "title": this.$L("完成时间"),
+                    "width": 160,
+                    render: (h, params) => {
+                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.completedate));
+                    }
+                }];
+            },
+
             setPage(page) {
                 this.listPage = page;
                 this.getLists();

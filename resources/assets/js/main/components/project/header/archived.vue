@@ -49,104 +49,7 @@
                 noDataText: "",
             }
         },
-        created() {
-            this.noDataText = this.$L("数据加载中.....");
-            this.columns = [{
-                "title": this.$L("任务名称"),
-                "key": 'title',
-                "minWidth": 120,
-                render: (h, params) => {
-                    return this.renderTaskTitle(h, params);
-                }
-            }, {
-                "title": this.$L("创建人"),
-                "key": 'createuser',
-                "minWidth": 80,
-                render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.createuser
-                        }
-                    });
-                }
-            }, {
-                "title": this.$L("负责人"),
-                "key": 'username',
-                "minWidth": 80,
-                render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.username
-                        }
-                    });
-                }
-            }, {
-                "title": this.$L("完成"),
-                "minWidth": 70,
-                "align": "center",
-                render: (h, params) => {
-                    return h('span', params.row.complete ? '√' : '-');
-                }
-            }, {
-                "title": this.$L("归档时间"),
-                "width": 160,
-                render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.archiveddate));
-                }
-            }, {
-                "title": this.$L("操作"),
-                "key": 'action',
-                "width": 100,
-                "align": 'center',
-                render: (h, params) => {
-                    return h('Button', {
-                        props: {
-                            type: 'primary',
-                            size: 'small'
-                        },
-                        style: {
-                            fontSize: '12px'
-                        },
-                        on: {
-                            click: () => {
-                                this.$Modal.confirm({
-                                    title: this.$L('取消归档'),
-                                    content: this.$L('你确定要取消归档吗？'),
-                                    loading: true,
-                                    onOk: () => {
-                                        $A.apiAjax({
-                                            url: 'project/task/edit',
-                                            method: 'post',
-                                            data: {
-                                                act: 'unarchived',
-                                                taskid: params.row.id,
-                                            },
-                                            error: () => {
-                                                this.$Modal.remove();
-                                                alert(this.$L('网络繁忙，请稍后再试！'));
-                                            },
-                                            success: (res) => {
-                                                this.$Modal.remove();
-                                                this.getLists();
-                                                setTimeout(() => {
-                                                    if (res.ret === 1) {
-                                                        this.$Message.success(res.msg);
-                                                        $A.triggerTaskInfoListener('unarchived', res.data);
-                                                        $A.triggerTaskInfoChange(params.row.id);
-                                                    } else {
-                                                        this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
-                                                    }
-                                                }, 350);
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        }
-                    }, this.$L('取消归档'));
-                }
-            }];
-        },
+
         mounted() {
             if (this.canload) {
                 this.loadYet = true;
@@ -206,6 +109,105 @@
         },
 
         methods: {
+            initLanguage() {
+                this.noDataText = this.$L("数据加载中.....");
+                this.columns = [{
+                    "title": this.$L("任务名称"),
+                    "key": 'title',
+                    "minWidth": 120,
+                    render: (h, params) => {
+                        return this.renderTaskTitle(h, params);
+                    }
+                }, {
+                    "title": this.$L("创建人"),
+                    "key": 'createuser',
+                    "minWidth": 80,
+                    render: (h, params) => {
+                        return h('UserView', {
+                            props: {
+                                username: params.row.createuser
+                            }
+                        });
+                    }
+                }, {
+                    "title": this.$L("负责人"),
+                    "key": 'username',
+                    "minWidth": 80,
+                    render: (h, params) => {
+                        return h('UserView', {
+                            props: {
+                                username: params.row.username
+                            }
+                        });
+                    }
+                }, {
+                    "title": this.$L("完成"),
+                    "minWidth": 70,
+                    "align": "center",
+                    render: (h, params) => {
+                        return h('span', params.row.complete ? '√' : '-');
+                    }
+                }, {
+                    "title": this.$L("归档时间"),
+                    "width": 160,
+                    render: (h, params) => {
+                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.archiveddate));
+                    }
+                }, {
+                    "title": this.$L("操作"),
+                    "key": 'action',
+                    "width": 100,
+                    "align": 'center',
+                    render: (h, params) => {
+                        return h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                fontSize: '12px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.$Modal.confirm({
+                                        title: this.$L('取消归档'),
+                                        content: this.$L('你确定要取消归档吗？'),
+                                        loading: true,
+                                        onOk: () => {
+                                            $A.apiAjax({
+                                                url: 'project/task/edit',
+                                                method: 'post',
+                                                data: {
+                                                    act: 'unarchived',
+                                                    taskid: params.row.id,
+                                                },
+                                                error: () => {
+                                                    this.$Modal.remove();
+                                                    alert(this.$L('网络繁忙，请稍后再试！'));
+                                                },
+                                                success: (res) => {
+                                                    this.$Modal.remove();
+                                                    this.getLists();
+                                                    setTimeout(() => {
+                                                        if (res.ret === 1) {
+                                                            this.$Message.success(res.msg);
+                                                            $A.triggerTaskInfoListener('unarchived', res.data);
+                                                            $A.triggerTaskInfoChange(params.row.id);
+                                                        } else {
+                                                            this.$Modal.error({title: this.$L('温馨提示'), content: res.msg});
+                                                        }
+                                                    }, 350);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }, this.$L('取消归档'));
+                    }
+                }];
+            },
+
             setPage(page) {
                 this.listPage = page;
                 this.getLists();

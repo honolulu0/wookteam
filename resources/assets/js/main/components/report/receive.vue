@@ -80,66 +80,6 @@
             }
         },
 
-        created() {
-            this.noDataText = this.$L("数据加载中.....");
-            this.contentText = this.$L("内容加载中.....");
-            this.columns = [{
-                "title": this.$L("标题"),
-                "key": 'title',
-                "sortable": true,
-                "minWidth": 120,
-            }, {
-                "title": this.$L("发送人"),
-                "key": 'username',
-                "sortable": true,
-                "minWidth": 80,
-                "maxWidth": 130,
-                render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.username
-                        }
-                    });
-                }
-            }, {
-                "title": this.$L("类型"),
-                "key": 'type',
-                "minWidth": 80,
-                "maxWidth": 120,
-                "align": 'center',
-            }, {
-                "title": this.$L("创建日期"),
-                "minWidth": 160,
-                "maxWidth": 200,
-                "align": 'center',
-                "sortable": true,
-                render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
-                }
-            }, {
-                "title": " ",
-                "key": 'action',
-                "width": 70,
-                "align": 'center',
-                render: (h, params) => {
-                    return h('div', [
-                        h('Tooltip', {
-                            props: { content: this.$L('查看'), transfer: true, delay: 600 },
-                            style: { position: 'relative' },
-                        }, [h('Icon', {
-                            props: { type: 'md-eye', size: 16 },
-                            style: { margin: '0 3px', cursor: 'pointer' },
-                            on: {
-                                click: () => {
-                                    this.reportDetail(params.row.id, params.row.title);
-                                }
-                            }
-                        })]),
-                    ]);
-                }
-            }];
-        },
-
         mounted() {
             if (this.canload) {
                 this.loadYet = true;
@@ -157,6 +97,66 @@
         },
 
         methods: {
+            initLanguage() {
+                this.noDataText = this.$L("数据加载中.....");
+                this.contentText = this.$L("内容加载中.....");
+                this.columns = [{
+                    "title": this.$L("标题"),
+                    "key": 'title',
+                    "sortable": true,
+                    "minWidth": 120,
+                }, {
+                    "title": this.$L("发送人"),
+                    "key": 'username',
+                    "sortable": true,
+                    "minWidth": 80,
+                    "maxWidth": 130,
+                    render: (h, params) => {
+                        return h('UserView', {
+                            props: {
+                                username: params.row.username
+                            }
+                        });
+                    }
+                }, {
+                    "title": this.$L("类型"),
+                    "key": 'type',
+                    "minWidth": 80,
+                    "maxWidth": 120,
+                    "align": 'center',
+                }, {
+                    "title": this.$L("创建日期"),
+                    "minWidth": 160,
+                    "maxWidth": 200,
+                    "align": 'center',
+                    "sortable": true,
+                    render: (h, params) => {
+                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
+                    }
+                }, {
+                    "title": " ",
+                    "key": 'action',
+                    "width": 70,
+                    "align": 'center',
+                    render: (h, params) => {
+                        return h('div', [
+                            h('Tooltip', {
+                                props: { content: this.$L('查看'), transfer: true, delay: 600 },
+                                style: { position: 'relative' },
+                            }, [h('Icon', {
+                                props: { type: 'md-eye', size: 16 },
+                                style: { margin: '0 3px', cursor: 'pointer' },
+                                on: {
+                                    click: () => {
+                                        this.reportDetail(params.row.id, params.row.title);
+                                    }
+                                }
+                            })]),
+                        ]);
+                    }
+                }];
+            },
+
             sreachTab(clear) {
                 if (clear === true) {
                     this.keys = {};

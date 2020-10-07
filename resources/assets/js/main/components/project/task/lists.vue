@@ -108,124 +108,6 @@
             }
         },
 
-        created() {
-            this.noDataText = this.$L("数据加载中.....");
-            this.columns = [{
-                "title": this.$L("任务名称"),
-                "key": 'title',
-                "minWidth": 120,
-                render: (h, params) => {
-                    return this.renderTaskTitle(h, params);
-                }
-            }, {
-                "title": this.$L("阶段"),
-                "key": 'labelid',
-                "minWidth": 80,
-                "sortable": true,
-                render: (h, params) => {
-                    let labelid = params.row.labelid;
-                    let labelDetail = this.labelLists.find((item) => { return item.id === labelid});
-                    return h('span', labelDetail ? labelDetail.title : labelid);
-                }
-            }, {
-                "title": this.$L("计划时间"),
-                "key": 'enddate',
-                "width": 160,
-                "align": "center",
-                "sortable": true,
-                render: (h, params) => {
-                    if (!params.row.startdate && !params.row.enddate) {
-                        return h('span', '-');
-                    }
-                    return h('div', {
-                        style: {
-                            fontSize: '12px',
-                            lineHeight: '14px'
-                        }
-                    }, [
-                        h('div', params.row.startdate ? $A.formatDate("Y-m-d H:i:s", params.row.startdate) : '-'),
-                        h('div', params.row.enddate ? $A.formatDate("Y-m-d H:i:s", params.row.enddate) : '-'),
-                    ]);
-                }
-            }, {
-                "title": this.$L("负责人"),
-                "key": 'username',
-                "minWidth": 90,
-                "sortable": true,
-                render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.username
-                        }
-                    });
-                }
-            }, {
-                "title": this.$L("优先级"),
-                "key": 'level',
-                "align": "center",
-                "minWidth": 90,
-                "maxWidth": 100,
-                "sortable": true,
-                render: (h, params) => {
-                    let level = params.row.level;
-                    let color;
-                    switch (level) {
-                        case 1:
-                            color = "#ff0000";
-                            break;
-                        case 2:
-                            color = "#BB9F35";
-                            break;
-                        case 3:
-                            color = "#449EDD";
-                            break;
-                        case 4:
-                            color = "#84A83B";
-                            break;
-                    }
-                    return h('span', {
-                        style: {
-                            color: color
-                        }
-                    }, "P" + level);
-                },
-            }, {
-                "title": this.$L("状态"),
-                "key": 'type',
-                "align": "center",
-                "minWidth": 80,
-                "maxWidth": 100,
-                "sortable": true,
-                render: (h, params) => {
-                    let color;
-                    let status;
-                    if (params.row.overdue) {
-                        color = "#ff0000";
-                        status = this.$L("已超期");
-                    } else if (params.row.complete) {
-                        color = "";
-                        status = this.$L("已完成");
-                    } else {
-                        color = "#19be6b";
-                        status = this.$L("未完成");
-                    }
-                    return h('span', {
-                        style: {
-                            color: color
-                        }
-                    }, status);
-                },
-            }, {
-                "title": this.$L("创建时间"),
-                "key": 'indate',
-                "width": 160,
-                "sortable": true,
-                render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
-                }
-            }];
-        },
-
         mounted() {
             if (this.canload) {
                 this.loadYet = true;
@@ -285,6 +167,124 @@
         },
 
         methods: {
+            initLanguage() {
+                this.noDataText = this.$L("数据加载中.....");
+                this.columns = [{
+                    "title": this.$L("任务名称"),
+                    "key": 'title',
+                    "minWidth": 120,
+                    render: (h, params) => {
+                        return this.renderTaskTitle(h, params);
+                    }
+                }, {
+                    "title": this.$L("阶段"),
+                    "key": 'labelid',
+                    "minWidth": 80,
+                    "sortable": true,
+                    render: (h, params) => {
+                        let labelid = params.row.labelid;
+                        let labelDetail = this.labelLists.find((item) => { return item.id === labelid});
+                        return h('span', labelDetail ? labelDetail.title : labelid);
+                    }
+                }, {
+                    "title": this.$L("计划时间"),
+                    "key": 'enddate',
+                    "width": 160,
+                    "align": "center",
+                    "sortable": true,
+                    render: (h, params) => {
+                        if (!params.row.startdate && !params.row.enddate) {
+                            return h('span', '-');
+                        }
+                        return h('div', {
+                            style: {
+                                fontSize: '12px',
+                                lineHeight: '14px'
+                            }
+                        }, [
+                            h('div', params.row.startdate ? $A.formatDate("Y-m-d H:i:s", params.row.startdate) : '-'),
+                            h('div', params.row.enddate ? $A.formatDate("Y-m-d H:i:s", params.row.enddate) : '-'),
+                        ]);
+                    }
+                }, {
+                    "title": this.$L("负责人"),
+                    "key": 'username',
+                    "minWidth": 90,
+                    "sortable": true,
+                    render: (h, params) => {
+                        return h('UserView', {
+                            props: {
+                                username: params.row.username
+                            }
+                        });
+                    }
+                }, {
+                    "title": this.$L("优先级"),
+                    "key": 'level',
+                    "align": "center",
+                    "minWidth": 90,
+                    "maxWidth": 100,
+                    "sortable": true,
+                    render: (h, params) => {
+                        let level = params.row.level;
+                        let color;
+                        switch (level) {
+                            case 1:
+                                color = "#ff0000";
+                                break;
+                            case 2:
+                                color = "#BB9F35";
+                                break;
+                            case 3:
+                                color = "#449EDD";
+                                break;
+                            case 4:
+                                color = "#84A83B";
+                                break;
+                        }
+                        return h('span', {
+                            style: {
+                                color: color
+                            }
+                        }, "P" + level);
+                    },
+                }, {
+                    "title": this.$L("状态"),
+                    "key": 'type',
+                    "align": "center",
+                    "minWidth": 80,
+                    "maxWidth": 100,
+                    "sortable": true,
+                    render: (h, params) => {
+                        let color;
+                        let status;
+                        if (params.row.overdue) {
+                            color = "#ff0000";
+                            status = this.$L("已超期");
+                        } else if (params.row.complete) {
+                            color = "";
+                            status = this.$L("已完成");
+                        } else {
+                            color = "#19be6b";
+                            status = this.$L("未完成");
+                        }
+                        return h('span', {
+                            style: {
+                                color: color
+                            }
+                        }, status);
+                    },
+                }, {
+                    "title": this.$L("创建时间"),
+                    "key": 'indate',
+                    "width": 160,
+                    "sortable": true,
+                    render: (h, params) => {
+                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
+                    }
+                }];
+            },
+
             exportTab() {
                 let whereData = $A.cloneData(this.keys);
                 whereData.page = Math.max(this.listPage, 1);

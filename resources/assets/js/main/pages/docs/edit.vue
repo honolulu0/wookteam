@@ -363,59 +363,6 @@
                 timeValue: Math.round(new Date().getTime() / 1000),
             }
         },
-        created() {
-            this.historyColumns = [{
-                "title": this.$L("存档日期"),
-                "minWidth": 160,
-                "maxWidth": 200,
-                render: (h, params) => {
-                    return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
-                }
-            }, {
-                "title": this.$L("操作员"),
-                "key": 'username',
-                "minWidth": 80,
-                "maxWidth": 130,
-                render: (h, params) => {
-                    return h('UserView', {
-                        props: {
-                            username: params.row.username
-                        }
-                    });
-                }
-            }, {
-                "title": " ",
-                "key": 'action',
-                "width": 80,
-                "align": 'center',
-                render: (h, params) => {
-                    if (this.hid == params.row.id || (this.hid == 0 && params.index == 0)) {
-                        return h('Icon', {
-                            props: { type: 'md-checkmark' },
-                            style: { marginRight: '6px', fontSize: '16px', color: '#FF5722' },
-                        });
-                    }
-                    return h('Button', {
-                        props: {
-                            type: 'text',
-                            size: 'small'
-                        },
-                        style: {
-                            fontSize: '12px'
-                        },
-                        on: {
-                            click: () => {
-                                let data = {sid: this.getSid() + "-" + params.row.id, other: this.$route.params.other}
-                                if (params.index == 0) {
-                                    data.sid = this.getSid();
-                                }
-                                this.handleSection('openBefore', data);
-                            }
-                        }
-                    }, this.$L('还原'));
-                }
-            }];
-        },
         mounted() {
             this.routeName = this.$route.name;
             //
@@ -618,6 +565,60 @@
             }
         },
         methods: {
+            initLanguage() {
+                this.historyColumns = [{
+                    "title": this.$L("存档日期"),
+                    "minWidth": 160,
+                    "maxWidth": 200,
+                    render: (h, params) => {
+                        return h('span', $A.formatDate("Y-m-d H:i:s", params.row.indate));
+                    }
+                }, {
+                    "title": this.$L("操作员"),
+                    "key": 'username',
+                    "minWidth": 80,
+                    "maxWidth": 130,
+                    render: (h, params) => {
+                        return h('UserView', {
+                            props: {
+                                username: params.row.username
+                            }
+                        });
+                    }
+                }, {
+                    "title": " ",
+                    "key": 'action',
+                    "width": 80,
+                    "align": 'center',
+                    render: (h, params) => {
+                        if (this.hid == params.row.id || (this.hid == 0 && params.index == 0)) {
+                            return h('Icon', {
+                                props: { type: 'md-checkmark' },
+                                style: { marginRight: '6px', fontSize: '16px', color: '#FF5722' },
+                            });
+                        }
+                        return h('Button', {
+                            props: {
+                                type: 'text',
+                                size: 'small'
+                            },
+                            style: {
+                                fontSize: '12px'
+                            },
+                            on: {
+                                click: () => {
+                                    let data = {sid: this.getSid() + "-" + params.row.id, other: this.$route.params.other}
+                                    if (params.index == 0) {
+                                        data.sid = this.getSid();
+                                    }
+                                    this.handleSection('openBefore', data);
+                                }
+                            }
+                        }, this.$L('还原'));
+                    }
+                }];
+            },
+
             keySave(e) {
                 if ((e.ctrlKey || e.metaKey) && e.keyCode === 83) {
                     this.handleClick('saveBefore');

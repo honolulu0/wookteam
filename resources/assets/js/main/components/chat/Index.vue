@@ -941,12 +941,6 @@
             }
         },
 
-        created() {
-            this.dialogNoDataText = this.$L("数据加载中.....");
-            this.teamNoDataText = this.$L("数据加载中.....");
-            this.messageNoDataText = this.$L("数据加载中.....");
-        },
-
         mounted() {
             this.formatCall();
             this.getSetting();
@@ -1126,6 +1120,12 @@
         },
 
         methods: {
+            initLanguage() {
+                this.dialogNoDataText = this.$L("数据加载中.....");
+                this.teamNoDataText = this.$L("数据加载中.....");
+                this.messageNoDataText = this.$L("数据加载中.....");
+            },
+
             formatCall() {
                 if ($A.getToken() === false) {
                     return;

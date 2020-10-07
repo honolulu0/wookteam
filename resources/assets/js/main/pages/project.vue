@@ -335,24 +335,6 @@
                 handleProjectId: 0,
             }
         },
-        created() {
-            this.labelLists = [{
-                label: this.$L('空白模板'),
-                value: [],
-            }, {
-                label: this.$L('软件开发'),
-                value: [this.$L('产品规划'),this.$L('前端开发'),this.$L('后端开发'),this.$L('测试'),this.$L('发布'),this.$L('其它')],
-            }, {
-                label: this.$L('产品开发'),
-                value: [this.$L('产品计划'), this.$L('正在设计'), this.$L('正在研发'), this.$L('测试'), this.$L('准备发布'), this.$L('发布成功')],
-            }];
-            this.ruleAdd = {
-                title: [
-                    { required: true, message: this.$L('请填写项目名称！'), trigger: 'change' },
-                    { type: 'string', min: 2, message: this.$L('项目名称至少2个字！'), trigger: 'change' }
-                ]
-            };
-        },
         mounted() {
             this.getLists(true);
             //
@@ -406,6 +388,25 @@
             },
         },
         methods: {
+            initLanguage() {
+                this.labelLists = [{
+                    label: this.$L('空白模板'),
+                    value: [],
+                }, {
+                    label: this.$L('软件开发'),
+                    value: [this.$L('产品规划'),this.$L('前端开发'),this.$L('后端开发'),this.$L('测试'),this.$L('发布'),this.$L('其它')],
+                }, {
+                    label: this.$L('产品开发'),
+                    value: [this.$L('产品计划'), this.$L('正在设计'), this.$L('正在研发'), this.$L('测试'), this.$L('准备发布'), this.$L('发布成功')],
+                }];
+                this.ruleAdd = {
+                    title: [
+                        { required: true, message: this.$L('请填写项目名称！'), trigger: 'change' },
+                        { type: 'string', min: 2, message: this.$L('项目名称至少2个字！'), trigger: 'change' }
+                    ]
+                };
+            },
+
             setPage(page) {
                 this.listPage = page;
                 this.getLists();

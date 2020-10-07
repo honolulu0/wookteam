@@ -272,33 +272,6 @@
             }
         },
 
-        created() {
-            this.bookNoDataText = this.$L("数据加载中.....");
-            this.sectionNoDataText = this.$L("数据加载中.....");
-            this.sectionTypeLists = [
-                {value: 'document', text: this.$L("文本")},
-                {value: 'mind', text: this.$L("脑图")},
-                {value: 'sheet', text: this.$L("表格")},
-                {value: 'flow', text: this.$L("流程图")},
-                {value: 'folder', text: this.$L("目录")},
-            ];
-            this.ruleBookAdd = {
-                title: [
-                    { required: true, message: this.$L('请填写知识库名称！'), trigger: 'change' },
-                    { type: 'string', min: 2, message: this.$L('知识库名称长度至少2位！'), trigger: 'change' }
-                ],
-            };
-            this.ruleSectionAdd = {
-                title: [
-                    { required: true, message: this.$L('请填写文档标题！'), trigger: 'change' },
-                    { type: 'string', min: 2, message: this.$L('文档标题长度至少2位！'), trigger: 'change' }
-                ],
-                type: [
-                    { required: true },
-                ],
-            };
-        },
-
         mounted() {
             this.getBookLists(true);
         },
@@ -340,6 +313,33 @@
         },
 
         methods: {
+            initLanguage() {
+                this.bookNoDataText = this.$L("数据加载中.....");
+                this.sectionNoDataText = this.$L("数据加载中.....");
+                this.sectionTypeLists = [
+                    {value: 'document', text: this.$L("文本")},
+                    {value: 'mind', text: this.$L("脑图")},
+                    {value: 'sheet', text: this.$L("表格")},
+                    {value: 'flow', text: this.$L("流程图")},
+                    {value: 'folder', text: this.$L("目录")},
+                ];
+                this.ruleBookAdd = {
+                    title: [
+                        { required: true, message: this.$L('请填写知识库名称！'), trigger: 'change' },
+                        { type: 'string', min: 2, message: this.$L('知识库名称长度至少2位！'), trigger: 'change' }
+                    ],
+                };
+                this.ruleSectionAdd = {
+                    title: [
+                        { required: true, message: this.$L('请填写文档标题！'), trigger: 'change' },
+                        { type: 'string', min: 2, message: this.$L('文档标题长度至少2位！'), trigger: 'change' }
+                    ],
+                    type: [
+                        { required: true },
+                    ],
+                };
+            },
+
             children2lists(lists) {
                 let array = [];
                 lists.forEach((item) => {

@@ -94,9 +94,6 @@
                 currentDate: new Date()
             }
         },
-        created() {
-
-        },
         methods: {
             changeDateRange(start, end, currentStart, current, weekDays) {
                 this.currentDate = current

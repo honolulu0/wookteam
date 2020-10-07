@@ -229,52 +229,7 @@
                 noDataText: '',
             }
         },
-        created() {
-            this.columns = [
-                {
-                    "title": this.$L("头像"),
-                    "width": 60,
-                    "align": 'center',
-                    render: (h, params) => {
-                        return h('UserImg', {
-                            props: {
-                                info: params.row,
-                            },
-                            style: {
-                                width: "26px",
-                                height: "26px",
-                                fontSize: "13px",
-                                lineHeight: "26px",
-                                borderRadius: "50%",
-                                verticalAlign: "middle"
-                            },
-                        });
-                    }
-                }, {
-                    "title": this.$L("用户名"),
-                    "key": "username",
-                    "minWidth": 80,
-                    "ellipsis": true,
-                }, {
-                    "title": this.$L("昵称"),
-                    "key": "nickname",
-                    "minWidth": 80,
-                    "ellipsis": true,
-                    render: (h, params) => {
-                        return h('span', params.row.nickname || '-');
-                    }
-                }
-            ];
-            if (this.multiple) {
-                this.columns.unshift({
-                    type: 'selection',
-                    width: 30,
-                    align: 'center'
-                });
-            }
-            this.noDataText = this.$L("数据加载中.....");
-            this.isConfirm = this.$listeners['on-confirm'];
-        },
+
         watch: {
             value (val) {
                 if (this.multiple) {
@@ -392,6 +347,53 @@
             }
         },
         methods: {
+            initLanguage() {
+                this.columns = [
+                    {
+                        "title": this.$L("头像"),
+                        "width": 60,
+                        "align": 'center',
+                        render: (h, params) => {
+                            return h('UserImg', {
+                                props: {
+                                    info: params.row,
+                                },
+                                style: {
+                                    width: "26px",
+                                    height: "26px",
+                                    fontSize: "13px",
+                                    lineHeight: "26px",
+                                    borderRadius: "50%",
+                                    verticalAlign: "middle"
+                                },
+                            });
+                        }
+                    }, {
+                        "title": this.$L("用户名"),
+                        "key": "username",
+                        "minWidth": 80,
+                        "ellipsis": true,
+                    }, {
+                        "title": this.$L("昵称"),
+                        "key": "nickname",
+                        "minWidth": 80,
+                        "ellipsis": true,
+                        render: (h, params) => {
+                            return h('span', params.row.nickname || '-');
+                        }
+                    }
+                ];
+                if (this.multiple) {
+                    this.columns.unshift({
+                        type: 'selection',
+                        width: 30,
+                        align: 'center'
+                    });
+                }
+                this.noDataText = this.$L("数据加载中.....");
+                this.isConfirm = this.$listeners['on-confirm'];
+            },
+
             inputChange() {
                 const val = this.nickName;
                 this.spinShow = false;

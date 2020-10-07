@@ -124,19 +124,8 @@
             // 监听header组件事件
             bus.$on('changeWeekDays', res => {
             });
-            this.timeDivide = [{
-                start: 0,
-                end: 12,
-                label: this.$L('上午')
-            }, {
-                start: 12,
-                end: 18,
-                label: this.$L('下午')
-            }, {
-                start: 18,
-                end: 23,
-                label: this.$L('晚上')
-            }];
+            //
+            this.initLanguage()
         },
         data() {
             return {
@@ -174,6 +163,21 @@
             }
         },
         methods: {
+            initLanguage() {
+                this.timeDivide = [{
+                    start: 0,
+                    end: 12,
+                    label: this.$L('上午')
+                }, {
+                    start: 12,
+                    end: 18,
+                    label: this.$L('下午')
+                }, {
+                    start: 18,
+                    end: 23,
+                    label: this.$L('晚上')
+                }];
+            },
             isBegin(event, date, index) {
                 let st = new Date(event.start)
 
