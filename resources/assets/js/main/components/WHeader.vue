@@ -471,7 +471,7 @@
                         {
                             validator: (rule, value, callback) => {
                                 if (value === '') {
-                                    callback(new Error(this.$L('请输入确认新密码！')));
+                                    callback(new Error(this.$L('请重新输入新密码！')));
                                 } else if (value !== this.formPass.newpass) {
                                     callback(new Error(this.$L('两次密码输入不一致！')));
                                 } else {
