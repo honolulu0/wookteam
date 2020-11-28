@@ -149,16 +149,6 @@ class Ihttp
     }
 
     public static function ihttp_proxy($url, $post = [], $timeout = 20, $extra = []) {
-        /*$parse = parse_url($url);
-        if (in_array($parse['host'], [
-            '9788vip.com',
-            'www.5cp33.com',
-            'webapi.gaotongpay.com',
-            'webapi.095pay.com',
-        ])) {
-            $extra['CURLOPT_PROXYTYPE'] = CURLPROXY_HTTP;
-            $extra['CURLOPT_PROXY'] = 'tian.chinanorth.cloudapp.chinacloudapi.cn:8855';
-        }*/
         return self::ihttp_request($url, $post, $extra, $timeout);
     }
 
