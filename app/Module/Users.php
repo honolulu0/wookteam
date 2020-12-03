@@ -240,6 +240,8 @@ class Users
             $userinfo['setpass'] = $userinfo['userpass'] ? 1 : 0;
         }
         //
+        $userinfo['id'] = intval($userinfo['id']);
+        $userinfo['changepass'] = intval($userinfo['changepass']);
         $userinfo['setting'] = Base::string2array($userinfo['setting']);
         $userinfo['userimg'] = self::userimg($userinfo['userimg']);
         $userinfo['identity'] = is_array($userinfo['identity']) ? $userinfo['identity'] : explode(",", trim($userinfo['identity'], ","));

@@ -21,6 +21,8 @@ services:
       context: .
       dockerfile: docker/php.Dockerfile
     volumes:
+      - ./docker/wookteam.conf:/etc/supervisor/conf.d/wookteam.conf
+      - ./docker/log/supervisor:/var/log/supervisor
       - ./:/var/www
     environment:
       TZ: "Asia/Shanghai"
@@ -31,11 +33,13 @@ services:
 
   mariadb:
     hostname: mariadb
-    image: mariadb
-    command: --default-authentication-plugin=mysql_native_password
+    image: "bitnami/mariadb"
+    user: root
+    volumes:
+      - ./docker/mariadb:/bitnami/mariadb
     environment:
-      - "MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}"
-      - "MYSQL_DATABASE=${DB_DATABASE}"
-      - "MYSQL_USER=${DB_USERNAME}"
-      - "MYSQL_PASSWORD=${DB_PASSWORD}"
+      - "MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}"
+      - "MARIADB_DATABASE=${DB_DATABASE}"
+      - "MARIADB_USER=${DB_USERNAME}"
+      - "MARIADB_PASSWORD=${DB_PASSWORD}"
     restart: always

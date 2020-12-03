@@ -28,7 +28,6 @@ cp .env.docker .env
 #### 2、构建项目
 
 ```bash
-./cmd build php
 ./cmd composer install
 ./cmd artisan key:generate
 ./cmd artisan migrate --seed

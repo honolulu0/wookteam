@@ -9,6 +9,8 @@
 /public/.user.ini
 /public/hot
 /storage/*.key
+/docker/mariadb
+/docker/log
 /vendor
 .env
 .env.backup

@@ -28,7 +28,6 @@ cp .env.docker .env
 #### 2. Build image & install
 
 ```bash
-./cmd build php
 ./cmd composer install
 ./cmd artisan key:generate
 ./cmd artisan migrate --seed
