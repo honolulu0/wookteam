@@ -107,6 +107,13 @@
                     border-radius: 12px;
                 }
             }
+            .docs-body {
+                .body-sheet {
+                    .font-bold {
+                        background-position: initial
+                    }
+                }
+            }
         }
         .body-text {
             .mdeditor-box {
@@ -628,7 +635,9 @@
 
             goBackDirect() {
                 this.bakContent = $A.jsonStringify(this.docContent);
-                this.goBack({name:'docs'});
+                if (!['index', 'docs'].includes(this.$route.name)) {
+                    this.goBack({name:'docs'});
+                }
             },
 
             synergy(enter) {

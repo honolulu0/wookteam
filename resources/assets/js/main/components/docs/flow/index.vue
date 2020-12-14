@@ -98,13 +98,16 @@
             return {
                 loadIng: true,
 
-                url: window.location.origin + '/js/grapheditor/' + (this.readOnly ? 'viewer' : 'index') + '.html',
+                url: null,
 
                 zoom: -1,
                 zoomIng: false,
 
                 bakData: '',
             }
+        },
+        created() {
+            this.url = window.location.origin + '/js/grapheditor/' + (this.readOnly ? 'viewer' : 'index') + '.html?lang=' + (this.getLanguage() === 'zh' ? 'zh' : 'en');
         },
         mounted() {
             window.addEventListener('message', this.handleMessage)

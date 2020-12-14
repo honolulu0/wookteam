@@ -98,7 +98,7 @@
         <WDrawer v-model="settingDrawerShow" maxWidth="750">
             <Tabs v-if="settingDrawerShow" v-model="settingDrawerTab">
                 <TabPane :label="$L('文档设置')" name="setting">
-                    <book-setting :canload="settingDrawerShow && settingDrawerTab == 'setting'" :id="selectBookData.id"></book-setting>
+                    <book-setting :canload="settingDrawerShow && settingDrawerTab == 'setting'" :id="selectBookData.id" @on-setting-callback="settingCallback"></book-setting>
                 </TabPane>
                 <TabPane :label="$L('文档成员')" name="member">
                     <book-users :canload="settingDrawerShow && settingDrawerTab == 'member'" :id="selectBookData.id"></book-users>
@@ -656,6 +656,15 @@
                         ])
                     },
                 });
+            },
+
+            settingCallback(data) {
+                let tmpData = this.bookLists.find(({id}) => id == data.id);
+                if (tmpData) {
+                    $A.each(data, (key, val) => {
+                        this.$set(tmpData, key, val);
+                    });
+                }
             }
         },
     }

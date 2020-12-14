@@ -139,7 +139,7 @@ class DocsController extends Controller
         $id = intval(Request::input('id'));
         $type = trim(Request::input('type'));
         $role = Docs::checkRole($id, 'edit');
-        if (Base::isError($role) && $role['data'] < 0) {
+        if (Base::isError($role) && $role['ret'] < 0) {
             return $role;
         }
         $row = Base::DBC2A(DB::table('docs_book')->where('id', $id)->first());
@@ -319,7 +319,7 @@ class DocsController extends Controller
     {
         $bookid = intval(Request::input('bookid'));
         $role = Docs::checkRole($bookid, Request::input('act'));
-        if (Base::isError($role) && $role['data'] < 0) {
+        if (Base::isError($role) && $role['ret'] < 0) {
             return $role;
         }
         $lists = Base::DBC2A(DB::table('docs_section')
@@ -514,7 +514,7 @@ class DocsController extends Controller
             return Base::retError('文档不存在或已被删除！');
         }
         $role = Docs::checkRole($row['bookid'], Request::input('act'));
-        if (Base::isError($role) && $role['data'] < 0) {
+        if (Base::isError($role) && $role['ret'] < 0) {
             return $role;
         }
         $whereArray = [];
@@ -549,7 +549,7 @@ class DocsController extends Controller
             return Base::retError('文档不存在或已被删除！');
         }
         $role = Docs::checkRole($row['bookid'], 'edit');
-        if (Base::isError($role) && $role['data'] < 0) {
+        if (Base::isError($role) && $role['ret'] < 0) {
             return $role;
         }
         //

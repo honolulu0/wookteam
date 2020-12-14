@@ -25,7 +25,8 @@
 </style>
 <script>
     import Spreadsheet from 'x-data-spreadsheet';
-    import zhCN from 'x-data-spreadsheet/dist/locale/zh-cn';
+    import EN from 'x-data-spreadsheet/src/locale/en';
+    import zhCN from 'x-data-spreadsheet/src/locale/zh-cn';
     import XLSX from 'xlsx';
 
     export default {
@@ -52,7 +53,11 @@
             }
         },
         mounted() {
-            Spreadsheet.locale('zh-cn', zhCN);
+            if (this.getLanguage() === 'zh') {
+                Spreadsheet.locale('zh-cn', zhCN);
+            } else {
+                Spreadsheet.locale('en', EN);
+            }
             //
             let options = {
                 view: {

@@ -5,7 +5,7 @@
                 <FormItem :label="$L('文档链接')">
                     <a class="form-link" target="_blank" :href="$A.webUrl('docs/view/b' + this.id)">{{$A.webUrl('docs/view/b' + this.id)}}</a>
                 </FormItem>
-                <FormItem :label="$L('管理权限')">
+                <!--<FormItem :label="$L('管理权限')">
                     <div>
                         <div class="form-title">{{$L('修改权限')}}</div>
                         <div>
@@ -46,6 +46,26 @@
                             <div v-else-if="formSystem.role_look=='edit'" class="form-placeholder">
                                 {{$L('仅有修改权限的人员。')}}
                             </div>
+                        </div>
+                    </div>
+                </FormItem>-->
+                <FormItem :label="$L('管理权限')">
+                    <div>
+                        <div>
+                            <RadioGroup v-model="formSystem.role_edit">
+                                <Radio label="private">{{$L('私有文库')}}</Radio>
+                                <Radio label="member">{{$L('成员开放')}}</Radio>
+                                <Radio label="reg">{{$L('注册会员')}}</Radio>
+                            </RadioGroup>
+                        </div>
+                        <div v-if="formSystem.role_edit=='private'" class="form-placeholder">
+                            {{$L('仅作者可以修改。')}}
+                        </div>
+                        <div v-else-if="formSystem.role_edit=='member'" class="form-placeholder">
+                            {{$L('仅作者和文档成员可以修改。')}}
+                        </div>
+                        <div v-else-if="formSystem.role_edit=='reg'" class="form-placeholder">
+                            {{$L('所有会员都可以修改。')}}
                         </div>
                     </div>
                 </FormItem>
@@ -162,6 +182,9 @@
                             this.formSystem = data;
                             this.formSystem__reset = $A.cloneData(this.formSystem);
                             if (save) {
+                                this.$emit('on-setting-callback', Object.assign(data, {
+                                    id: this.id
+                                }));
                                 this.$Message.success(this.$L('修改成功'));
                             }
                         } else {
