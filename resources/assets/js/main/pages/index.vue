@@ -22,6 +22,9 @@
                     <dl>
                         <dd>
                             <Button v-if="systemConfig.enterprise=='show'" type="success" size="small" class="right-enterprise" @click="enterpriseOpen">{{$L('企业版')}}</Button>
+                            <a v-if="systemConfig.github=='show'" class="right-info" target="_blank" href="https://github.com/kuaifan/wookteam">
+                                <Icon class="right-icon" type="logo-github"/>
+                            </a>
                             <Dropdown class="right-info" trigger="hover" @on-click="setLanguage" transfer>
                                 <div>
                                     <Icon class="right-icon" type="md-globe"/>
@@ -368,7 +371,7 @@
         max-width: 1200px;
         margin: 30px auto;
         padding-top: 50px;
-        border: 1px solid #F4F7F9;
+        border: 1px solid transparent;
 
         .wrap-left, .wrap-right {
             line-height: 36px;
