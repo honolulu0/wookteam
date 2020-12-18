@@ -2482,12 +2482,26 @@ class ProjectController extends Controller
                 case "pptx":
                     $fileData['thumb'] = 'images/files/ppt.png';
                     break;
+                case "ai":
+                case "avi":
+                case "bmp":
+                case "cdr":
                 case "doc":
-                case "xls":
-                case "ppt":
-                case "txt":
-                case "esp":
+                case "eps":
                 case "gif":
+                case "mov":
+                case "mp3":
+                case "mp4":
+                case "pdf":
+                case "ppt":
+                case "pr":
+                case "psd":
+                case "rar":
+                case "svg":
+                case "tif":
+                case "txt":
+                case "xls":
+                case "zip":
                     $fileData['thumb'] = 'images/files/' . $fileData['ext'] . '.png';
                     break;
             }

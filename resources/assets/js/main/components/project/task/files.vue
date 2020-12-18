@@ -32,6 +32,7 @@
                     :show-upload-list="false"
                     :max-size="maxSize"
                     :on-success="handleSuccess"
+                    :on-error="handleError"
                     :on-format-error="handleFormatError"
                     :on-exceeded-size="handleMaxSize"
                     :before-upload="handleBeforeUpload">
@@ -100,7 +101,7 @@
                 lastPage: 0,
                 noDataText: "",
 
-                uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz'],
+                uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz', 'ai', 'avi', 'bmp', 'cdr', 'eps', 'mov', 'mp3', 'mp4', 'pr', 'psd', 'svg', 'tif'],
                 actionUrl: $A.apiUrl('project/files/upload'),
                 params: {
                     token: $A.getToken(),
@@ -108,7 +109,7 @@
                     projectid: this.projectid
                 },
                 uploadList: [],
-                maxSize: 10240
+                maxSize: 204800
             }
         },
 
@@ -216,7 +217,7 @@
                                     marginTop: '-3px'
                                 },
                                 props: {
-                                    percent: params.row.percentage || 100,
+                                    percent: parseFloat($A.runNum(params.row.percentage || 100, 2)),
                                 },
                             }));
                         }
@@ -507,6 +508,22 @@
 
             uploadHandleClick() {
                 this.$refs.upload.handleClick();
+            },
+
+            handleError (error, html, file) {
+                //上传失败
+                this.$Modal.warning({
+                    title: this.$L('上传失败'),
+                    content: this.$L('文件 % 上传失败，%', file.name, error)
+                });
+                this.$refs.upload.fileList.pop();
+                this.lists.some((item, index) => {
+                    if (item.uid == file.uid) {
+                        this.lists.splice(index, 1);
+                        return true;
+                    }
+                });
+                this.$emit('change', 'error');
             },
 
             handleSuccess (res, file) {

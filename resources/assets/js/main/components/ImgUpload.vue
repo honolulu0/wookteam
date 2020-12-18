@@ -341,7 +341,7 @@
                 maxNum: Math.min(Math.max($A.runNum(this.num), 1), 99),
                 httpValue: '',
                 httpType: '',
-                maxSize: 2048
+                maxSize: 204800
             }
         },
         mounted () {

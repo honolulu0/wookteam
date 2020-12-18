@@ -25,13 +25,13 @@ export default {
         },
         maxSize: {
             type: Number,
-            default: 10240
+            default: 204800
         }
     },
 
     data() {
         return {
-            uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz'],
+            uploadFormat: ['jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'esp', 'pdf', 'rar', 'zip', 'gz', 'ai', 'avi', 'bmp', 'cdr', 'eps', 'mov', 'mp3', 'mp4', 'pr', 'psd', 'svg', 'tif'],
             actionUrl: $A.apiUrl('chat/files/upload'),
             params: {
                 username: this.target,
