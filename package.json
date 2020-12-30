@@ -1,6 +1,6 @@
 {
     "name": "wookteam",
-    "version": "1.5.21",
+    "version": "1.5.22",
     "description": "WookTeam是一款轻量级的开源在线团队协作工具，提供各类文档工具、在线思维导图、在线流程图、项目管理、任务分发、即时IM，知识库管理等工具。",
     "scripts": {
         "ide-helper": "php artisan ide-helper:generate",
@@ -19,7 +19,7 @@
         "url": "git+https://github.com/kuaifan/wookteam.git"
     },
     "author": "kuaifan <aipaw@live.cn>",
-    "license": "MIT",
+    "license": "AGPL-3.0",
     "devDependencies": {
         "axios": "^0.19.2",
         "cross-env": "^7.0.2",

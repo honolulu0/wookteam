@@ -53,12 +53,12 @@
             </div>
         </div>
         <WDrawer v-model="systemDrawerShow" maxWidth="640" :title="$L('系统设置')">
-            <Form ref="formSystem" :model="formSystem" :label-width="120" @submit.native.prevent>
+            <Form ref="formSystem" :model="formSystem" :label-width="150" @submit.native.prevent>
                 <FormItem :label="$L('首页Logo')">
                     <ImgUpload v-model="formSystem.logo" :num="1"></ImgUpload>
                     <span style="color:#777">{{$L('建议尺寸：%', '300x52')}}</span>
                 </FormItem>
-                <FormItem :label="$L('Github图标')">
+                <FormItem :label="$L('Github/Gitee图标')">
                     <RadioGroup v-model="formSystem.github">
                         <Radio label="show">{{$L('显示')}}</Radio>
                         <Radio label="hidden">{{$L('隐藏')}}</Radio>

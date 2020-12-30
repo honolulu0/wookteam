@@ -2,7 +2,7 @@ export default {
     "3天": "3 days",
     "5天": "5 days",
     "7天": "7 days",
-    "Github图标": "Github icon",
+    "Github/Gitee图标": "Github/Gitee icon",
     "MD编辑器": "Markdown Cell",
     "[任务消息]": "[Task message]",
     "[图片]": "[image]",

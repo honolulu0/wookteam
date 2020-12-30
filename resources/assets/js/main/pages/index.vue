@@ -22,6 +22,9 @@
                     <dl>
                         <dd>
                             <Button v-if="systemConfig.enterprise=='show'" type="success" size="small" class="right-enterprise" @click="enterpriseOpen">{{$L('企业版')}}</Button>
+                            <a v-if="systemConfig.github=='show'" href='https://gitee.com/aipaw/wookteam' class="right-info" target="_blank">
+                                <img class="right-img" src="https://gitee.com/aipaw/wookteam/badge/star.svg?theme=gvp" alt="star"/>
+                            </a>
                             <a v-if="systemConfig.github=='show'" class="right-info" target="_blank" href="https://github.com/kuaifan/wookteam">
                                 <Icon class="right-icon" type="logo-github"/>
                             </a>
@@ -238,6 +241,9 @@
                             color: #ffffff;
                             .right-icon {
                                 font-size: 26px;
+                                vertical-align: middle;
+                            }
+                            .right-img {
                                 vertical-align: middle;
                             }
                         }
