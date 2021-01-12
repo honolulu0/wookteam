@@ -322,10 +322,12 @@
                             padding: 4px 0;
                             &.project-people {
                                 width: auto;
+                                min-width: 36px;
                                 position: absolute;
                                 bottom: 18px;
                                 right: 0;
                                 cursor: pointer;
+                                justify-content: flex-end;
                                 .userimg-icon,
                                 .userimg-count {
                                     width: 36px;
