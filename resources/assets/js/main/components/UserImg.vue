@@ -1,9 +1,9 @@
 <template>
-    <div class="userimg-container" @click="onClick">
+    <div class="userimg-container" :class="{'usering-scale':scale}" @click="onClick" :title="showTitle?fullName:''">
         <template v-if="this.isJson(info)">
             <img v-if="isShowImg(userImg)&&!imgError" class="userimg-container-img" :src="userImg" @error="loadError"/>
             <div v-else class="userimg-container-box" :style="textStyle">
-                <div class="usertext-container-text">{{userName}}</div>
+                <div class="usertext-container-text" :style="nameStyle">{{userName}}</div>
             </div>
         </template>
     </div>
@@ -16,6 +16,14 @@
         max-height: 100%;
         position: relative;
         overflow: hidden;
+        &.usering-scale {
+            transition: all 0.2s;
+            transform: scale(1);
+            &:hover {
+                z-index: 1;
+                transform: scale(1.2);
+            }
+        }
         .userimg-container-img {
             width: 100%;
             height: 100%;
@@ -38,6 +46,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                overflow: hidden;
+                white-space: nowrap;
             }
         }
     }
@@ -51,7 +61,19 @@
             },
             size: {
 
-            }
+            },
+            scale: {
+                type: Boolean,
+                default: false
+            },
+            twoWords: {
+                type: Boolean,
+                default: false
+            },
+            showTitle: {
+                type: Boolean,
+                default: false
+            },
         },
         data() {
             return {
@@ -79,6 +101,17 @@
                 return style;
             },
 
+            nameStyle() {
+                const style = {
+                };
+                if (this.twoWords) {
+                    if ((this.userName + "").length >= 2) {
+                        style.transform = 'scale(0.68)';
+                    }
+                }
+                return style;
+            },
+
             userName() {
                 if (!this.isJson(this.info)) {
                     return '';
@@ -87,7 +120,25 @@
                 if (this.info.nickname && !this.isEmojiPrefix(this.info.nickname)) {
                     name = this.info.nickname;
                 }
-                return (name + " ").substring(0, 1).toLocaleUpperCase();
+                if (this.twoWords) {
+                    if (this.allChina(name) && $A.count(name) == 3) {
+                        return name.substring(1, 3).toLocaleUpperCase();
+                    } else {
+                        return (name + "  ").substring(0, 2).toLocaleUpperCase();
+                    }
+                } else {
+                    return (name + " ").substring(0, 1).toLocaleUpperCase();
+                }
+            },
+            fullName() {
+                if (!this.isJson(this.info)) {
+                    return '';
+                }
+                let name = this.info.send_username || this.info.username;
+                if (this.info.nickname && !this.isEmojiPrefix(this.info.nickname)) {
+                    name = this.info.nickname;
+                }
+                return name;
             },
 
             userImg() {
@@ -111,6 +162,14 @@
 
             isEmojiPrefix(text) {
                 return /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(text);
+            },
+
+            allChina(str) {
+                if (/^[\u4e00-\u9fa5]+$/.test(str)) {
+                    return true; //全是中文
+                } else {
+                    return false;
+                }
             },
 
             loadError() {

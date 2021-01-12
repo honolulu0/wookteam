@@ -309,19 +309,30 @@ class Users
 
     /**
      * 用户头像，不存在时返回默认
-     * @param string $var 头像地址 或 会员用户名
+     * @param string|array $params 头像地址 或 会员用户名
      * @return \Illuminate\Contracts\Routing\UrlGenerator|string
      */
-    public static function userimg($var) {
-        if (!Base::strExists($var, '.')) {
-            if (empty($var)) {
-                $var = "";
+    public static function userimg($params) {
+        if (is_array($params)) {
+            foreach ($params as $key => $val) {
+                if (is_array($val)) {
+                    $val['userimg'] = self::userimg($val['userimg'] ?: $val['username']);
+                } else {
+                    $val = self::userimg($val);
+                }
+                $params[$key] = $val;
+            }
+            return $params;
+        }
+        if (!Base::strExists($params, '.')) {
+            if (empty($params)) {
+                $params = "";
             } else {
-                $userInfo = self::username2basic($var);
-                $var = $userInfo['userimg'];
+                $userInfo = self::username2basic($params);
+                $params = $userInfo['userimg'];
             }
         }
-        return $var ? Base::fillUrl($var) : url('images/other/avatar.png');
+        return $params ? Base::fillUrl($params) : url('images/other/avatar.png');
     }
 
     /**

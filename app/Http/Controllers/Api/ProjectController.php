@@ -75,6 +75,36 @@ class ProjectController extends Controller
         if ($lists['total'] == 0) {
             return Base::retError('未找到任何相关的项目');
         }
+        foreach ($lists['lists'] AS $key => $item) {
+            $tmpBuilder = DB::table('project_task')->where([
+                'projectid' => $item['id'],
+                'delete' => 0,
+                'archived' => 0,
+            ]);
+            $tmpBuilder->where(function ($query) use ($user) {
+                $query->where('username', $user['username']);
+                $query->orWhereIn('id', function ($inQuery) use ($user) {
+                    $inQuery->from('project_users')
+                        ->select('taskid')
+                        ->where('username', $user['username'])
+                        ->where('type', '负责人');
+                });
+            });
+            $item['self_count'] = $tmpBuilder->count();
+            $item['self_complete'] = $tmpBuilder->where('complete', 1)->count();
+            //
+            $tmpBuilder = DB::table('project_users')
+                ->join('users', 'project_users.username', '=', 'users.username')
+                ->select(['users.username', 'users.nickname', 'users.userimg'])
+                ->where([
+                    ['project_users.projectid', $item['id']],
+                    ['project_users.type', '成员'],
+                ]);
+            $item['people_count'] = $tmpBuilder->count();
+            $item['people_lists'] = Users::userimg(Base::DBC2A($tmpBuilder->orderBy('project_users.id')->take(5)->get()));
+            //
+            $lists['lists'][$key] = $item;
+        }
         return Base::retSuccess('success', $lists);
     }
 

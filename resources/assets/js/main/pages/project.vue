@@ -56,22 +56,44 @@
                             </div>
                         </div>
                         <div class="project-num" @click="handleProject('open', item)">
-                            <div class="project-complete" @click.stop="openComplete(item)"><em>{{item.complete}}</em>{{$L('已完成数')}}</div>
-                            <div class="project-num-line"></div>
-                            <div class="project-unfinished"><em>{{item.unfinished}}</em>{{$L('未完成数')}}</div>
+                            <div class="project-circle">
+                                <i-circle
+                                    :size="100"
+                                    :trail-width="8"
+                                    :stroke-width="8"
+                                    :percent="selfProportion(item.self_complete, item.self_count)"
+                                    stroke-linecap="round"
+                                    stroke-color="#62C5FE">
+                                    <div class="project-circle-box">
+                                        <div class="project-circle-num">
+                                            <em>{{item.self_complete}}</em>
+                                            <span>{{item.self_count}}</span>
+                                        </div>
+                                        <div class="project-circle-title">{{$L('个人总计')}}</div>
+                                    </div>
+                                </i-circle>
+                            </div>
+                            <div class="project-situation">
+                                <ul>
+                                    <li>{{$L('项目总任务数')}}<em>{{item.complete + item.unfinished}}</em></li>
+                                    <li>{{$L('项目已完成数')}}<em>{{item.complete}}</em></li>
+                                    <li>{{$L('项目未完成数')}}<em>{{item.unfinished}}</em></li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="project-bottom">
-                            <div class="project-iconbtn" @click.stop="handleProject('archived', item)">
-                                <Icon class="project-iconbtn-icon1" type="md-filing" size="24" />
-                                <div class="project-iconbtn-text">{{$L('已归档任务')}}</div>
+                            <div class="project-iconbtn">
+                                <Icon class="project-iconbtn-icon" type="md-stats" />
+                                <div class="project-iconbtn-text" @click.stop="handleProject('statistics', item)">{{$L('项目统计')}}</div>
                             </div>
-                            <div class="project-iconbtn" @click.stop="handleProject('statistics', item)">
-                                <Icon class="project-iconbtn-icon3" type="md-stats" size="24" />
-                                <div class="project-iconbtn-text">{{$L('项目统计')}}</div>
+                            <div class="project-iconbtn">
+                                <Icon class="project-iconbtn-icon" type="md-filing"/>
+                                <div class="project-iconbtn-text" @click.stop="handleProject('archived', item)">{{$L('已归档任务')}}</div>
                             </div>
-                            <div class="project-iconbtn" @click.stop="handleProject('member', item)">
-                                <Icon class="project-iconbtn-icon2" type="md-people" size="24" />
-                                <div class="project-iconbtn-text">{{$L('成员管理')}}</div>
+                            <div class="project-iconbtn project-people" @click.stop="handleProject('member', item)">
+                                <UserImg v-for="(uItem, uKey) in item.people_lists" class="userimg-icon" :key="uKey" :info="uItem" two-words show-title/>
+                                <div v-if="item.people_count > 99" class="userimg-count" :title="item.people_count">99+</div>
+                                <div v-else-if="item.people_count > 5" class="userimg-count">{{item.people_count}}</div>
                             </div>
                         </div>
                     </div>
@@ -171,7 +193,7 @@
                     flex: 1;
                     margin: 10px;
                     width: 100%;
-                    height: 280px;
+                    height: 313px;
                     padding: 20px;
                     background-color: #ffffff;
                     border-radius: 4px;
@@ -210,64 +232,128 @@
                     }
                     .project-num {
                         flex: 1;
-                        padding: 24px 0;
+                        padding: 34px 0;
                         display: flex;
                         flex-direction: row;
                         align-items: center;
+                        justify-content: center;
                         cursor: pointer;
-                        .project-complete,
-                        .project-unfinished {
+                        position: relative;
+                        &:before {
+                            content: "";
+                            position: absolute;
+                            width: 1px;
+                            height: 60%;
+                            background-color: #EFEFEF;
+                        }
+                        .project-circle {
                             flex: 1;
                             text-align: center;
-                            font-size: 14px;
-                            color: #999999;
-                            em {
-                                display: block;
-                                font-size: 32px;
-                                color: #0396f2;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                max-width: 120px;
-                                margin: 0 auto;
+                            margin-right: 10px;
+                            .project-circle-box {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: center;
+                                .project-circle-num {
+                                    display: flex;
+                                    align-items: flex-end;
+                                    font-weight: 600;
+                                    em {
+                                        color: #62C5FE;
+                                        font-size: 26px;
+                                    }
+                                    span {
+                                        color: #666666;
+                                        &:before {
+                                            content: "/";
+                                        }
+                                    }
+                                }
+                                .project-circle-title {
+                                    font-size: 12px;
+                                    padding-top: 4px;
+                                    color: #999999;
+                                }
                             }
                         }
-                        .project-num-line {
-                            width: 1px;
-                            height: 90%;
-                            background-color: #e8e8e8;
+                        .project-situation {
+                            flex: 1;
+                            position: relative;
+                            ul {
+                                display: flex;
+                                flex-direction: column;
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                > li {
+                                    width: 100%;
+                                    color: #BBBBBB;
+                                    font-size: 12px;
+                                    white-space: nowrap;
+                                    display: flex;
+                                    align-items: center;
+                                    padding: 6px 0;
+                                    line-height: 20px;
+                                    > em {
+                                        padding-left: 14px;
+                                        font-size: 18px;
+                                        color: #666666;
+                                        font-weight: 500;
+                                    }
+                                }
+                            }
                         }
                     }
                     .project-bottom {
                         display: flex;
-                        flex-direction: row;
-                        align-items: center;
-                        border-top: 1px solid #efefef;
-                        padding: 6px 0;
+                        flex-direction: column;
+                        border-top: 1px solid #EFEFEF;
+                        padding: 18px 0;
                         cursor: default;
+                        position: relative;
                         .project-iconbtn {
                             flex: 1;
+                            width: 50%;
                             text-align: center;
-                            cursor: pointer;
-                            &:hover {
-                                .project-iconbtn-text {
-                                    color: #0396f2;
+                            display: flex;
+                            align-items: center;
+                            padding: 4px 0;
+                            &.project-people {
+                                width: auto;
+                                position: absolute;
+                                bottom: 18px;
+                                right: 0;
+                                cursor: pointer;
+                                .userimg-icon,
+                                .userimg-count {
+                                    width: 36px;
+                                    height: 36px;
+                                    border-radius: 18px;
+                                    margin-left: -16px;
+                                    border: 2px solid #ffffff;
+                                }
+                                .userimg-count {
+                                    transform: scale(1);
+                                    color: #ffffff;
+                                    font-size: 16px;
+                                    font-weight: 500;
+                                    line-height: 32px;
+                                    background-color: #62C5FE;
                                 }
                             }
-                            .project-iconbtn-icon1 {
-                                margin: 12px 0;
-                                color: #ff7a7a;
-                            }
-                            .project-iconbtn-icon2 {
-                                margin: 12px 0;
-                                color: #764df8;
-                            }
-                            .project-iconbtn-icon3 {
-                                margin: 12px 0;
-                                color: #ffca65;
+                            .project-iconbtn-icon {
+                                font-size: 16px;
+                                margin-right: 6px;
+                                color: #999;
                             }
                             .project-iconbtn-text {
                                 color: #999999;
+                                cursor: pointer;
+                                &:hover {
+                                    color: #0396f2;
+                                }
                             }
                         }
                     }
@@ -343,36 +429,55 @@
                 if (!item) {
                     return;
                 }
+                const persons = detail.persons ? !!detail.persons.find(({username}) => username == this.usrName) : null;
+                const unfinishedNum = (add) => {
+                    if (add) {
+                        item.unfinished++;
+                        persons === true && item.self_count++;
+                    } else {
+                        item.unfinished--;
+                        persons === true && item.self_count--;
+                    }
+                };
+                const completeNum = (add) => {
+                    if (add) {
+                        item.complete++;
+                        persons === true && item.self_complete++;
+                    } else {
+                        item.complete--;
+                        persons === true && item.self_complete--;
+                    }
+                };
                 switch (act) {
                     case 'deleteproject':   // 删除项目
                     case 'deletelabel':     // 删除分类
                         this.getLists(true);
                         break;
                     case "create":          // 创建任务
-                        item.unfinished++;
+                        unfinishedNum(true);
                         break;
                     case "delete":          // 删除任务
                     case "archived":        // 归档
                         if (detail.complete) {
-                            item.complete--;
+                            completeNum();
                         } else {
-                            item.unfinished--;
+                            unfinishedNum();
                         }
                         break;
                     case "unarchived":      // 取消归档
                         if (detail.complete) {
-                            item.complete++;
+                            completeNum(true);
                         } else {
-                            item.unfinished++;
+                            unfinishedNum(true);
                         }
                         break;
                     case "complete":        // 标记完成
-                        item.complete++;
-                        item.unfinished--;
+                        completeNum(true);
+                        unfinishedNum();
                         break;
                     case "unfinished":      // 标记未完成
-                        item.complete--;
-                        item.unfinished++;
+                        completeNum();
+                        unfinishedNum(true);
                         break;
                 }
             }, true);
@@ -695,6 +800,13 @@
                     },
                 });
             },
+
+            selfProportion(complete, count) {
+                if (count <= 0) {
+                    return 100;
+                }
+                return Math.round(complete / count * 100)
+            }
         },
     }
 </script>

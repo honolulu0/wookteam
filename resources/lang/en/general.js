@@ -634,5 +634,9 @@ export default {
     "首次登陆需修改密码": "Password must be changed for the first login",
     "首页Logo": "Logo",
     "鱼骨图": "Fishbone Diagram",
-    "默认节点": "The default node"
+    "默认节点": "The default node",
+    "个人总计": "Total personal",
+    "项目总任务数": "The total number of project tasks",
+    "项目已完成数": "Number of projects have been completed",
+    "项目未完成数": "The number of unfinished projects",
 }
